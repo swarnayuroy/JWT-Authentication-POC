@@ -11,7 +11,7 @@ namespace web.Repository
 {
     public interface IWebRepository
     {
-        Task<ResponseDetail> CheckCredential(string username, string password);
+        Task<ResponseDetail> CheckCredential(Credential userCredential);
         Task<ResponseDetail> RegisterUser(Registration userRegistrationDetail);
     }
 }

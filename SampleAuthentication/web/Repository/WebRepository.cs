@@ -21,13 +21,13 @@ namespace web.Repository
             _accountService = accountService;
         }
 
-        public async Task<ResponseDetail> CheckCredential(string username, string password)
+        public async Task<ResponseDetail> CheckCredential(Credential userCredential)
         {
             // Get all users
             var users = await _userService.Get();
             
             // Find user by email
-            var user = users.FirstOrDefault(u => u.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
+            var user = users.FirstOrDefault(u => u.Email.Equals(userCredential.Email, StringComparison.OrdinalIgnoreCase));
             
             if (user == null)
             {
@@ -42,7 +42,7 @@ namespace web.Repository
             var accounts = await _accountService.Get();
             
             // Find account by userId and verify password
-            var account = accounts.FirstOrDefault(a => a.UserId.ToString() == user.Id && a.Password == password);
+            var account = accounts.FirstOrDefault(a => a.UserId.ToString() == user.Id && a.Password == userCredential.Password);
 
             return account != null ? new ResponseDetail { Status = true } : new ResponseDetail { Status = false, Message = "Incorrect password"};
         }

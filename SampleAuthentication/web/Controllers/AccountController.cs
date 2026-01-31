@@ -52,7 +52,7 @@ namespace web.Controllers
                 });
             }
             
-            response = await _repository.CheckCredential(formModel.SignIn.Email, formModel.SignIn.Password);
+            response = await _repository.CheckCredential(formModel.SignIn);
             if (response.Status)
             {
                 return RedirectToAction("Dashboard", "Home");
