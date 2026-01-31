@@ -1,0 +1,64 @@
+﻿using DataContext.DataProvider;
+using DataContext.DataService;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+using web.Service.DTO;
+
+namespace web.Service.DataLayer
+{
+    //public class Data
+    //{
+    //    private IEnumerable<UserDetail> _user;
+    //    private IEnumerable<UserAccountDetail> _usersAccount;
+
+    //    public IEnumerable<UserDetail> User {
+    //        get { 
+    //            return _user;
+    //        }
+
+    //        set {
+    //            if (value.Count() > 0)
+    //            {
+    //                _user = value;
+    //            }
+    //        } 
+    //    }
+    //    public IEnumerable<UserAccountDetail> AccountDetail {
+    //        get
+    //        {
+    //            return _usersAccount;
+    //        }
+
+    //        set
+    //        {
+    //            if (value.Count() > 0)
+    //            {
+    //                _usersAccount = value;
+    //            }
+    //        }
+    //    }
+    //}
+    public class DataService<T> : IService<T> where T : class
+    {
+        private readonly IDataProvider _dataProvider;
+        private readonly IDataService _dataService;
+        public DataService(IDataProvider dataProvider, IDataService dataService)
+        {
+            this._dataProvider = dataProvider;
+            this._dataService = dataService;
+        }
+
+        public Task<IEnumerable<T>> Get()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> Save(T entity)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

@@ -1,0 +1,36 @@
+﻿.page_toast_notification {
+    position: fixed;
+    display: flex;
+    justify-content: inherit;
+    width: auto;
+    height: 60px;
+    gap: 20px;
+    border: 2px solid black;
+    top: 50px;
+    right: 10px;
+    padding: 8px;
+    border-radius: 10px;
+    background: white;
+    z-index: 1;
+}
+
+.page_toast_notification_content {
+    display: flex;
+    align-items: center;
+    justify-content: inherit;
+    gap: 12px;
+}
+
+.page_toast_notification_message {
+    width: 210px;
+}
+.page_toast_notification_text{
+    word-wrap: break-word;
+}
+
+.page_toast_notification_close_btn {
+    height: 0px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}

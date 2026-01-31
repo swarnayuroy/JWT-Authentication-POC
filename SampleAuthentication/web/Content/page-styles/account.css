@@ -1,0 +1,98 @@
+﻿body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.form-container {
+    border: 1px black solid;
+    border-radius: 10px;
+    padding: 30px;
+    width: 300px;
+    display: flex;
+    justify-content: center;
+}
+
+.form_signIn_header, .form_registration_header {
+    text-align: center;
+}
+
+.form_signIn_email, .form_registration_email, .form_registration_name,
+.form_signIn_password, .form_registration_password,
+.form_signIn_btn, .form_registration_btn {
+    padding: 10px;
+}
+
+.form_signIn_label, .form_registration_label {
+    font-size: 18px;
+}
+
+.form_signIn_input, .form_registration_input {
+    border: 1px solid black;
+    border-radius: 5px;
+    height: 30px;
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .form_signIn_input input, .form_registration_input input {
+        border: none;
+        outline: none;
+    }
+
+#form_signIn_password_hide, #form_registration_password_hide {
+    display: none;
+}
+
+#form_signIn_password_show, #form_registration_password_show,
+#form_signIn_password_hide, #form_registration_password_hide {
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.field-validation-error {
+    font-size: 12px;
+    color: red;
+}
+
+.form_signIn_btn, .form_registration_btn {
+    text-align: center;
+}
+
+    .form_signIn_btn .button, .form_registration_btn .button {
+        border: none;
+        width: 150px;
+        height: 35px;
+        font-size: 16px;
+        color: white;
+        background-color: black;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+
+.form_signIn_other_actions {
+    text-align: center;
+    padding: 10px;
+}
+
+.form_registration_other_actions {
+    text-align: center;
+    padding: 5px;
+}
+
+.form_signIn_other_actions p {
+    cursor: pointer;
+    padding: 5px;
+}
+
+.login_here, .register_here {
+    text-decoration: none;
+    color: black;
+    background: none;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+}

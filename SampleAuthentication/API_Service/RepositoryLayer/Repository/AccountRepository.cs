@@ -1,0 +1,112 @@
+﻿using API_Service.AppData;
+using API_Service.Models.DTO;
+using API_Service.Models.Entities;
+using API_Service.Models.ResponseModel;
+using API_Service.RepositoryLayer.Interface;
+
+namespace API_Service.RepositoryLayer.Repository
+{
+    public class AccountRepository : IAccountRepository
+    {
+        private readonly IService<User> _userService;
+        private readonly IService<Account> _accountService;
+        public AccountRepository(IService<User> _userService, IService<Account> _accountService)
+        {
+           this._userService = _userService;
+           this._accountService = _accountService;
+        }
+        
+        public async Task<ResponseDetail> CheckCredential(UserCredential userCredential)
+        {
+            // Get all users
+            var users = await _userService.Get();
+            // Find user by email
+            var user = users.FirstOrDefault(u => u.Email.Equals(userCredential.Email, StringComparison.OrdinalIgnoreCase));
+            if (user == null)
+            {
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "Incorrect email"
+                };
+            }
+
+            // Get all accounts
+            var accounts = await _accountService.Get();
+            // Find account by userId and verify password
+            var account = accounts.FirstOrDefault(a => a.UserId == user.Id && a.Password == userCredential.Password);
+
+            return account != null ? new ResponseDetail { Status = true } : new ResponseDetail { Status = false, Message = "Incorrect password" };
+        }
+
+        public async Task<ResponseDetail> RegisterUser(UserDetail userRegistrationDetail)
+        {
+            // Get existing users to check for duplicate email
+            var existingUsers = await _userService.Get();
+
+            if (existingUsers.Any(u => u.Email.Equals(userRegistrationDetail.Email, StringComparison.OrdinalIgnoreCase)))
+            {
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "User already exists!"
+                };
+            }
+
+            // Create new user DTO
+            var newUser = new User
+            {
+                Id = Guid.NewGuid(),
+                Name = userRegistrationDetail.Name,
+                Email = userRegistrationDetail.Email,
+                IsVerified = false
+            };
+            // Save user
+            var userSaved = await _userService.Save(newUser);
+
+            if (!userSaved)
+            {
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "Failed to create user"
+                };
+            }
+
+            // Create account for the user
+            var newAccount = new Account
+            {
+                Id = Guid.NewGuid(),
+                UserId = newUser.Id,
+                Password = userRegistrationDetail.Password,
+                CreatedAt = DateTime.Now,
+                LoggedInAt = DateTime.MinValue
+            };
+
+            // Save account
+            var accountSaved = await _accountService.Save(newAccount);
+
+            // Rollback: If account save fails, delete the user that was just saved
+            if (!accountSaved)
+            {
+                await RollBackUser(newUser.Id.ToString());
+
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "Failed to create account."
+                };
+            }
+
+            return new ResponseDetail
+            {
+                Status = true,
+                Message = "Account created successfully"
+            };
+        }
+        public async Task RollBackUser(string userId)
+        {
+            await _userService.Delete(userId);
+        }
+    }
+}

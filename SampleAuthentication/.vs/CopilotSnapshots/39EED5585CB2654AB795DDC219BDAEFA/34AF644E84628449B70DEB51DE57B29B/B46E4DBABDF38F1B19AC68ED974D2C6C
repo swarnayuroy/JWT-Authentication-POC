@@ -1,0 +1,87 @@
+﻿using DataContext.DataProvider;
+using DataContext.DataService;
+using DataContext.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DataContext.SampleData
+{
+    public class AccountData : IDataProvider, IDataService
+    {
+        private static IList<User> _userList = new List<User>()
+        {
+            new User
+            {
+                Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
+                Name = "John Doe",
+                Email = "doe.john@gmail.com",
+                IsVerfied = false
+            },
+            new User
+            {
+                Id = Guid.Parse("4b79aeeb-96cd-49bf-abf0-8b5f6f693467"),
+                Name = "Jane Doe",
+                Email = "doe.jane@gmail.com",
+                IsVerfied = true
+            }
+        };
+        private static IList<Account> _accountsDetail = new List<Account>()
+        {
+            new Account
+            {
+                Id = Guid.Parse("48e283eb-8193-4de0-a025-e8dcb6bc678a"),
+                UserId = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
+                Password = "TestJohn@1994",
+                CreatedAt = DateTime.Parse("2025-04-10T10:15:30")
+            },
+            new Account
+            {
+                Id = Guid.Parse("50b26a44-c7f9-462a-9d4f-c66ac2e9938e"),
+                UserId = Guid.Parse("4b79aeeb-96cd-49bf-abf0-8b5f6f693467"),
+                Password = "TestJane@1994",
+                CreatedAt = DateTime.Parse("2025-05-10T10:15:30")
+            }
+        };
+
+        public IList<User> User { get { return _userList; } }
+        public IList<Account> Account { get { return _accountsDetail; } }
+
+        public async Task SaveAccountAsync(Account accountDetail)
+        {
+            await Task.Run(() => _accountsDetail.Add(accountDetail));
+        }
+        public async Task SaveUserAsync(User userDetail)
+        {
+            await Task.Run(() => _userList.Add(userDetail));
+        }
+
+        public async Task<bool> DeleteUserAsync(Guid userId)
+        {
+            return await Task.Run(() =>
+            {
+                var user = _userList.FirstOrDefault(u => u.Id == userId);
+                if (user != null)
+                {
+                    return _userList.Remove(user);
+                }
+                return false;
+            });
+        }
+
+        public async Task<bool> DeleteAccountAsync(Guid accountId)
+        {
+            return await Task.Run(() =>
+            {
+                var account = _accountsDetail.FirstOrDefault(a => a.Id == accountId);
+                if (account != null)
+                {
+                    return _accountsDetail.Remove(account);
+                }
+                return false;
+            });
+        }
+    }
+}

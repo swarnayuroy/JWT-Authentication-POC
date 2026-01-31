@@ -1,0 +1,101 @@
+﻿@model web.Models.Form
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Login</title>
+    <link href="~/Content/page-styles/shared.css" rel="stylesheet" />
+    <link href="~/Content/page-styles/account.css" rel="stylesheet" />
+    <link href="~/Content/page-styles/notification.css" rel="stylesheet" />
+    <link href="~/Content/page-styles/loader.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <script src="~/Scripts/page-scripts/form.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
+</head>
+<body>
+    @Html.Partial("_Loader");
+    
+    @if (Model.ToastNotification.IsEnable)
+    {
+        Html.RenderPartial("_ToastNotification", Model.ToastNotification);
+    }
+
+    <div class="form-container">
+    @if (Model.showSignInForm)
+    {
+        using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form_signIn" }))
+        {
+            <h2 class="form_signIn_header">Sign In</h2>
+            <div class="form_signIn_email">
+                @Html.LabelFor(formModel => formModel.SignIn.Email, new { @class = "form_signIn_label" })
+                <div class="form_signIn_input">
+                    @Html.TextBoxFor(formModel => formModel.SignIn.Email, new { autocomplete = "off", type = "email" })
+                </div>
+                <p>@Html.ValidationMessageFor(formModel => formModel.SignIn.Email)</p>
+            </div>
+            <div class="form_signIn_password">
+                @Html.LabelFor(formModel => formModel.SignIn.Password, new { @class = "form_signIn_label" })
+                <div class="form_signIn_input">
+                    @Html.PasswordFor(formModel => formModel.SignIn.Password, new { id = "signIn_password_input" })
+                    <i class="fa-solid fa-eye" id="form_signIn_password_show" onclick="showPassword('signIn')"></i>
+                    <i class="fa-solid fa-eye-slash" id="form_signIn_password_hide" onclick="hidePassword('signIn')"></i>
+                </div>
+                <p>@Html.ValidationMessageFor(formModel => formModel.SignIn.Password)</p>
+            </div>
+            <div class="form_signIn_btn">
+                @Html.AntiForgeryToken()
+                <input type="submit" value="Login" class="button" />
+            </div>
+            <div class="form_signIn_other_actions">
+                <p><span>Forgot Password</span></p>
+                <p>@Html.ActionLink("Don't have an account? Sign Up", "SignUp", "Account", null, new { @class = "register_here" }) </p>
+            </div>
+        }
+    }
+    @if (Model.showSignUpForm)
+    {
+        using (Html.BeginForm("SignUp", "Account", FormMethod.Post, new { @class = "form_registration" }))
+        {
+            <h2 class="form_registration_header">Sign Up</h2>
+            <div class="form_registration_name">
+                @Html.LabelFor(formModel => formModel.SignUp.Name, new { @class = "form_registration_label" })
+                <div class="form_registration_input">
+                    @Html.TextBoxFor(formModel => formModel.SignUp.Name, new { autocomplete = "off" })
+                </div>
+                <p>@Html.ValidationMessageFor(formModel => formModel.SignUp.Name)</p>
+            </div>
+            <div class="form_registration_email">
+                @Html.LabelFor(formModel => formModel.SignUp.Email, new { @class = "form_registration_label" })
+                <div class="form_registration_input">
+                    @Html.TextBoxFor(formModel => formModel.SignUp.Email, new { autocomplete = "off", type = "email" })
+                </div>
+                <p>@Html.ValidationMessageFor(formModel => formModel.SignUp.Email)</p>
+            </div>
+            <div class="form_registration_password">
+                @Html.LabelFor(formModel => formModel.SignUp.Password, new { @class = "form_registration_label" })
+                <div class="form_registration_input">
+                    @Html.PasswordFor(formModel => formModel.SignUp.Password, new { id = "registration_password_input" })
+                    <i class="fa-solid fa-eye" id="form_registration_password_show" onclick="showPassword('registration')"></i>
+                    <i class="fa-solid fa-eye-slash" id="form_registration_password_hide" onclick="hidePassword('registration')"></i>
+                </div>
+                <p>@Html.ValidationMessageFor(formModel => formModel.SignUp.Password)</p>
+            </div>
+            <div class="form_registration_btn">
+                @Html.AntiForgeryToken()
+                <input type="submit" value="Submit" class="button" />
+            </div>
+            <div class="form_registration_other_actions">
+                <p>@Html.ActionLink("Have an account? LogIn", "Login", "Account", null, new { @class = "login_here" }) </p>
+            </div>
+        }
+    }
+    </div>
+</body>
+</html>

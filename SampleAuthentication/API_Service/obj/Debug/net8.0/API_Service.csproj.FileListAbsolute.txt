@@ -1,0 +1,75 @@
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\appsettings.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.staticwebassets.endpoints.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.exe
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.deps.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.runtimeconfig.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.pdb
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.csproj.AssemblyReference.cache
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.AssemblyInfoInputs.cache
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.AssemblyInfo.cs
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.csproj.CoreCompileInputs.cache
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\scopedcss\bundle\API_Service.styles.css
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\swae.build.ex.cache
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Serv.90E08E2A.Up2Date
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\refint\API_Service.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.pdb
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.genruntimeconfig.cache
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\obj\Debug\net8.0\ref\API_Service.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\DataContext.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\API_Service\bin\Debug\net8.0\DataContext.pdb
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\appsettings.Development.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\appsettings.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.staticwebassets.endpoints.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.exe
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.deps.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.runtimeconfig.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\API_Service.pdb
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\DataContext.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\bin\Debug\net8.0\DataContext.pdb
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.csproj.AssemblyReference.cache
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.GeneratedMSBuildEditorConfig.editorconfig
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.AssemblyInfoInputs.cache
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.AssemblyInfo.cs
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.csproj.CoreCompileInputs.cache
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.MvcApplicationPartsAssemblyInfo.cs
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.MvcApplicationPartsAssemblyInfo.cache
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\scopedcss\bundle\API_Service.styles.css
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\staticwebassets.build.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\staticwebassets.development.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Serv.90E08E2A.Up2Date
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\refint\API_Service.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.pdb
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\API_Service.genruntimeconfig.cache
+C:\Sample Personal\Sample Project\SampleAuthentication\API_Service\obj\Debug\net8.0\ref\API_Service.dll

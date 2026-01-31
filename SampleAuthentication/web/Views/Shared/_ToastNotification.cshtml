@@ -1,0 +1,17 @@
+﻿﻿@model web.Models.ToastNotification
+
+<div class="page_toast_notification">
+    <div class="page_toast_notification_content">
+        <i class="@Model.StatusIcon" style="font-size: 22px;"></i>
+        <div class="page_toast_notification_message">
+            <p class="page_toast_notification_text">@Model.Message</p>
+        </div>
+    </div>
+
+    <button class="page_toast_notification_close_btn" onclick="hideToast()">
+        <i class="@Model.CloseToastIcon" style="font-size: 15px;"></i>
+    </button>
+</div>
+<script type="text/javascript">
+    setTimeout(hideToast, @Model.TimeOut);
+</script>

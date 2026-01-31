@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="API_Service/API_Service.csproj" Id="1358fdcd-db97-4b45-b30f-5f29675d19ed" />
+  <Project Path="DataContext/DataContext.csproj" Id="49cbb7e7-d0df-40fb-a1e9-935f5b1a19c7" />
+  <Project Path="web/web.csproj" Id="eb9c1541-9725-408c-9f8f-e84fbaf58258" />
+</Solution>

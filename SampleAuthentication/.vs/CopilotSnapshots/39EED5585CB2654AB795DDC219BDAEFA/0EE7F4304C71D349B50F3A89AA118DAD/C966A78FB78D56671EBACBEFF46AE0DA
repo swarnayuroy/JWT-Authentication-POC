@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+using web.Models;
+using web.Service;
+using web.Service.DTO;
+
+namespace web.Repository
+{
+    public class WebRepository : IWebRepository
+    {        
+        public WebRepository()
+        {
+                
+        }
+        public Task<bool> CheckCredential(string username, string password)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> RegisterUser(Registration userRegistrationDetail)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

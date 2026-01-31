@@ -1,0 +1,186 @@
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\web.dll.config
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\web.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\web.pdb
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\csc.exe
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\csc.exe.config
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\csc.rsp
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\csi.exe
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\csi.exe.config
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\csi.rsp
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.CodeAnalysis.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.CSharp.Core.targets
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.Managed.Core.targets
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.VisualBasic.Core.targets
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\Microsoft.Win32.Primitives.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.AppContext.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Collections.Immutable.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Console.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Diagnostics.StackTrace.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Globalization.Calendars.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.IO.Compression.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.IO.Compression.ZipFile.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.IO.FileSystem.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.IO.FileSystem.Primitives.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Net.Http.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Net.Sockets.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Reflection.Metadata.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Security.Cryptography.Encoding.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Security.Cryptography.Primitives.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Text.Encoding.CodePages.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Threading.Tasks.Extensions.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.ValueTuple.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Xml.ReaderWriter.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Xml.XmlDocument.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Xml.XPath.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\System.Xml.XPath.XDocument.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\vbc.exe
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\vbc.exe.config
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\vbc.rsp
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\VBCSCompiler.exe
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\roslyn\VBCSCompiler.exe.config
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Antlr3.Runtime.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Newtonsoft.Json.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.Helpers.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.Mvc.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.Optimization.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.Razor.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.WebPages.Deployment.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.WebPages.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.WebPages.Razor.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\WebGrease.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.Helpers.xml
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.Mvc.xml
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.Optimization.xml
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.Razor.xml
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.WebPages.xml
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.WebPages.Deployment.xml
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Web.WebPages.Razor.xml
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Newtonsoft.Json.xml
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Antlr3.Runtime.pdb
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\obj\Debug\web.csproj.AssemblyReference.cache
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\obj\Debug\web.csproj.CoreCompileInputs.cache
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\obj\Debug\web.csproj.Up2Date
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\obj\Debug\web.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\obj\Debug\web.pdb
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\DataContext.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\DataContext.pdb
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Threading.Tasks.Extensions.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Unity.Abstractions.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Unity.Container.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Unity.Mvc.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\WebActivatorEx.dll
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\System.Threading.Tasks.Extensions.xml
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Unity.Abstractions.pdb
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Unity.Container.pdb
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Unity.Mvc.pdb
+C:\Users\Public\Public Projects\Sample\SampleAuthentication\web\bin\Unity.Mvc.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\web.dll.config
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\web.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\web.pdb
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\csc.exe
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\csc.exe.config
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\csc.rsp
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\csi.exe
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\csi.exe.config
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\csi.rsp
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.CodeAnalysis.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.CSharp.Core.targets
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.Managed.Core.targets
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.VisualBasic.Core.targets
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\Microsoft.Win32.Primitives.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.AppContext.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Collections.Immutable.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Console.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Diagnostics.StackTrace.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Globalization.Calendars.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.IO.Compression.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.IO.Compression.ZipFile.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.IO.FileSystem.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.IO.FileSystem.Primitives.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Net.Http.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Net.Sockets.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Reflection.Metadata.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Security.Cryptography.Encoding.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Security.Cryptography.Primitives.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Text.Encoding.CodePages.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Threading.Tasks.Extensions.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.ValueTuple.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Xml.ReaderWriter.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Xml.XmlDocument.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Xml.XPath.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\System.Xml.XPath.XDocument.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\vbc.exe
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\vbc.exe.config
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\vbc.rsp
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\VBCSCompiler.exe
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\roslyn\VBCSCompiler.exe.config
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Antlr3.Runtime.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\DataContext.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Microsoft.Web.Infrastructure.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Newtonsoft.Json.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Runtime.CompilerServices.Unsafe.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Threading.Tasks.Extensions.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.Helpers.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.Mvc.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.Optimization.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.Razor.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.WebPages.Deployment.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.WebPages.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.WebPages.Razor.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Unity.Abstractions.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Unity.Container.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Unity.Mvc.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\WebActivatorEx.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\WebGrease.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\DataContext.pdb
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Runtime.CompilerServices.Unsafe.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Threading.Tasks.Extensions.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.Helpers.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.Mvc.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.Optimization.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.Razor.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.WebPages.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.WebPages.Deployment.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\System.Web.WebPages.Razor.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Newtonsoft.Json.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Unity.Abstractions.pdb
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Unity.Container.pdb
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Unity.Mvc.pdb
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Unity.Mvc.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Antlr3.Runtime.pdb
+C:\Sample Personal\Sample Project\SampleAuthentication\web\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+C:\Sample Personal\Sample Project\SampleAuthentication\web\obj\Debug\web.csproj.AssemblyReference.cache
+C:\Sample Personal\Sample Project\SampleAuthentication\web\obj\Debug\web.csproj.CoreCompileInputs.cache
+C:\Sample Personal\Sample Project\SampleAuthentication\web\obj\Debug\web.csproj.Up2Date
+C:\Sample Personal\Sample Project\SampleAuthentication\web\obj\Debug\web.dll
+C:\Sample Personal\Sample Project\SampleAuthentication\web\obj\Debug\web.pdb
