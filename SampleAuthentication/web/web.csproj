@@ -162,6 +162,7 @@
     <Compile Include="Service\DTO\UserDetail.cs" />
     <Compile Include="Service\IHttpService.cs" />
     <Compile Include="Service\IService.cs" />
+    <Compile Include="Utils\FilterResponse.cs" />
     <Compile Include="Utils\Logger.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -83,60 +83,7 @@ namespace web.Repository
                     };
                 }
 
-                // Handle error response
-                string responseContent = null;
-
-                if (_response.Content != null)
-                {
-                    responseContent = await _response.Content.ReadAsStringAsync();
-                    _logger.LogDetails(LogType.INFO, $"API Response Content: {responseContent}");
-
-                    if (!string.IsNullOrWhiteSpace(responseContent))
-                    {
-                        try
-                        {
-                            // Try to parse as JSON object
-                            var jsonResponse = JObject.Parse(responseContent);
-                            // Try both "Message" and "message" (case-insensitive)
-                            string message = jsonResponse["Message"]?.ToString() ?? jsonResponse["message"]?.ToString();
-
-                            if (!string.IsNullOrWhiteSpace(message))
-                            {
-                                return new ResponseDetail
-                                {
-                                    Status = false,
-                                    StatusCode = _response.StatusCode,
-                                    Message = message
-                                };
-                            }
-                        }
-                        catch (JsonReaderException ex)
-                        {
-                            _logger.LogDetails(LogType.WARNING, $"Failed to parse JSON: {ex.Message}");
-
-                            // If it's not JSON, treat it as plain string
-                            string message = responseContent.Trim().Trim('"');
-
-                            if (!string.IsNullOrWhiteSpace(message))
-                            {
-                                return new ResponseDetail
-                                {
-                                    Status = false,
-                                    StatusCode = _response.StatusCode,
-                                    Message = message
-                                };
-                            }
-                        }
-                    }
-                }
-
-                // Fallback to ReasonPhrase
-                return new ResponseDetail
-                {
-                    Status = false,
-                    StatusCode = _response.StatusCode,
-                    Message = _response.ReasonPhrase ?? "Request failed"
-                };
+                return await new FilterResponse<WebRepository>().Process(_response);
             }
             catch (Exception ex)
             {
@@ -225,43 +172,7 @@ namespace web.Repository
             {
                 _response = await _httpService.RegisterUser(userRegistrationDetail);
 
-                if (_response.Content != null)
-                {
-                    string responseContent = await _response.Content.ReadAsStringAsync();
-
-                    try
-                    {
-                        // Try to parse as JSON object
-                        var jsonResponse = JObject.Parse(responseContent);
-                        // Try both "Message" and "message" (case-insensitive)
-                        string message = jsonResponse["Message"]?.ToString() ?? jsonResponse["message"]?.ToString();
-
-                        return new ResponseDetail
-                        {
-                            Status = _response.IsSuccessStatusCode,
-                            StatusCode = _response.StatusCode,
-                            Message = message ?? _response.ReasonPhrase
-                        };
-                    }
-                    catch (JsonReaderException)
-                    {
-                        // If it's not JSON (plain string from Created response)
-                        string message = responseContent.Trim('"');
-                        return new ResponseDetail
-                        {
-                            Status = _response.IsSuccessStatusCode,
-                            StatusCode = _response.StatusCode,
-                            Message = message
-                        };
-                    }
-                }
-
-                return new ResponseDetail
-                {
-                    Status = _response.IsSuccessStatusCode,
-                    StatusCode = _response.StatusCode,
-                    Message = _response.ReasonPhrase
-                };
+                return await new FilterResponse<WebRepository>().Process(_response);
             }
             catch (Exception ex)
             {
