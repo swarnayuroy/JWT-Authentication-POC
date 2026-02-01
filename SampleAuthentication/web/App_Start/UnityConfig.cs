@@ -58,7 +58,7 @@ namespace web
             
             // IService<UserAccountDetail> -> DataService<UserAccountDetail>
             container.RegisterType<IService<UserAccountDetail>, DataService<UserAccountDetail>>(new HierarchicalLifetimeManager());
-
+            container.RegisterType<IHttpService, HttpDataService>(new HierarchicalLifetimeManager());
             // Register Repository
             // IWebRepository -> WebRepository
             container.RegisterType<IWebRepository, WebRepository>(new HierarchicalLifetimeManager());

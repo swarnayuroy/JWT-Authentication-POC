@@ -65,7 +65,7 @@ namespace web.Controllers
                 ToastNotification = new ToastNotification
                 {
                     IsEnable = true,
-                    Type = HttpStatusCode.NotFound,
+                    Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.BadRequest,
                     StatusIcon = ToastNotification.WARNING_ICON,
                     Message = response.Message
                 }
@@ -114,7 +114,7 @@ namespace web.Controllers
                     ToastNotification = new ToastNotification
                     {
                         IsEnable = true,
-                        Type = HttpStatusCode.OK,
+                        Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.OK,
                         StatusIcon = ToastNotification.SUCCESS_ICON,
                         Message = response.Message
                     }
@@ -127,7 +127,7 @@ namespace web.Controllers
                 ToastNotification = new ToastNotification
                 {
                     IsEnable = true,
-                    Type = HttpStatusCode.BadRequest,
+                    Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.BadRequest,
                     StatusIcon = ToastNotification.WARNING_ICON,
                     Message = response.Message
                 }

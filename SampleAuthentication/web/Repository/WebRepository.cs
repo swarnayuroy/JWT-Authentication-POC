@@ -1,6 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using web.Models;
@@ -12,106 +16,179 @@ namespace web.Repository
 {
     public class WebRepository : IWebRepository
     {
+        private readonly IHttpService _httpService;
+
         private readonly IService<UserDetail> _userService;
         private readonly IService<UserAccountDetail> _accountService;
 
-        public WebRepository(IService<UserDetail> userService, IService<UserAccountDetail> accountService)
+        private HttpResponseMessage _response;
+
+        public WebRepository
+        (
+            IHttpService httpService, 
+            IService<UserDetail> userService, 
+            IService<UserAccountDetail> accountService
+        )
         {
-            _userService = userService;
-            _accountService = accountService;
+            this._httpService = httpService;
+            this._userService = userService;
+            this._accountService = accountService;
         }
 
         public async Task<ResponseDetail> CheckCredential(Credential userCredential)
         {
-            // Get all users
-            var users = await _userService.Get();
+            #region working with SampleData
             
-            // Find user by email
-            var user = users.FirstOrDefault(u => u.Email.Equals(userCredential.Email, StringComparison.OrdinalIgnoreCase));
+            //// Get all users
+            //var users = await _userService.Get();
+
+            //// Find user by email
+            //var user = users.FirstOrDefault(u => u.Email.Equals(userCredential.Email, StringComparison.OrdinalIgnoreCase));
+
+            //if (user == null)
+            //{
+            //    return new ResponseDetail
+            //    {
+            //        Status = false,
+            //        Message = "Incorrect email!"
+            //    };
+            //}
+
+            //// Get all accounts
+            //var accounts = await _accountService.Get();
+
+            //// Find account by userId and verify password
+            //var account = accounts.FirstOrDefault(a => a.UserId.ToString() == user.Id && a.Password == userCredential.Password);
+
+            //return account != null ? new ResponseDetail { Status = true } : new ResponseDetail { Status = false, Message = "Incorrect password"};
             
-            if (user == null)
+            #endregion
+
+            #region HTTTP Service Call
+            
+            try
             {
+                _response = await _httpService.CheckCredential(userCredential);
+                if (_response.IsSuccessStatusCode)
+                {
+                    return new ResponseDetail
+                    {
+                        Status = true,
+                        StatusCode = _response.StatusCode,
+                        Message = "Credential verified successfully"
+                    };
+                }
                 return new ResponseDetail
                 {
                     Status = false,
-                    Message = "Incorrect email!"
+                    StatusCode = _response.StatusCode,
+                    Message = _response.Content != null ?
+                        JObject.Parse(await _response.Content.ReadAsStringAsync())["Message"]?.ToString()
+                                : _response.ReasonPhrase
                 };
             }
-
-            // Get all accounts
-            var accounts = await _accountService.Get();
+            catch (Exception)
+            {
+                return _response.Content != null ?
+                    new ResponseDetail { Status = false, StatusCode = _response.StatusCode, Message = $"Invalid response." }
+                    : new ResponseDetail { Status = false, StatusCode = HttpStatusCode.BadRequest, Message = $"Failed to process your request" };
+            }
             
-            // Find account by userId and verify password
-            var account = accounts.FirstOrDefault(a => a.UserId.ToString() == user.Id && a.Password == userCredential.Password);
-
-            return account != null ? new ResponseDetail { Status = true } : new ResponseDetail { Status = false, Message = "Incorrect password"};
+            #endregion
         }
         public async Task<ResponseDetail> RegisterUser(Registration userRegistrationDetail)
         {
-            // Get existing users to check for duplicate email
-            var existingUsers = await _userService.Get();
-            
-            if (existingUsers.Any(u => u.Email.Equals(userRegistrationDetail.Email, StringComparison.OrdinalIgnoreCase)))
+            #region working with SampleData
+
+            //// Get existing users to check for duplicate email
+            //var existingUsers = await _userService.Get();
+
+            //if (existingUsers.Any(u => u.Email.Equals(userRegistrationDetail.Email, StringComparison.OrdinalIgnoreCase)))
+            //{
+            //    return new ResponseDetail
+            //    {
+            //        Status = false,
+            //        Message = "User already exists!"
+            //    };
+            //}
+
+            //// Create new user DTO
+            //var newUser = new UserDetail
+            //{
+            //    Id = Guid.NewGuid().ToString(),
+            //    Name = userRegistrationDetail.Name,
+            //    Email = userRegistrationDetail.Email,
+            //    IsVerified = false
+            //};
+
+            //// Save user
+            //var userSaved = await _userService.Save(newUser);
+
+            //if (!userSaved)
+            //{
+            //    return new ResponseDetail
+            //    {
+            //        Status = false,
+            //        Message = "Failed to create user"
+            //    };
+            //}
+
+            //// Create account for the user
+            //var newAccount = new UserAccountDetail
+            //{
+            //    Id = Guid.NewGuid(),
+            //    UserId = Guid.Parse(newUser.Id),
+            //    Password = userRegistrationDetail.Password,
+            //    CreatedAt = DateTime.Now,
+            //    LoggedInAt = DateTime.MinValue
+            //};
+
+            //// Save account
+            //var accountSaved = await _accountService.Save(newAccount);
+
+            //// Rollback: If account save fails, delete the user that was just saved
+            //if (!accountSaved)
+            //{
+            //    await RollBackUser(newUser.Id);
+
+            //    return new ResponseDetail
+            //    {
+            //        Status = false,
+            //        Message = "Failed to create account."
+            //    };
+            //}            
+
+            //return new ResponseDetail
+            //{
+            //    Status = true,
+            //    Message = "Account created successfully"
+            //};
+
+            #endregion
+
+            #region HTTP Service Call
+
+            try
             {
+                _response = await _httpService.RegisterUser(userRegistrationDetail);
                 return new ResponseDetail
                 {
-                    Status = false,
-                    Message = "User already exists!"
+                    Status = _response.IsSuccessStatusCode ? true : false,
+                    StatusCode = _response.StatusCode,
+                    Message = _response.Content != null ? _response.StatusCode == System.Net.HttpStatusCode.Created ?
+                        JsonConvert.DeserializeObject<string>(_response.Content.ReadAsStringAsync().Result)
+                            : JObject.Parse(await _response.Content.ReadAsStringAsync())["Message"]?.ToString()
+                                : _response.ReasonPhrase
                 };
             }
-
-            // Create new user DTO
-            var newUser = new UserDetail
+            catch (Exception)
             {
-                Id = Guid.NewGuid().ToString(),
-                Name = userRegistrationDetail.Name,
-                Email = userRegistrationDetail.Email,
-                IsVerified = false
-            };
-
-            // Save user
-            var userSaved = await _userService.Save(newUser);
-            
-            if (!userSaved)
-            {
-                return new ResponseDetail
-                {
-                    Status = false,
-                    Message = "Failed to create user"
-                };
+                return _response.Content != null ?
+                    new ResponseDetail { Status = false, StatusCode = _response.StatusCode, Message = $"Invalid response." }
+                    : new ResponseDetail { Status = false, StatusCode = HttpStatusCode.BadRequest, Message = $"Failed to process your request" };
             }
 
-            // Create account for the user
-            var newAccount = new UserAccountDetail
-            {
-                Id = Guid.NewGuid(),
-                UserId = Guid.Parse(newUser.Id),
-                Password = userRegistrationDetail.Password,
-                CreatedAt = DateTime.Now,
-                LoggedInAt = DateTime.MinValue
-            };
-
-            // Save account
-            var accountSaved = await _accountService.Save(newAccount);
-            
-            // Rollback: If account save fails, delete the user that was just saved
-            if (!accountSaved)
-            {
-                await RollBackUser(newUser.Id);
-                
-                return new ResponseDetail
-                {
-                    Status = false,
-                    Message = "Failed to create account."
-                };
-            }
-            
-            
-            return new ResponseDetail
-            {
-                Status = true,
-                Message = "Account created successfully"
-            };
+            #endregion
         }
         public async Task RollBackUser(string userId) {
             await _userService.Delete(userId);
