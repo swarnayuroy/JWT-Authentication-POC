@@ -17,7 +17,6 @@ namespace web.Controllers
         public AccountController(IWebRepository repository)
         {
             this._repository = repository;
-
         }
         // GET: Login
         public ActionResult Login()

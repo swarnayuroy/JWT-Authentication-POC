@@ -11,11 +11,13 @@ using web.Models;
 using web.Models.ResponseModel;
 using web.Service;
 using web.Service.DTO;
+using web.Utils;
 
 namespace web.Repository
 {
     public class WebRepository : IWebRepository
     {
+        private Logger<WebRepository> _logger;
         private readonly IHttpService _httpService;
 
         private readonly IService<UserDetail> _userService;
@@ -25,11 +27,12 @@ namespace web.Repository
 
         public WebRepository
         (
-            IHttpService httpService, 
-            IService<UserDetail> userService, 
+            IHttpService httpService,
+            IService<UserDetail> userService,
             IService<UserAccountDetail> accountService
         )
         {
+            this._logger = new Logger<WebRepository>();
             this._httpService = httpService;
             this._userService = userService;
             this._accountService = accountService;
@@ -38,7 +41,7 @@ namespace web.Repository
         public async Task<ResponseDetail> CheckCredential(Credential userCredential)
         {
             #region working with SampleData
-            
+
             //// Get all users
             //var users = await _userService.Get();
 
@@ -61,14 +64,15 @@ namespace web.Repository
             //var account = accounts.FirstOrDefault(a => a.UserId.ToString() == user.Id && a.Password == userCredential.Password);
 
             //return account != null ? new ResponseDetail { Status = true } : new ResponseDetail { Status = false, Message = "Incorrect password"};
-            
+
             #endregion
 
             #region HTTTP Service Call
-            
+
             try
             {
                 _response = await _httpService.CheckCredential(userCredential);
+
                 if (_response.IsSuccessStatusCode)
                 {
                     return new ResponseDetail
@@ -78,22 +82,71 @@ namespace web.Repository
                         Message = "Credential verified successfully"
                     };
                 }
+
+                // Handle error response
+                string responseContent = null;
+
+                if (_response.Content != null)
+                {
+                    responseContent = await _response.Content.ReadAsStringAsync();
+                    _logger.LogDetails(LogType.INFO, $"API Response Content: {responseContent}");
+
+                    if (!string.IsNullOrWhiteSpace(responseContent))
+                    {
+                        try
+                        {
+                            // Try to parse as JSON object
+                            var jsonResponse = JObject.Parse(responseContent);
+                            // Try both "Message" and "message" (case-insensitive)
+                            string message = jsonResponse["Message"]?.ToString() ?? jsonResponse["message"]?.ToString();
+
+                            if (!string.IsNullOrWhiteSpace(message))
+                            {
+                                return new ResponseDetail
+                                {
+                                    Status = false,
+                                    StatusCode = _response.StatusCode,
+                                    Message = message
+                                };
+                            }
+                        }
+                        catch (JsonReaderException ex)
+                        {
+                            _logger.LogDetails(LogType.WARNING, $"Failed to parse JSON: {ex.Message}");
+
+                            // If it's not JSON, treat it as plain string
+                            string message = responseContent.Trim().Trim('"');
+
+                            if (!string.IsNullOrWhiteSpace(message))
+                            {
+                                return new ResponseDetail
+                                {
+                                    Status = false,
+                                    StatusCode = _response.StatusCode,
+                                    Message = message
+                                };
+                            }
+                        }
+                    }
+                }
+
+                // Fallback to ReasonPhrase
                 return new ResponseDetail
                 {
                     Status = false,
                     StatusCode = _response.StatusCode,
-                    Message = _response.Content != null ?
-                        JObject.Parse(await _response.Content.ReadAsStringAsync())["Message"]?.ToString()
-                                : _response.ReasonPhrase
+                    Message = _response.ReasonPhrase ?? "Request failed"
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return _response.Content != null ?
+                _logger.LogDetails(LogType.ERROR, $"Exception in CheckCredential: {ex.Message}");
+
+                return _response?.Content != null ?
                     new ResponseDetail { Status = false, StatusCode = _response.StatusCode, Message = $"Invalid response." }
                     : new ResponseDetail { Status = false, StatusCode = HttpStatusCode.BadRequest, Message = $"Failed to process your request" };
             }
-            
+
             #endregion
         }
         public async Task<ResponseDetail> RegisterUser(Registration userRegistrationDetail)
@@ -171,26 +224,58 @@ namespace web.Repository
             try
             {
                 _response = await _httpService.RegisterUser(userRegistrationDetail);
+
+                if (_response.Content != null)
+                {
+                    string responseContent = await _response.Content.ReadAsStringAsync();
+
+                    try
+                    {
+                        // Try to parse as JSON object
+                        var jsonResponse = JObject.Parse(responseContent);
+                        // Try both "Message" and "message" (case-insensitive)
+                        string message = jsonResponse["Message"]?.ToString() ?? jsonResponse["message"]?.ToString();
+
+                        return new ResponseDetail
+                        {
+                            Status = _response.IsSuccessStatusCode,
+                            StatusCode = _response.StatusCode,
+                            Message = message ?? _response.ReasonPhrase
+                        };
+                    }
+                    catch (JsonReaderException)
+                    {
+                        // If it's not JSON (plain string from Created response)
+                        string message = responseContent.Trim('"');
+                        return new ResponseDetail
+                        {
+                            Status = _response.IsSuccessStatusCode,
+                            StatusCode = _response.StatusCode,
+                            Message = message
+                        };
+                    }
+                }
+
                 return new ResponseDetail
                 {
-                    Status = _response.IsSuccessStatusCode ? true : false,
+                    Status = _response.IsSuccessStatusCode,
                     StatusCode = _response.StatusCode,
-                    Message = _response.Content != null ? _response.StatusCode == System.Net.HttpStatusCode.Created ?
-                        JsonConvert.DeserializeObject<string>(_response.Content.ReadAsStringAsync().Result)
-                            : JObject.Parse(await _response.Content.ReadAsStringAsync())["Message"]?.ToString()
-                                : _response.ReasonPhrase
+                    Message = _response.ReasonPhrase
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return _response.Content != null ?
+                _logger.LogDetails(LogType.ERROR, ex.Message);
+
+                return _response?.Content != null ?
                     new ResponseDetail { Status = false, StatusCode = _response.StatusCode, Message = $"Invalid response." }
                     : new ResponseDetail { Status = false, StatusCode = HttpStatusCode.BadRequest, Message = $"Failed to process your request" };
             }
 
             #endregion
         }
-        public async Task RollBackUser(string userId) {
+        public async Task RollBackUser(string userId)
+        {
             await _userService.Delete(userId);
         }
     }
