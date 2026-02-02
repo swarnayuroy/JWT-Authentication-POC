@@ -10,9 +10,9 @@ namespace API_Service.RepositoryLayer.Repository
     {
         private LoggerService<UserRepository> _logger;
         private readonly IService<User> _userService;
-        public UserRepository(IService<User> userService)
+        public UserRepository(ILogger<UserRepository> logger, IService<User> userService)
         {
-            this._logger = new LoggerService<UserRepository>(new LoggerFactory().CreateLogger<UserRepository>());
+            this._logger = new LoggerService<UserRepository>(logger);
             this._userService = userService;
         }
         public async Task<IEnumerable<UserDetail>> GetAllUsersAsync()
@@ -41,7 +41,7 @@ namespace API_Service.RepositoryLayer.Repository
                 var user = users.FirstOrDefault(u => u.Id.ToString() == id);
                 if (user != null)
                 {
-                    _logger.LogDetails(LogType.INFO, $"Successfull fetch for {user.Id}");
+                    _logger.LogDetails(LogType.INFO, $"Successfully fetched user: {user.Id}");
                     return new UserDetail
                     {
                         Id = user.Id.ToString(),

@@ -11,9 +11,9 @@ namespace API_Service.Controllers
     {
         private LoggerService<UserController> _logger;
         private readonly IUserRepository _userRepository;
-        public UserController(IUserRepository userRepository)
+        public UserController(ILogger<UserController> logger, IUserRepository userRepository)
         {
-            this._logger = new LoggerService<UserController>(new LoggerFactory().CreateLogger<UserController>());
+            this._logger = new LoggerService<UserController>(logger);
             this._userRepository = userRepository;
         }
 

@@ -14,9 +14,9 @@ namespace API_Service.Controllers
     {
         private LoggerService<AccountController> _logger;
         private readonly IAccountRepository _accountService;
-        public AccountController(IAccountRepository accountService)
+        public AccountController(ILogger<AccountController> logger, IAccountRepository accountService)
         {
-            this._logger = new LoggerService<AccountController>(new LoggerFactory().CreateLogger<AccountController>());
+            this._logger = new LoggerService<AccountController>(logger);
             this._accountService = accountService;
         }
 

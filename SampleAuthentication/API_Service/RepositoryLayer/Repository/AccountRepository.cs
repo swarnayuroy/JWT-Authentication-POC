@@ -12,9 +12,9 @@ namespace API_Service.RepositoryLayer.Repository
         private LoggerService<AccountRepository> _logger;
         private readonly IService<User> _userService;
         private readonly IService<Account> _accountService;
-        public AccountRepository(IService<User> userService, IService<Account> accountService)
+        public AccountRepository(ILogger<AccountRepository> logger, IService<User> userService, IService<Account> accountService)
         {
-            this._logger = new LoggerService<AccountRepository>(new LoggerFactory().CreateLogger<AccountRepository>());
+            this._logger = new LoggerService<AccountRepository>(logger);
             this._userService = userService;
             this._accountService = accountService;
         }

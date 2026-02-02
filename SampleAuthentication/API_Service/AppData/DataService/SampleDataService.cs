@@ -51,9 +51,9 @@ namespace API_Service.AppData.DataService
         private readonly IDataProvider _dataProvider;
         private readonly IDataService _dataService;
 
-        public SampleDataService(IDataProvider dataProvider, IDataService dataService)
+        public SampleDataService(ILogger<SampleDataService<T>> logger, IDataProvider dataProvider, IDataService dataService)
         {
-            this._logger = new LoggerService<SampleDataService<T>>(new LoggerFactory().CreateLogger<SampleDataService<T>>());
+            this._logger = new LoggerService<SampleDataService<T>>(logger);
             this._dataProvider = dataProvider;
             this._dataService = dataService;
         }
