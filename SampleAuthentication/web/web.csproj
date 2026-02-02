@@ -157,8 +157,6 @@
     <Compile Include="Repository\IWebRepository.cs" />
     <Compile Include="Repository\WebRepository.cs" />
     <Compile Include="Service\DataLayer\HttpDataService.cs" />
-    <Compile Include="Service\DTO\UserAccountDetail.cs" />
-    <Compile Include="Service\DTO\UserDetail.cs" />
     <Compile Include="Service\IHttpService.cs" />
     <Compile Include="Utils\FilterResponse.cs" />
     <Compile Include="Utils\Logger.cs" />
