@@ -1,6 +1,7 @@
 ﻿using API_Service.RepositoryLayer.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using API_Service.Utils;
 
 namespace API_Service.Controllers
 {
@@ -8,10 +9,12 @@ namespace API_Service.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private LoggerService<UserController> _logger;
         private readonly IUserRepository _userRepository;
         public UserController(IUserRepository userRepository)
         {
-                this._userRepository = userRepository;
+            this._logger = new LoggerService<UserController>(new LoggerFactory().CreateLogger<UserController>());
+            this._userRepository = userRepository;
         }
 
         [HttpGet]
@@ -34,8 +37,9 @@ namespace API_Service.Controllers
                     return NoContent();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "An error occurred while processing your request.");
             }
@@ -61,8 +65,9 @@ namespace API_Service.Controllers
                     return NotFound("User not found.");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "An error occurred while processing your request.");
             }

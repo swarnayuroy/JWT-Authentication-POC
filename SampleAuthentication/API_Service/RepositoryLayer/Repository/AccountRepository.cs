@@ -1,4 +1,5 @@
 ﻿using API_Service.AppData;
+using API_Service.Utils;
 using API_Service.Models.DTO;
 using API_Service.Models.Entities;
 using API_Service.Models.ResponseModel;
@@ -8,12 +9,14 @@ namespace API_Service.RepositoryLayer.Repository
 {
     public class AccountRepository : IAccountRepository
     {
+        private LoggerService<AccountRepository> _logger;
         private readonly IService<User> _userService;
         private readonly IService<Account> _accountService;
-        public AccountRepository(IService<User> _userService, IService<Account> _accountService)
+        public AccountRepository(IService<User> userService, IService<Account> accountService)
         {
-           this._userService = _userService;
-           this._accountService = _accountService;
+            this._logger = new LoggerService<AccountRepository>(new LoggerFactory().CreateLogger<AccountRepository>());
+            this._userService = userService;
+            this._accountService = accountService;
         }
         
         public async Task<ResponseDetail> CheckCredential(UserCredential userCredential)
@@ -21,9 +24,10 @@ namespace API_Service.RepositoryLayer.Repository
             // Get all users
             var users = await _userService.Get();
             // Find user by email
+            _logger.LogDetails(LogType.INFO, $"getting user by email");
             var user = users.FirstOrDefault(u => u.Email.Equals(userCredential.Email, StringComparison.OrdinalIgnoreCase));
             if (user == null)
-            {
+            {                
                 return new ResponseDetail
                 {
                     Status = false,
@@ -34,6 +38,7 @@ namespace API_Service.RepositoryLayer.Repository
             // Get all accounts
             var accounts = await _accountService.Get();
             // Find account by userId and verify password
+            _logger.LogDetails(LogType.INFO, $"validating password for the user");
             var account = accounts.FirstOrDefault(a => a.UserId == user.Id && a.Password == userCredential.Password);
 
             return account != null ? new ResponseDetail { Status = true } : new ResponseDetail { Status = false, Message = "Incorrect password" };
@@ -43,7 +48,7 @@ namespace API_Service.RepositoryLayer.Repository
         {
             // Get existing users to check for duplicate email
             var existingUsers = await _userService.Get();
-
+            _logger.LogDetails(LogType.INFO, $"Checking if email exists");
             if (existingUsers.Any(u => u.Email.Equals(userRegistrationDetail.Email, StringComparison.OrdinalIgnoreCase)))
             {
                 return new ResponseDetail
@@ -72,6 +77,7 @@ namespace API_Service.RepositoryLayer.Repository
                     Message = "Failed to create user"
                 };
             }
+            _logger.LogDetails(LogType.INFO, $"New user with id {newUser.Id} saved");
 
             // Create account for the user
             var newAccount = new Account
@@ -96,8 +102,9 @@ namespace API_Service.RepositoryLayer.Repository
                     Status = false,
                     Message = "Failed to create account."
                 };
-            }
-
+            }            
+            _logger.LogDetails(LogType.INFO, $"Account information saved for respective user, {newUser.Id}");
+            
             return new ResponseDetail
             {
                 Status = true,
@@ -106,6 +113,7 @@ namespace API_Service.RepositoryLayer.Repository
         }
         public async Task RollBackUser(string userId)
         {
+            _logger.LogDetails(LogType.INFO, $"rolling back for user: {userId} in progress.");
             await _userService.Delete(userId);
         }
     }

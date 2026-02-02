@@ -1,8 +1,10 @@
 ﻿using API_Service.Models.DTO;
 using API_Service.Models.Entities;
+using API_Service.Utils;
 using DataContext.DataProvider;
 using DataContext.DataService;
 using DataContext.Models;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace API_Service.AppData.DataService
@@ -45,10 +47,13 @@ namespace API_Service.AppData.DataService
     }
     public class SampleDataService<T> : IService<T> where T : class
     {
+        private LoggerService<SampleDataService<T>> _logger;
         private readonly IDataProvider _dataProvider;
         private readonly IDataService _dataService;
+
         public SampleDataService(IDataProvider dataProvider, IDataService dataService)
         {
+            this._logger = new LoggerService<SampleDataService<T>>(new LoggerFactory().CreateLogger<SampleDataService<T>>());
             this._dataProvider = dataProvider;
             this._dataService = dataService;
         }
@@ -65,7 +70,9 @@ namespace API_Service.AppData.DataService
                     Email = u.Email,
                     IsVerified = u.IsVerfied
                 });
-                dataContext.User = users;
+                _logger.LogDetails(LogType.INFO, $"Fetched {users.Count()} users from data provider.");
+
+                dataContext.User = users;                
                 return Task.FromResult((IEnumerable<T>)dataContext.User!);
             }
             else if (typeof(T) == typeof(Models.Entities.Account))
@@ -78,10 +85,13 @@ namespace API_Service.AppData.DataService
                     CreatedAt = a.CreatedAt,
                     LoggedInAt = a.LoggedInAt
                 });
+                _logger.LogDetails(LogType.INFO, $"Fetched {accountDetails.Count()} accounts from data provider.");
+
                 dataContext.AccountDetail = accountDetails;
                 return Task.FromResult((IEnumerable<T>)dataContext.AccountDetail!);
             }
 
+            _logger.LogDetails(LogType.WARNING, $"Type {typeof(T).Name} is not supported type");
             throw new NotSupportedException($"Type {typeof(T).Name} is not supported type");
         }
 
@@ -107,6 +117,7 @@ namespace API_Service.AppData.DataService
                     };
 
                     await _dataService.SaveUserAsync(user);
+                    _logger.LogDetails(LogType.INFO, $"Account: {user.Id} saved successfully.");
                     return true;
                 }
                 else if (typeof(T) == typeof(Models.Entities.Account))
@@ -128,13 +139,16 @@ namespace API_Service.AppData.DataService
                     };
 
                     await _dataService.SaveAccountAsync(account);
+                    _logger.LogDetails(LogType.INFO, $"Account: {account.Id} saved successfully.");
                     return true;
                 }
 
+                _logger.LogDetails(LogType.WARNING, $"Type {typeof(T).Name} is not supported type");
                 throw new NotSupportedException($"Type {typeof(T).Name} is not supported type");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogDetails(LogType.ERROR, $"{ex.Message}");
                 return false;
             }
         }
@@ -145,6 +159,7 @@ namespace API_Service.AppData.DataService
             {
                 if (!Guid.TryParse(id, out Guid guidId))
                 {
+                    _logger.LogDetails(LogType.WARNING, $"Failed to parse the id:{id}");
                     return Task.FromResult(false);
                 }
 
@@ -157,10 +172,12 @@ namespace API_Service.AppData.DataService
                     return _dataService.DeleteAccountAsync(guidId);
                 }
 
+                _logger.LogDetails(LogType.WARNING, $"Type {typeof(T).Name} is not supported type");
                 throw new NotSupportedException($"Type {typeof(T).Name} is not supported type");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogDetails(LogType.ERROR, $"{ex.Message}");
                 return Task.FromResult(false);
             }
         }

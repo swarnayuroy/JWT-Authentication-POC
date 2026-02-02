@@ -1,5 +1,7 @@
-﻿using API_Service.RepositoryLayer.Interface;
-using API_Service.Models.DTO;
+﻿using API_Service.Models.DTO;
+using API_Service.RepositoryLayer.Interface;
+using API_Service.RepositoryLayer.Repository;
+using API_Service.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -10,9 +12,11 @@ namespace API_Service.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+        private LoggerService<AccountController> _logger;
         private readonly IAccountRepository _accountService;
         public AccountController(IAccountRepository accountService)
         {
+            this._logger = new LoggerService<AccountController>(new LoggerFactory().CreateLogger<AccountController>());
             this._accountService = accountService;
         }
 
@@ -29,8 +33,9 @@ namespace API_Service.Controllers
 
                 return response.Status ? Ok() : Unauthorized(response.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, 
                     "An error occurred while processing your request.");
             }
@@ -50,8 +55,9 @@ namespace API_Service.Controllers
                     ? StatusCode(StatusCodes.Status201Created, response.Message)
                     : Conflict(response.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, 
                     "An error occurred while processing your request.");
             }
