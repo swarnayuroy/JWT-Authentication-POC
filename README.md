@@ -4,11 +4,17 @@ Summary
 
 
 Design Patterns:
+
 a. Repository
+
 b. Generic Repository
+
 c. Dependency Injection
+
 d. DTO
+
 e. Service Layer
+
 f. Singleton
 
 
