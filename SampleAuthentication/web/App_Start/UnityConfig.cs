@@ -52,15 +52,7 @@ namespace web
             container.RegisterType<IDataProvider, AccountData>(new HierarchicalLifetimeManager());
             container.RegisterType<IDataService, AccountData>(new HierarchicalLifetimeManager());
 
-            // Register Generic Services for each DTO type
-            // IService<UserDetail> -> DataService<UserDetail>
-            container.RegisterType<IService<UserDetail>, DataService<UserDetail>>(new HierarchicalLifetimeManager());
-            
-            // IService<UserAccountDetail> -> DataService<UserAccountDetail>
-            container.RegisterType<IService<UserAccountDetail>, DataService<UserAccountDetail>>(new HierarchicalLifetimeManager());
             container.RegisterType<IHttpService, HttpDataService>(new HierarchicalLifetimeManager());
-            // Register Repository
-            // IWebRepository -> WebRepository
             container.RegisterType<IWebRepository, WebRepository>(new HierarchicalLifetimeManager());
         }
     }
