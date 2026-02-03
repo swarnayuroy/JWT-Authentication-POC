@@ -1,6 +1,3 @@
-using DataContext.DataProvider;
-using DataContext.DataService;
-using DataContext.SampleData;
 using web.Service;
 using web.Service.DataLayer;
 using web.Repository;
@@ -48,9 +45,6 @@ namespace web
 
             // Register Data Provider and Data Service
             // Using HierarchicalLifetimeManager for per-request lifetime (recommended for web apps)
-            container.RegisterType<IDataProvider, AccountData>(new HierarchicalLifetimeManager());
-            container.RegisterType<IDataService, AccountData>(new HierarchicalLifetimeManager());
-
             container.RegisterType<IHttpService, HttpDataService>(new HierarchicalLifetimeManager());
             container.RegisterType<IWebRepository, WebRepository>(new HierarchicalLifetimeManager());
         }
