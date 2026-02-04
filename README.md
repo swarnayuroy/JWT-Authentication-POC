@@ -3,7 +3,9 @@
 
 
 
-Summary
+Summary:
+
+This is a well-structured three-tier application using Repository, Service Layer, and Dependency Injection patterns as the core architectural patterns. It demonstrates a hybrid approach with modern .NET 8 for APIs and .NET Framework for the web application, communicating via HTTP/REST services. The architecture promotes SOLID principles, particularly Dependency Inversion and Single Responsibility.
 
 -------------------------------------------------------
 
@@ -20,7 +22,9 @@ d. DTO
 
 e. Service Layer
 
-f. Singleton
+f. Facade
+
+g. Singleton
 
 
 
