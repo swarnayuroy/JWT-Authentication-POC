@@ -60,15 +60,15 @@ namespace DataContext.SampleData
 
         public async Task<bool> UpdateUserAsync(User userDetail) 
         {
-            await Task.Run(
-                () => _userList[_userList.IndexOf(userDetail)] = userDetail
+            await Task.Run(() => 
+            _userList[_userList.IndexOf(_userList.First(user=>user.Id==userDetail.Id))] = userDetail
                 );
             return true;
         }
         public async Task<bool> UpdateAccountAsync(Account accountDetail)
         {
-            await Task.Run(
-                () => _accountsDetail[_accountsDetail.IndexOf(accountDetail)] = accountDetail
+            await Task.Run(() => 
+            _accountsDetail[_accountsDetail.IndexOf(_accountsDetail.First(account=>account.UserId==accountDetail.UserId))] = accountDetail
                 );
             return true;
         }
