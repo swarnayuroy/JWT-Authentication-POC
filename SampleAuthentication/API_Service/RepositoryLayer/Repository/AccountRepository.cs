@@ -12,7 +12,11 @@ namespace API_Service.RepositoryLayer.Repository
         private LoggerService<AccountRepository> _logger;
         private readonly IService<User> _userService;
         private readonly IService<Account> _accountService;
-        public AccountRepository(ILogger<AccountRepository> logger, IService<User> userService, IService<Account> accountService)
+        public AccountRepository(
+            ILogger<AccountRepository> logger, 
+            IService<User> userService, 
+            IService<Account> accountService
+        )
         {
             this._logger = new LoggerService<AccountRepository>(logger);
             this._userService = userService;
@@ -27,7 +31,8 @@ namespace API_Service.RepositoryLayer.Repository
             _logger.LogDetails(LogType.INFO, $"getting user by email");
             var user = users.FirstOrDefault(u => u.Email.Equals(userCredential.Email, StringComparison.OrdinalIgnoreCase));
             if (user == null)
-            {                
+            {
+                _logger.LogDetails(LogType.WARNING, "incorrect email");
                 return new ResponseDetail
                 {
                     Status = false,
@@ -37,11 +42,22 @@ namespace API_Service.RepositoryLayer.Repository
 
             // Get all accounts
             var accounts = await _accountService.Get();
+            
             // Find account by userId and verify password
             _logger.LogDetails(LogType.INFO, $"validating password for the user");
             var account = accounts.FirstOrDefault(a => a.UserId == user.Id && a.Password == userCredential.Password);
-
-            return account != null ? new ResponseDetail { Status = true } : new ResponseDetail { Status = false, Message = "Incorrect password" };
+            if (account == null)
+            {
+                _logger.LogDetails(LogType.WARNING, "incorrect password");
+                return new ResponseDetail { Status = false, Message = "Incorrect password" };                
+            }
+            account.LoggedInAt = DateTime.Now;
+            if (!await _accountService.Update(account))
+            {
+                _logger.LogDetails(LogType.ERROR, $"Failed to save login time for user {user.Id}");
+                return new ResponseDetail { Status = false, Message = "Some error ocurred!" };
+            }            
+            return new ResponseDetail { Status = true };
         }
 
         public async Task<ResponseDetail> RegisterUser(UserDetail userRegistrationDetail)
@@ -51,6 +67,7 @@ namespace API_Service.RepositoryLayer.Repository
             _logger.LogDetails(LogType.INFO, $"Checking if email exists");
             if (existingUsers.Any(u => u.Email.Equals(userRegistrationDetail.Email, StringComparison.OrdinalIgnoreCase)))
             {
+                _logger.LogDetails(LogType.WARNING, $"The email is in use");
                 return new ResponseDetail
                 {
                     Status = false,
@@ -71,13 +88,14 @@ namespace API_Service.RepositoryLayer.Repository
 
             if (!userSaved)
             {
+                _logger.LogDetails(LogType.WARNING, $"Saving user process has been failed!");
                 return new ResponseDetail
                 {
                     Status = false,
                     Message = "Failed to create user"
                 };
             }
-            _logger.LogDetails(LogType.INFO, $"New user with id {newUser.Id} saved");
+            _logger.LogDetails(LogType.INFO, $"New user saved with id {newUser.Id} saved");
 
             // Create account for the user
             var newAccount = new Account
@@ -85,8 +103,7 @@ namespace API_Service.RepositoryLayer.Repository
                 Id = Guid.NewGuid(),
                 UserId = newUser.Id,
                 Password = userRegistrationDetail.Password,
-                CreatedAt = DateTime.Now,
-                LoggedInAt = DateTime.MinValue
+                CreatedAt = DateTime.Now
             };
 
             // Save account
@@ -95,6 +112,7 @@ namespace API_Service.RepositoryLayer.Repository
             // Rollback: If account save fails, delete the user that was just saved
             if (!accountSaved)
             {
+                _logger.LogDetails(LogType.WARNING, $"Account saving process failed");
                 await RollBackUser(newUser.Id.ToString());
 
                 return new ResponseDetail
@@ -102,9 +120,9 @@ namespace API_Service.RepositoryLayer.Repository
                     Status = false,
                     Message = "Failed to create account."
                 };
-            }            
-            _logger.LogDetails(LogType.INFO, $"Account information saved for respective user, {newUser.Id}");
+            }
             
+            _logger.LogDetails(LogType.INFO, $"Account information saved for respective user, {newUser.Id}");            
             return new ResponseDetail
             {
                 Status = true,
@@ -112,9 +130,9 @@ namespace API_Service.RepositoryLayer.Repository
             };
         }
         public async Task RollBackUser(string userId)
-        {
-            _logger.LogDetails(LogType.INFO, $"rolling back for user: {userId} in progress.");
+        {            
             await _userService.Delete(userId);
+            _logger.LogDetails(LogType.INFO, $"Rollback: User with id {userId} has been deleted.");
         }
     }
 }

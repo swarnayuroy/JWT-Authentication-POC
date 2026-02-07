@@ -153,6 +153,49 @@ namespace API_Service.AppData.DataService
             }
         }
 
+        public async Task<bool> Update(T entity) 
+        {
+            try
+            {
+                if (typeof(T) == typeof(Models.Entities.User))
+                {
+                    var userDetail = entity as Models.Entities.User;
+                    if (userDetail != null)
+                    {
+                        return await _dataService.UpdateUserAsync(new DataContext.Models.User
+                        {
+                            Id = userDetail.Id,
+                            Name = userDetail.Name,
+                            Email = userDetail.Email,
+                            IsVerfied = userDetail.IsVerified
+                        });
+                    }
+                }
+                else if (typeof(T) == typeof(Models.Entities.Account))
+                {
+                    var accountDetail = entity as Models.Entities.Account;
+                    if (accountDetail != null)
+                    {
+                        return await _dataService.UpdateAccountAsync(new DataContext.Models.Account
+                        {
+                            Id = accountDetail.Id,
+                            UserId = accountDetail.UserId,
+                            Password = accountDetail.Password,
+                            CreatedAt = accountDetail.CreatedAt,
+                            LoggedInAt = accountDetail.LoggedInAt
+                        });
+                    }
+                }
+                _logger.LogDetails(LogType.WARNING, $"Type {typeof(T).Name} is not supported type");
+                throw new NotSupportedException($"Type {typeof(T).Name} is not supported type");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, $"{ex.Message}");
+                return false;
+            }            
+        }
+
         public Task<bool> Delete(string id)
         {
             try

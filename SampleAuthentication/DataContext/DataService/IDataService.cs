@@ -11,6 +11,8 @@ namespace DataContext.DataService
     {
         Task SaveUserAsync(User userDetail);
         Task SaveAccountAsync(Account accountDetail);
+        Task<bool> UpdateUserAsync(User userDetail);
+        Task<bool> UpdateAccountAsync(Account accountDetail);
         Task<bool> DeleteUserAsync(Guid userId);
         Task<bool> DeleteAccountAsync(Guid accountId);
     }
