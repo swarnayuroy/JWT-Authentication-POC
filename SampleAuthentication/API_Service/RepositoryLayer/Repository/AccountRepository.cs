@@ -12,6 +12,7 @@ namespace API_Service.RepositoryLayer.Repository
         private LoggerService<AccountRepository> _logger;
         private readonly IService<User> _userService;
         private readonly IService<Account> _accountService;
+
         public AccountRepository(
             ILogger<AccountRepository> logger, 
             IService<User> userService, 
@@ -56,8 +57,14 @@ namespace API_Service.RepositoryLayer.Repository
             {
                 _logger.LogDetails(LogType.ERROR, $"Failed to save login time for user {user.Id}");
                 return new ResponseDetail { Status = false, Message = "Some error ocurred!" };
-            }            
-            return new ResponseDetail { Status = true };
+            }
+
+            return new ResponseDataDetail<string> 
+            { 
+                Status = true,
+                Message = "Account validation successful",
+                Data = new JwtManager().GenerateToken(user)
+            };
         }
 
         public async Task<ResponseDetail> RegisterUser(UserDetail userRegistrationDetail)

@@ -1,7 +1,9 @@
 ﻿using API_Service.Models.DTO;
+using API_Service.Models.ResponseModel;
 using API_Service.RepositoryLayer.Interface;
 using API_Service.RepositoryLayer.Repository;
 using API_Service.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -14,12 +16,16 @@ namespace API_Service.Controllers
     {
         private LoggerService<AccountController> _logger;
         private readonly IAccountRepository _accountService;
-        public AccountController(ILogger<AccountController> logger, IAccountRepository accountService)
+        public AccountController(
+            ILogger<AccountController> logger, 
+            IAccountRepository accountService
+        )
         {
             this._logger = new LoggerService<AccountController>(logger);
             this._accountService = accountService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("check")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -31,7 +37,7 @@ namespace API_Service.Controllers
             {
                 var response = await _accountService.CheckCredential(userCredential);
 
-                return response.Status ? Ok() : Unauthorized(response.Message);
+                return response.Status ? Ok(response as ResponseDataDetail<string>) : Unauthorized(response.Message);
             }
             catch (Exception ex)
             {
@@ -41,6 +47,7 @@ namespace API_Service.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("register")]
         [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]

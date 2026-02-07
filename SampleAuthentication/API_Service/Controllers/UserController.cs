@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using API_Service.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API_Service.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private LoggerService<UserController> _logger;
