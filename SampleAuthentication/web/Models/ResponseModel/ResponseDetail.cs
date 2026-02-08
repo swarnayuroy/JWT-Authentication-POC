@@ -12,4 +12,8 @@ namespace web.Models.ResponseModel
         public HttpStatusCode? StatusCode { get; set; }
         public string Message { get; set; }
     }
+    public class ResponseDataDetail<T> : ResponseDetail
+    {
+        public T Data { get; set; }
+    }
 }

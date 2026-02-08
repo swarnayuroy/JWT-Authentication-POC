@@ -54,7 +54,28 @@ namespace web.Controllers
             response = await _repository.CheckCredential(formModel.SignIn);
             if (response.Status)
             {
-                return RedirectToAction("Dashboard", "Home");
+                if (response is ResponseDataDetail<string> responseWithToken && !string.IsNullOrEmpty(responseWithToken.Data))
+                {
+                    var cookie = new HttpCookie("sessionToken", responseWithToken.Data)
+                    {
+                        HttpOnly = true,
+                        Secure = true
+                    };
+                    Response.Cookies.Add(cookie);
+                    return RedirectToAction("Dashboard", "Home");
+                }
+                return View("Login", new Form
+                {
+                    showSignInForm = true,
+                    showSignUpForm = false,
+                    ToastNotification = new ToastNotification
+                    {
+                        IsEnable = true,
+                        Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.BadRequest,
+                        StatusIcon = ToastNotification.WARNING_ICON,
+                        Message = "Oops! please try again later."
+                    }
+                });
             }
 
             return View("Login", new Form

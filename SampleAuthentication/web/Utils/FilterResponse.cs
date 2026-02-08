@@ -32,14 +32,51 @@ namespace web.Utils
                     {
                         // Try to parse as JSON object
                         var jsonResponse = JObject.Parse(responseContent);
-                        // Try both "Message" and "message" (case-insensitive)
-                        string message = jsonResponse["Message"]?.ToString() ?? jsonResponse["message"]?.ToString();
 
-                        if (!string.IsNullOrWhiteSpace(message))
+                        // Extract properties (case-insensitive)
+                        string message = jsonResponse["Message"]?.ToString() ?? jsonResponse["message"]?.ToString();
+                        bool? statusFromJson = jsonResponse["Status"]?.ToObject<bool?>() ?? jsonResponse["status"]?.ToObject<bool?>();
+                        bool status = statusFromJson ?? response.IsSuccessStatusCode;
+
+                        // Check if Data property exists
+                        var data = jsonResponse["Data"] ?? jsonResponse["data"];
+
+                        if (data != null)
                         {
+                            // Response has Data property - try to determine the type
+                            // For now, we'll assume string type for token scenarios
+                            // This can be extended for other types if needed
+                            try
+                            {
+                                string responseData = data.ToObject<string>();
+
+                                return new ResponseDataDetail<string>
+                                {
+                                    Status = status,
+                                    StatusCode = response.StatusCode,
+                                    Message = message ?? string.Empty,
+                                    Data = responseData
+                                };
+                            }
+                            catch
+                            {
+                                // If it's not a string, treat as object and log
+                                _logger.LogDetails(LogType.INFO, "Data property exists but is not a string type");
+
+                                return new ResponseDetail
+                                {
+                                    Status = status,
+                                    StatusCode = response.StatusCode,
+                                    Message = message ?? string.Empty
+                                };
+                            }
+                        }
+                        else if (!string.IsNullOrWhiteSpace(message))
+                        {
+                            // No Data property found, return standard ResponseDetail
                             return new ResponseDetail
                             {
-                                Status = response.IsSuccessStatusCode,
+                                Status = status,
                                 StatusCode = response.StatusCode,
                                 Message = message
                             };
@@ -61,6 +98,10 @@ namespace web.Utils
                                 Message = message
                             };
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogDetails(LogType.ERROR, $"Error processing response: {ex.Message}");
                     }
                 }
             }

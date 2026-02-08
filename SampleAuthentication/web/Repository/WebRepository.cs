@@ -35,16 +35,6 @@ namespace web.Repository
             {
                 _response = await _httpService.CheckCredential(userCredential);
 
-                if (_response.IsSuccessStatusCode)
-                {
-                    return new ResponseDetail
-                    {
-                        Status = true,
-                        StatusCode = _response.StatusCode,
-                        Message = "Credential verified successfully"
-                    };
-                }
-
                 return await new FilterResponse<WebRepository>().Process(_response);
             }
             catch (Exception ex)
