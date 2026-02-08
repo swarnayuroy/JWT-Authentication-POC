@@ -49,3 +49,21 @@ function hidePassword(formType) {
             break;
     }
 }
+
+$(document).ready(function () {
+    hideLoader();
+
+    $(".form_signIn").on("submit", function (e) {
+        var form = $(this);
+        if (form.valid()) {
+            showLoader();
+        }
+    });
+
+    $(".form_registration").on("submit", function (e) {
+        var form = $(this);
+        if (form.valid()) {
+            showLoader();
+        }
+    });
+});

@@ -18,22 +18,3 @@ function hideLoader() {
         loaderElement.style.display = "none";
     }
 }
-
-
-$(document).ready(function () {
-    hideLoader();
-
-    $(".form_signIn").on("submit", function (e) {
-        var form = $(this);
-        if (form.valid()) {
-            showLoader();
-        }
-    });
-
-    $(".form_registration").on("submit", function (e) {
-        var form = $(this);
-        if (form.valid()) {
-            showLoader();
-        }
-    });
-});
