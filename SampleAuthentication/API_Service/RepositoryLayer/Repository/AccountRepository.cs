@@ -59,11 +59,22 @@ namespace API_Service.RepositoryLayer.Repository
                 return new ResponseDetail { Status = false, Message = "Some error ocurred!" };
             }
 
-            return new ResponseDataDetail<string> 
+            string userToken = new JwtManager().GenerateToken(user);
+            if (!String.IsNullOrEmpty(userToken))
+            {
+                _logger.LogDetails(LogType.INFO, "Generated token successfully");
+                return new ResponseDataDetail<string>
+                {
+                    Status = true,
+                    Message = "Account validation successful",
+                    Data = userToken
+                };
+            }
+            _logger.LogDetails(LogType.WARNING, "Failed to generate token!");
+            return new ResponseDetail 
             { 
-                Status = true,
-                Message = "Account validation successful",
-                Data = new JwtManager().GenerateToken(user)
+                Status = false,
+                Message = "Failed to generate token!"
             };
         }
 
