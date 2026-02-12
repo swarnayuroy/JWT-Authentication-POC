@@ -21,6 +21,13 @@ namespace web.Controllers
         // GET: Login
         public ActionResult Login()
         {
+            // Set cache control headers to prevent caching
+            Response.Cache.SetExpires(DateTime.UtcNow.AddMinutes(-1));
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.Cache.SetNoStore();
+            Response.Cache.SetRevalidation(HttpCacheRevalidation.AllCaches);
+            Response.AppendHeader("Pragma", "no-cache");
+
             return View(new Form
             {
                 showSignInForm = true,

@@ -255,6 +255,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\page-scripts\form.js" />
+    <Content Include="Scripts\page-scripts\restrict-prev.js" />
     <Content Include="Scripts\page-scripts\shared.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

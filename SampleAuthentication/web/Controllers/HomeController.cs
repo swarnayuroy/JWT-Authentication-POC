@@ -27,6 +27,13 @@ namespace web.Controllers
                 string userId = claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
                 if (!String.IsNullOrEmpty(userId))
                 {
+                    // Set cache control headers to prevent back navigation
+                    Response.Cache.SetExpires(DateTime.UtcNow.AddMinutes(-1));
+                    Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                    Response.Cache.SetNoStore();
+                    Response.Cache.SetRevalidation(HttpCacheRevalidation.AllCaches);
+                    Response.AppendHeader("Pragma", "no-cache");
+
                     return View();
                 }
                 return RedirectToAction("Logout");
@@ -48,13 +55,14 @@ namespace web.Controllers
                     cookie.Value = String.Empty;
                     Response.Cookies.Add(cookie);
                     Request.Cookies.Remove("sessionToken");
-
-                    Response.Cache.SetExpires(DateTime.Now.AddMinutes(-1));
-                    Response.Cache.SetCacheability(HttpCacheability.NoCache);
-                    Response.Cache.SetNoStore();
-
-                    //_logger.LogDetails(LogType.INFO, $"{userId} logged out");
                 }
+
+                Response.Cache.SetExpires(DateTime.UtcNow.AddMinutes(-1));
+                Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                Response.Cache.SetNoStore();
+                Response.Cache.SetRevalidation(HttpCacheRevalidation.AllCaches);
+                Response.AppendHeader("Pragma", "no-cache");
+                Response.AppendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 
                 return RedirectToAction("Login", "Account");
             }
