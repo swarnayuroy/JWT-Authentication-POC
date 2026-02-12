@@ -1,8 +1,9 @@
 ﻿using API_Service.AppData;
-using API_Service.Utils;
 using API_Service.Models.DTO;
 using API_Service.Models.Entities;
+using API_Service.Models.ResponseModel;
 using API_Service.RepositoryLayer.Interface;
+using API_Service.Utils;
 
 namespace API_Service.RepositoryLayer.Repository
 {
@@ -15,11 +16,10 @@ namespace API_Service.RepositoryLayer.Repository
             this._logger = new LoggerService<UserRepository>(logger);
             this._userService = userService;
         }
-        public async Task<IEnumerable<UserDetail>> GetAllUsersAsync()
+        public async Task<ResponseDetail> GetAllUsersAsync()
         {
             var users = await _userService.Get();
-            
-            if (users.Count()>0)
+            if (users.Count() > 0)
             {
                 _logger.LogDetails(LogType.INFO, $"Fetched {users.Count()} users");
                 var userDetails = users.Select(user => new UserDetail
@@ -28,12 +28,22 @@ namespace API_Service.RepositoryLayer.Repository
                     Name = user.Name,
                     Email = user.Email,
                     Password = string.Empty // Do not expose password
-                }); 
-                return userDetails;
+                });
+                return new ResponseDataDetail<IEnumerable<UserDetail>>
+                {
+                    Status = true,
+                    Message = userDetails.Count() > 1 ? $"{userDetails.Count()} users fetched successfully" : "1 user fetched successfully",
+                    Data = userDetails
+                };
             }
-            return Enumerable.Empty<UserDetail>();
+            return new ResponseDetail
+            {
+                Status = false,
+                Message = "No users found"
+            };
         }
-        public async Task<UserDetail?> GetUserAsync(string id)
+
+        public async Task<ResponseDetail> GetUserAsync(string id)
         {
             var users = await _userService.Get();
             if (users.Count() > 0)
@@ -42,16 +52,25 @@ namespace API_Service.RepositoryLayer.Repository
                 if (user != null)
                 {
                     _logger.LogDetails(LogType.INFO, $"Successfully fetched user: {user.Id}");
-                    return new UserDetail
+                    return new ResponseDataDetail<UserDetail>
                     {
-                        Id = user.Id.ToString(),
-                        Name = user.Name,
-                        Email = user.Email,
-                        Password = string.Empty // Do not expose password
+                        Status = true,
+                        Message = "User fetched successfully",
+                        Data = new UserDetail
+                        {
+                            Id = user.Id.ToString(),
+                            Name = user.Name,
+                            Email = user.Email,
+                            Password = string.Empty // Do not expose password
+                        }
                     };
                 }
             }
-            return null;
+            return new ResponseDetail
+            {
+                Status = false,
+                Message = "User not found"
+            };
         }
     }
 }

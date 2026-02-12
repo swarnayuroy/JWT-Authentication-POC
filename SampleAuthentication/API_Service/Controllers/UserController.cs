@@ -1,8 +1,9 @@
-﻿using API_Service.RepositoryLayer.Interface;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using API_Service.Models.DTO;
+using API_Service.Models.ResponseModel;
+using API_Service.RepositoryLayer.Interface;
 using API_Service.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API_Service.Controllers
 {
@@ -29,10 +30,10 @@ namespace API_Service.Controllers
             try
             {
                 // Placeholder for actual user retrieval logic
-                var users = await _userRepository.GetAllUsersAsync();
-                if (users.Any())
+                var response = await _userRepository.GetAllUsersAsync();
+                if (response.Status)
                 {
-                    return Ok(users);
+                    return Ok(response as ResponseDataDetail<IEnumerable<UserDetail>>);
                 }
                 else
                 {
@@ -57,14 +58,14 @@ namespace API_Service.Controllers
             try
             {
                 // Placeholder for actual user retrieval logic by ID
-                var user = await _userRepository.GetUserAsync(id);
-                if (user != null)
+                var response = await _userRepository.GetUserAsync(id);
+                if (response.Status)
                 {
-                    return Ok(user);
+                    return Ok(response as ResponseDataDetail<UserDetail>);
                 }
                 else
                 {
-                    return NotFound("User not found.");
+                    return NotFound(response.Message);
                 }
             }
             catch (Exception ex)

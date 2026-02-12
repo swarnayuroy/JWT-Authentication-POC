@@ -1,10 +1,10 @@
-﻿using API_Service.Models.DTO;
+﻿using API_Service.Models.ResponseModel;
 
 namespace API_Service.RepositoryLayer.Interface
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<UserDetail>> GetAllUsersAsync();
-        Task<UserDetail?> GetUserAsync(string id);
+        Task<ResponseDetail> GetAllUsersAsync();
+        Task<ResponseDetail> GetUserAsync(string id);
     }
 }
