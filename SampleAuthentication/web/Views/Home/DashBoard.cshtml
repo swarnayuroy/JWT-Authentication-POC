@@ -1,4 +1,4 @@
-﻿
+﻿@model web.Models.SessionModel.UserSessionDetail
 @{
     Layout = null;
 }
@@ -16,13 +16,13 @@
     <title>DashBoard</title>
 </head>
 <body>
-    <div class="bord-header">
+    <div class="board-header">
         <a href="@Url.Action("Logout", "Home")" class="logout-btn">
             <i class="fa-solid fa-power-off"></i>
         </a>
     </div>
     <div class="bord-content">
-        Welcome! you've successfully logged in.
+        Welcome <b>@Model.User.Name.Split(' ')[0]</b>, you've successfully logged in.
     </div>
 </body>
 </html>

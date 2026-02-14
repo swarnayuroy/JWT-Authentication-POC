@@ -12,5 +12,6 @@ namespace web.Service
     {
         Task<HttpResponseMessage> CheckCredential(Credential credential);
         Task<HttpResponseMessage> RegisterUser(Registration detail);
+        Task<HttpResponseMessage> GetUserDetail(string token, string userId);
     }
 }

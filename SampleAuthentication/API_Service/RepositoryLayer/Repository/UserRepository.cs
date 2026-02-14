@@ -27,6 +27,7 @@ namespace API_Service.RepositoryLayer.Repository
                     Id = user.Id.ToString(),
                     Name = user.Name,
                     Email = user.Email,
+                    IsVerified = user.IsVerified,
                     Password = string.Empty // Do not expose password
                 });
                 return new ResponseDataDetail<IEnumerable<UserDetail>>
@@ -61,6 +62,7 @@ namespace API_Service.RepositoryLayer.Repository
                             Id = user.Id.ToString(),
                             Name = user.Name,
                             Email = user.Email,
+                            IsVerified = user.IsVerified,
                             Password = string.Empty // Do not expose password
                         }
                     };

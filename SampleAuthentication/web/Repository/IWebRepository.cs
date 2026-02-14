@@ -13,5 +13,6 @@ namespace web.Repository
     {
         Task<ResponseDetail> CheckCredential(Credential userCredential);
         Task<ResponseDetail> RegisterUser(Registration userRegistrationDetail);
+        Task<ResponseDetail> GetUserDetail(string token, string userId);
     }
 }
