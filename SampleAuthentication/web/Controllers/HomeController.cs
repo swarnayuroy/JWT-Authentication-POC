@@ -57,7 +57,6 @@ namespace web.Controllers
                             });
                         }
                     }
-                    return View();
                 }
                 return RedirectToAction("Logout");
             }
