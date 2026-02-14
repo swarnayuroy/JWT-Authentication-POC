@@ -3,6 +3,7 @@ using API_Service.AppData.DataService;
 using API_Service.Models.Entities;
 using API_Service.RepositoryLayer.Interface;
 using API_Service.RepositoryLayer.Repository;
+using API_Service.Utils;
 using DataContext.DataProvider;
 using DataContext.DataService;
 using DataContext.SampleData;
@@ -65,12 +66,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddSingleton<IDataProvider, AccountData>();
-builder.Services.AddSingleton<IDataService, AccountData>();
-builder.Services.AddSingleton<IService<User>, SampleDataService<User>>();
-builder.Services.AddSingleton<IService<Account>, SampleDataService<Account>>();
-builder.Services.AddSingleton<IAccountRepository, AccountRepository>();
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IDataProvider, AccountData>();
+builder.Services.AddScoped<IDataService, AccountData>();
+builder.Services.AddScoped<IService<User>, SampleDataService<User>>();
+builder.Services.AddScoped<IService<Account>, SampleDataService<Account>>();
+builder.Services.AddScoped<IJwtManager, JwtManager>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddAuthentication(options =>
 {

@@ -2,20 +2,22 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using API_Service.Models.Entities;
 
 namespace API_Service.Utils
 {
-    public class JwtManager
+    public interface IJwtManager
+    {
+        string GenerateToken(User userDetail);
+    }
+    public class JwtManager : IJwtManager
     {
         private readonly IConfiguration _configuration;
-        public JwtManager()
+        public JwtManager(IConfiguration configuration)
         {
-            this._configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .Build();
+            this._configuration = configuration;
         }
-        public string GenerateToken(Models.Entities.User userDetail)
+        public string GenerateToken(User userDetail)
         {
             var tokenDescriptor = new SecurityTokenDescriptor
             {

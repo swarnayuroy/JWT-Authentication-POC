@@ -12,16 +12,19 @@ namespace API_Service.RepositoryLayer.Repository
         private LoggerService<AccountRepository> _logger;
         private readonly IService<User> _userService;
         private readonly IService<Account> _accountService;
+        private readonly IJwtManager _jwtManager;
 
         public AccountRepository(
             ILogger<AccountRepository> logger, 
             IService<User> userService, 
-            IService<Account> accountService
+            IService<Account> accountService,
+            IJwtManager jwtManager
         )
         {
             this._logger = new LoggerService<AccountRepository>(logger);
             this._userService = userService;
             this._accountService = accountService;
+            this._jwtManager = jwtManager;
         }
         
         public async Task<ResponseDetail> CheckCredential(UserCredential userCredential)
@@ -59,7 +62,7 @@ namespace API_Service.RepositoryLayer.Repository
                 return new ResponseDetail { Status = false, Message = "Some error ocurred!" };
             }
 
-            string userToken = new JwtManager().GenerateToken(user);
+            string userToken = _jwtManager.GenerateToken(user);
             if (!String.IsNullOrEmpty(userToken))
             {
                 _logger.LogDetails(LogType.INFO, "Generated token successfully");
