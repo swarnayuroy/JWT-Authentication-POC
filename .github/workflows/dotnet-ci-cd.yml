@@ -112,7 +112,6 @@ jobs:
     name: Code Quality Analysis
     runs-on: windows-latest
     needs: build
-    if: github.event_name == 'pull_request'
 
     steps:
     - name: Checkout code
@@ -125,9 +124,32 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    # Optional: Add SonarCloud or CodeQL analysis here
-    - name: Code Quality Check
-      run: echo "Add SonarCloud or other code quality tools here"
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    # Restore all projects
+    - name: Restore NuGet packages
+      run: |
+        nuget restore ${{ env.WEB_PROJECT_PATH }} -PackagesDirectory SampleAuthentication/packages
+        nuget restore ${{ env.DATA_CONTEXT_PATH }} -PackagesDirectory SampleAuthentication/packages
+        dotnet restore ${{ env.API_PROJECT_PATH }}
+        dotnet restore ${{ env.TEST_PROJECT_PATH }}
+
+    # Run .NET code analysis
+    - name: Run .NET Code Analysis
+      run: |
+        dotnet build ${{ env.API_PROJECT_PATH }} --configuration Release --no-restore /p:EnforceCodeStyleInBuild=true /p:TreatWarningsAsErrors=false
+        dotnet build ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-restore /p:EnforceCodeStyleInBuild=true /p:TreatWarningsAsErrors=false
+
+    # Run code metrics
+    - name: Install dotnet-coverage tool
+      run: dotnet tool install --global dotnet-coverage
+
+    - name: Code Quality Summary
+      run: echo "Code quality analysis completed successfully"
 
   security-scan:
     name: Security Vulnerability Scan
@@ -148,98 +170,3 @@ jobs:
       run: |
         dotnet list ${{ env.API_PROJECT_PATH }} package --vulnerable --include-transitive
         dotnet list ${{ env.TEST_PROJECT_PATH }} package --vulnerable --include-transitive
-
-  deploy-dev:
-    name: Deploy to Development
-    runs-on: windows-latest
-    needs: [build, security-scan]
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-    environment:
-      name: Development
-      url: https://dev-api.yourdomain.com
-
-    steps:
-    - name: Download API Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: api-service
-        path: ./api
-
-    - name: Download Web Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: web-mvc
-        path: ./web
-
-    # Deploy to Azure Web App (API)
-    - name: Deploy API to Azure
-      run: echo "Deploy API to Azure Web App or IIS"
-      # Uncomment and configure for actual Azure deployment
-      # - name: Azure Login
-      #   uses: azure/login@v2
-      #   with:
-      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
-      #
-      # - name: Deploy to Azure Web App
-      #   uses: azure/webapps-deploy@v3
-      #   with:
-      #     app-name: 'your-api-app-name'
-      #     package: ./api
-
-    # Deploy Web MVC to Azure or IIS
-    - name: Deploy Web to Azure
-      run: echo "Deploy Web MVC to Azure Web App or IIS"
-
-  deploy-staging:
-    name: Deploy to Staging
-    runs-on: windows-latest
-    needs: [build, security-scan]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment:
-      name: Staging
-      url: https://staging-api.yourdomain.com
-
-    steps:
-    - name: Download API Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: api-service
-        path: ./api
-
-    - name: Download Web Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: web-mvc
-        path: ./web
-
-    - name: Deploy to Staging
-      run: echo "Deploy to staging environment"
-
-  deploy-production:
-    name: Deploy to Production
-    runs-on: windows-latest
-    needs: [deploy-staging]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment:
-      name: Production
-      url: https://api.yourdomain.com
-
-    steps:
-    - name: Download API Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: api-service
-        path: ./api
-
-    - name: Download Web Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: web-mvc
-        path: ./web
-
-    # Require manual approval before production deployment
-    - name: Manual Approval Required
-      run: echo "Production deployment requires manual approval in GitHub Environments"
-
-    - name: Deploy to Production
-      run: echo "Deploy to production environment"
