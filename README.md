@@ -29,19 +29,30 @@ g. Singleton
 
 
 Architecture:
-Layered/N-Tier Architecture (3-Tier) with Client-Server and Service-Oriented characteristics:
+1. Multi-Tier Architecture (N-Layer Architecture)
 
-
+The solution follows a 3-tier/N-tier architecture with clear separation of concerns:
 
 •  Presentation Layer: ASP.NET MVC (.NET Framework 4.8.1) web application
-
 
 
 •  Business Logic Layer: ASP.NET Core Web API (.NET 8) with RESTful endpoints
 
 
-
 •  Data Access Layer: Shared DataContext library (.NET Framework 4.8) with in-memory storage
+
+
+•  Test Layer: TestProject project (.NET 8)
+
+2. Client-Server Architecture
+   
+•	MVC Web Application (client) communicates with Web API (server)
+
+
+•	CORS enabled for cross-origin communication
+
+
+•	JWT token-based authentication between client and server
 
 
 
