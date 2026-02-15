@@ -9,11 +9,11 @@ on:
 
 env:
   DOTNET_VERSION: '8.0.x'
-  SOLUTION_PATH: 'SampleAuthentication.slnx'
-  API_PROJECT_PATH: 'API_Service/API_Service.csproj'
-  WEB_PROJECT_PATH: 'web/web.csproj'
-  DATA_CONTEXT_PATH: 'DataContext/DataContext.csproj'
-  TEST_PROJECT_PATH: 'TestProject/TestProject.csproj'
+  SOLUTION_PATH: 'SampleAuthentication/SampleAuthentication.slnx'
+  API_PROJECT_PATH: 'SampleAuthentication/API_Service/API_Service.csproj'
+  WEB_PROJECT_PATH: 'SampleAuthentication/web/web.csproj'
+  DATA_CONTEXT_PATH: 'SampleAuthentication/DataContext/DataContext.csproj'
+  TEST_PROJECT_PATH: 'SampleAuthentication/TestProject/TestProject.csproj'
 
 jobs:
   build:
