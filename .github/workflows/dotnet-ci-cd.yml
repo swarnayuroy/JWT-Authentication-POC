@@ -61,6 +61,10 @@ jobs:
     # Build API Service (.NET 8)
     - name: Build API Service
       run: dotnet build ${{ env.API_PROJECT_PATH }} --configuration Release --no-restore
+      
+    # Build Test Project (.NET 8)
+    - name: Build Test Project
+      run: dotnet build ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-restore
 
     # Run Tests
     - name: Run Unit Tests
