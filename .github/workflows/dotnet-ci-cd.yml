@@ -41,8 +41,8 @@ jobs:
     # Restore NuGet packages for .NET Framework projects
     - name: Restore NuGet packages (.NET Framework)
       run: |
-        nuget restore ${{ env.WEB_PROJECT_PATH }} -PackagesDirectory packages
-        nuget restore ${{ env.DATA_CONTEXT_PATH }} -PackagesDirectory packages
+        nuget restore ${{ env.WEB_PROJECT_PATH }} -PackagesDirectory SampleAuthentication/packages
+        nuget restore ${{ env.DATA_CONTEXT_PATH }} -PackagesDirectory SampleAuthentication/packages
 
     # Restore .NET 8 projects
     - name: Restore .NET 8 dependencies
