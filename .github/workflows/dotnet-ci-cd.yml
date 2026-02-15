@@ -156,13 +156,13 @@ jobs:
 
     steps:
     - name: Download API Artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: api-service
         path: ./api
 
     - name: Download Web Artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: web-mvc
         path: ./web
@@ -197,13 +197,13 @@ jobs:
 
     steps:
     - name: Download API Artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: api-service
         path: ./api
 
     - name: Download Web Artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: web-mvc
         path: ./web
@@ -222,13 +222,13 @@ jobs:
 
     steps:
     - name: Download API Artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: api-service
         path: ./api
 
     - name: Download Web Artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: web-mvc
         path: ./web
