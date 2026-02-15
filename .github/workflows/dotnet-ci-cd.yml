@@ -1,0 +1,241 @@
+name: .NET CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  SOLUTION_PATH: 'SampleAuthentication.slnx'
+  API_PROJECT_PATH: 'API_Service/API_Service.csproj'
+  WEB_PROJECT_PATH: 'web/web.csproj'
+  DATA_CONTEXT_PATH: 'DataContext/DataContext.csproj'
+  TEST_PROJECT_PATH: 'TestProject/TestProject.csproj'
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Setup .NET 8 for modern projects
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    # Setup MSBuild for .NET Framework projects
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    # Setup NuGet for .NET Framework package restoration
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    # Restore NuGet packages for .NET Framework projects
+    - name: Restore NuGet packages (.NET Framework)
+      run: |
+        nuget restore ${{ env.WEB_PROJECT_PATH }} -PackagesDirectory packages
+        nuget restore ${{ env.DATA_CONTEXT_PATH }} -PackagesDirectory packages
+
+    # Restore .NET 8 projects
+    - name: Restore .NET 8 dependencies
+      run: |
+        dotnet restore ${{ env.API_PROJECT_PATH }}
+        dotnet restore ${{ env.TEST_PROJECT_PATH }}
+
+    # Build DataContext (.NET Framework 4.8)
+    - name: Build DataContext
+      run: msbuild ${{ env.DATA_CONTEXT_PATH }} /p:Configuration=Release /p:Platform=AnyCPU
+
+    # Build Web (.NET Framework 4.8.1)
+    - name: Build Web MVC Application
+      run: msbuild ${{ env.WEB_PROJECT_PATH }} /p:Configuration=Release /p:Platform=AnyCPU /p:DeployOnBuild=true /p:PublishProfile=Release
+
+    # Build API Service (.NET 8)
+    - name: Build API Service
+      run: dotnet build ${{ env.API_PROJECT_PATH }} --configuration Release --no-restore
+
+    # Run Tests
+    - name: Run Unit Tests
+      run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
+
+    # Upload test results
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: '**/TestResults/*.trx'
+
+    # Upload code coverage
+    - name: Upload Code Coverage
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: code-coverage
+        path: '**/TestResults/**/coverage.cobertura.xml'
+
+    # Publish API Service
+    - name: Publish API Service
+      run: dotnet publish ${{ env.API_PROJECT_PATH }} --configuration Release --no-build --output ./publish/api
+
+    # Publish Web MVC Application
+    - name: Publish Web MVC Application
+      run: msbuild ${{ env.WEB_PROJECT_PATH }} /p:Configuration=Release /p:Platform=AnyCPU /p:DeployOnBuild=true /p:PublishProfile=Release /p:PublishUrl=./publish/web
+
+    # Upload API artifacts
+    - name: Upload API Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-service
+        path: ./publish/api
+
+    # Upload Web artifacts
+    - name: Upload Web Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-mvc
+        path: ./publish/web
+
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: windows-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    # Optional: Add SonarCloud or CodeQL analysis here
+    - name: Code Quality Check
+      run: echo "Add SonarCloud or other code quality tools here"
+
+  security-scan:
+    name: Security Vulnerability Scan
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    # Run security vulnerability scan
+    - name: Run Security Scan
+      run: |
+        dotnet list ${{ env.API_PROJECT_PATH }} package --vulnerable --include-transitive
+        dotnet list ${{ env.TEST_PROJECT_PATH }} package --vulnerable --include-transitive
+
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: windows-latest
+    needs: [build, security-scan]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment:
+      name: Development
+      url: https://dev-api.yourdomain.com
+
+    steps:
+    - name: Download API Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: api-service
+        path: ./api
+
+    - name: Download Web Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: web-mvc
+        path: ./web
+
+    # Deploy to Azure Web App (API)
+    - name: Deploy API to Azure
+      run: echo "Deploy API to Azure Web App or IIS"
+      # Uncomment and configure for actual Azure deployment
+      # - name: Azure Login
+      #   uses: azure/login@v2
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+      #
+      # - name: Deploy to Azure Web App
+      #   uses: azure/webapps-deploy@v3
+      #   with:
+      #     app-name: 'your-api-app-name'
+      #     package: ./api
+
+    # Deploy Web MVC to Azure or IIS
+    - name: Deploy Web to Azure
+      run: echo "Deploy Web MVC to Azure Web App or IIS"
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: windows-latest
+    needs: [build, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: Staging
+      url: https://staging-api.yourdomain.com
+
+    steps:
+    - name: Download API Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: api-service
+        path: ./api
+
+    - name: Download Web Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: web-mvc
+        path: ./web
+
+    - name: Deploy to Staging
+      run: echo "Deploy to staging environment"
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: windows-latest
+    needs: [deploy-staging]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: Production
+      url: https://api.yourdomain.com
+
+    steps:
+    - name: Download API Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: api-service
+        path: ./api
+
+    - name: Download Web Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: web-mvc
+        path: ./web
+
+    # Require manual approval before production deployment
+    - name: Manual Approval Required
+      run: echo "Production deployment requires manual approval in GitHub Environments"
+
+    - name: Deploy to Production
+      run: echo "Deploy to production environment"
