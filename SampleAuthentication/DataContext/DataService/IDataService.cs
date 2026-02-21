@@ -10,10 +10,13 @@ namespace DataContext.DataService
     public interface IDataService
     {
         Task SaveUserAsync(User userDetail);
+        Task SaveUserRoleAsync(UserRole userRole);
         Task SaveAccountAsync(Account accountDetail);
         Task<bool> UpdateUserAsync(User userDetail);
+        Task<bool> UpdateUserRoleAsync(UserRole userRole);
         Task<bool> UpdateAccountAsync(Account accountDetail);
         Task<bool> DeleteUserAsync(Guid userId);
+        Task<bool> DeleteUserRoleAsync(Guid userId);
         Task<bool> DeleteAccountAsync(Guid accountId);
     }
 }

@@ -10,6 +10,7 @@ namespace DataContext.DataProvider
     public interface IDataProvider
     {
         IList<User> User { get; }
+        IList<UserRole> UserRole { get; }
         IList<Account> Account { get; }
     }
 }
