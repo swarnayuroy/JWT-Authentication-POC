@@ -20,10 +20,15 @@ namespace API_Service.Controllers
             this._userRepository = userRepository;
         }
 
+        /// <summary>
+        /// Get all users - Admin only
+        /// </summary>
         [HttpGet]
         [Route("get")]
+        [Authorize(Roles = nameof(Role.Admin))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Get()
         {
@@ -48,10 +53,15 @@ namespace API_Service.Controllers
             }
         }
 
+        /// <summary>
+        /// Get user by ID - Any authenticated user can access
+        /// </summary>
         [HttpGet]
         [Route("get/{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(string id)
         {
