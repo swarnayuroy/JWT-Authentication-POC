@@ -27,6 +27,7 @@ namespace API_Service.RepositoryLayer.Repository
                     Id = user.Id.ToString(),
                     Name = user.Name,
                     Email = user.Email,
+                    Role = user.Role,
                     IsVerified = user.IsVerified,
                     Password = string.Empty // Do not expose password
                 });
@@ -62,6 +63,7 @@ namespace API_Service.RepositoryLayer.Repository
                             Id = user.Id.ToString(),
                             Name = user.Name,
                             Email = user.Email,
+                            Role = user.Role,
                             IsVerified = user.IsVerified,
                             Password = string.Empty // Do not expose password
                         }

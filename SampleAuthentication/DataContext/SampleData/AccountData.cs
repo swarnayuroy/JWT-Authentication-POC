@@ -68,6 +68,13 @@ namespace DataContext.SampleData
                 UserId = Guid.Parse("4b79aeeb-96cd-49bf-abf0-8b5f6f693467"),
                 Password = "TestJane@1994",
                 CreatedAt = DateTime.Parse("2025-05-10T10:15:30")
+            },
+            new Account
+            {
+                Id = Guid.Parse("619778a8-e20a-4f1d-a52d-f5dc75a6bc21"),
+                UserId = Guid.Parse("4d96c0ff-6f5e-4433-b7ed-46fa38974d79"),
+                Password = "TestMiller@1995",
+                CreatedAt = DateTime.Parse("2025-05-10T10:15:30")
             }
         };
 
@@ -115,21 +122,13 @@ namespace DataContext.SampleData
             return await Task.Run(() =>
             {
                 var user = _userList.FirstOrDefault(u => u.Id == userId);
-                if (user != null)
-                {
-                    return _userList.Remove(user);
-                }
-                return false;
-            });
-        }
-        public async Task<bool> DeleteUserRoleAsync(Guid userId)
-        {
-            return await Task.Run(() =>
-            {
                 var userRoleDetail = _userRoles.FirstOrDefault(u => u.UserId == userId);
-                if (userRoleDetail != null)
+                if (user != null && userRoleDetail != null)
                 {
-                    return _userRoles.Remove(userRoleDetail);
+                    bool isUserRemoved = _userList.Remove(user);
+                    bool isUserRoleRemoved = _userRoles.Remove(userRoleDetail);
+
+                    return isUserRemoved && isUserRoleRemoved;
                 }
                 return false;
             });

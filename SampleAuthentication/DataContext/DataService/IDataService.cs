@@ -16,7 +16,6 @@ namespace DataContext.DataService
         Task<bool> UpdateUserRoleAsync(UserRole userRole);
         Task<bool> UpdateAccountAsync(Account accountDetail);
         Task<bool> DeleteUserAsync(Guid userId);
-        Task<bool> DeleteUserRoleAsync(Guid userId);
         Task<bool> DeleteAccountAsync(Guid accountId);
     }
 }

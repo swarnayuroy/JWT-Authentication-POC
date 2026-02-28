@@ -24,14 +24,13 @@ namespace API_Service.Utils
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, userDetail.Id.ToString()),
-                    new Claim(ClaimTypes.Name, userDetail.Name),
-                    new Claim(ClaimTypes.Email, userDetail.Email)
+                    new Claim(ClaimTypes.Role, userDetail.Role)
                 }),
                 Issuer = _configuration["JwtConfig:Issuer"],
                 Audience = _configuration["JwtConfig:Audience"],
                 Expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("JwtConfig:TokenValidityMins")),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey
-                                        (Encoding.ASCII.GetBytes(_configuration["JwtConfig:Key"])), 
+                                        (Encoding.ASCII.GetBytes(_configuration["JwtConfig:Key"]!)), 
                                         SecurityAlgorithms.HmacSha256Signature
                                      )
             };

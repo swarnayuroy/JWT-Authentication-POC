@@ -4,6 +4,7 @@ using API_Service.Utils;
 using DataContext.DataProvider;
 using DataContext.DataService;
 using DataContext.Models;
+using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 
@@ -63,13 +64,18 @@ namespace API_Service.AppData.DataService
             var dataContext = new Data();
             if (typeof(T) == typeof(Models.Entities.User))
             {
-                var users = _dataProvider.User.Select(u => new Models.Entities.User
-                {
-                    Id = u.Id, // Fix: assign Guid directly, not string
-                    Name = u.Name,
-                    Email = u.Email,
-                    IsVerified = u.IsVerfied
-                });
+                var users = (from user in _dataProvider.User
+                             join userRole in _dataProvider.UserRole
+                             on user.Id equals userRole.UserId
+                             select new Models.Entities.User
+                             {
+                                 Id = user.Id, // Fix: assign Guid directly, not string
+                                 Name = user.Name,
+                                 Email = user.Email,
+                                 Role = userRole.Role == UserRoleType.Admin ? "Admin" : "User",
+                                 IsVerified = user.IsVerfied
+                             }).ToList<Models.Entities.User>();
+
                 _logger.LogDetails(LogType.INFO, $"Fetched {users.Count()} users from data provider.");
 
                 dataContext.User = users;                
@@ -112,11 +118,20 @@ namespace API_Service.AppData.DataService
                     {
                         Id = userDetail.Id,
                         Name = userDetail.Name,
-                        Email = userDetail.Email,
+                        Email = userDetail.Email,                        
                         IsVerfied = userDetail.IsVerified
                     };
+                    var userRole = new UserRole
+                    {
+                        UserId = userDetail.Id,
+                        Role = userDetail.Role == "Admin" ? UserRoleType.Admin : UserRoleType.User
+                    };
 
-                    await _dataService.SaveUserAsync(user);
+                    await Task.WhenAll(
+                        _dataService.SaveUserAsync(user),
+                        _dataService.SaveUserRoleAsync(userRole)
+                    );
+
                     _logger.LogDetails(LogType.INFO, $"Account: {user.Id} saved successfully.");
                     return true;
                 }

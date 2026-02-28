@@ -102,6 +102,7 @@ namespace API_Service.RepositoryLayer.Repository
                 Id = Guid.NewGuid(),
                 Name = userRegistrationDetail.Name,
                 Email = userRegistrationDetail.Email,
+                Role = "User",
                 IsVerified = false
             };
             // Save user
