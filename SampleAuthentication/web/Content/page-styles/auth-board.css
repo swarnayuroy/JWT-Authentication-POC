@@ -5,7 +5,7 @@
     min-height: 100vh;
 }
 
-.board-header {
+.board-header-layout {
     position: absolute;
     top: 0px;
     width: 100%;
@@ -15,12 +15,25 @@
     justify-content: center;
 }
 
-    .board-header a {
-        text-decoration: none;
-        color: black;
-        border: 1px solid black;
-        border-radius: 50px;
-        padding: 5px;
-        background-color: lightgrey;
-        cursor: pointer;
-    }
+.board-header-content {
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.board-header-logo {
+    gap: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.board-header-content a {
+    text-decoration: none;
+    color: black;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 5px;
+    background-color: lightgrey;
+    cursor: pointer;
+}

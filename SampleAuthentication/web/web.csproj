@@ -213,6 +213,7 @@
   <ItemGroup>
     <Content Include="App_Data\Logs\web_logs.txt" />
     <Content Include="Content\animation\loader1.gif" />
+    <Content Include="Content\animation\razor.png" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-grid.rtl.css" />
@@ -254,6 +255,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\page-scripts\auth-board.js" />
     <Content Include="Scripts\page-scripts\form.js" />
     <Content Include="Scripts\page-scripts\restrict-prev.js" />
     <Content Include="Scripts\page-scripts\shared.js" />
