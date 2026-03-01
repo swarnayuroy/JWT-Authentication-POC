@@ -18,6 +18,7 @@ namespace web.Models
 
     public class Form
     {
+        public string ViewText { get{ return "Razor"; } }
         public bool showSignInForm { get; set; }
         public bool showSignUpForm { get; set; }
         public Credential SignIn { get; set; }

@@ -15,6 +15,7 @@ namespace web.Models.SessionModel
     }
     public class UserSessionDetail
     {
+        public string ViewText { get { return "Razor"; } }
         public UserDetail User { get; set; }
         public ToastNotification ToastNotification { get; set; }
     }
