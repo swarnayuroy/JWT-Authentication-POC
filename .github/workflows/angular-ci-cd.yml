@@ -110,16 +110,29 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
-    - name: Run npm audit
+    - name: Install dependencies
       working-directory: ${{ env.ANGULAR_WEB_PATH }}
-      run: npm audit --audit-level=moderate
+      run: npm ci
+
+    - name: Run npm audit report
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm audit --json > npm-audit-report.json || true
 
     - name: Check for critical vulnerabilities
       working-directory: ${{ env.ANGULAR_WEB_PATH }}
       run: |
-        npm audit --json > npm-audit-report.json || true
         if grep -q '"severity":"critical"' npm-audit-report.json; then
-          echo "Critical vulnerabilities found!"
+          echo "::error::Critical vulnerabilities found! Please review and fix."
           cat npm-audit-report.json
           exit 1
+        else
+          echo "No critical vulnerabilities found. Moderate/High vulnerabilities may require attention."
+          grep -o '"severity":"high"' npm-audit-report.json | wc -l | xargs echo "High severity vulnerabilities:" || echo "0"
         fi
+
+    - name: Upload audit report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: npm-audit-report
+        path: ${{ env.ANGULAR_WEB_PATH }}/npm-audit-report.json
