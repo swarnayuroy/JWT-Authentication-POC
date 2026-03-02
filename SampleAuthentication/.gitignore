@@ -1,0 +1,140 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options directory
+.vs/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Visual Studio user-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Build Tools
+*.builds
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
+packages/
+!packages/repositories.config
+
+# NuGet v3's project.json files produces more ignoreable files
+*.nuget.resx
+
+# Microsoft Azure BuildOutput
+csx/
+*.build.csdef
+
+# Microsoft Azure Emulator
+ecf/
+rcf/
+
+# Windows Installer files from build results
+*.cab
+
+# Windows Service files
+*.exe
+*.exe.config
+*.exe.manifest
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+
+# BDD Spec Flow
+*.feature.cs
+
+# Backup & swap files
+*~
+*.swp
+*.swo
+*#
+
+# OS files
+.DS_Store
+Thumbs.db
+*.lnk
+
+# IDE files
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Entity Framework
+*.edmx.diagram
+
+# BizTalk Build Output
+*.btp.cs
+*.btm.cs
+*.odx.cs
+*.xsd.cs
+
+# OpenCover UI Analysis
+OpenCover/
+
+# Azure Stream Analytics local run output
+ASALocalRun/
+
+# MSBuild Binary and Structured Log
+*.binlog
+
+# NVidia Nsight GPU debugger configuration file
+*.nvuser
+
+# MFractors (Xamarin productivity tool) working folder
+.mfractor/
+
+# Local History for Visual Studio
+.localhistory/
+
+# BeatPulse healthcheck temp database
+healthchecksdb
+
+# Rider
+.idea/
+*.sln.iml
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Project Rider
+.idea/
+*.sln.iml
+
+# User secrets
+secrets.json
+appsettings.local.json
+
+# Temporary files
+*.tmp
+*.temp
+*.log
