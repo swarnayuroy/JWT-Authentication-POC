@@ -9,11 +9,13 @@ on:
 
 env:
   DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '18.x'
   SOLUTION_PATH: 'SampleAuthentication/SampleAuthentication.slnx'
   API_PROJECT_PATH: 'SampleAuthentication/API_Service/API_Service.csproj'
   WEB_PROJECT_PATH: 'SampleAuthentication/web/web.csproj'
   DATA_CONTEXT_PATH: 'SampleAuthentication/DataContext/DataContext.csproj'
   TEST_PROJECT_PATH: 'SampleAuthentication/TestProject/TestProject.csproj'
+  ANGULAR_WEB_PATH: 'SampleAuthentication/angular-web'
 
 jobs:
   build:
@@ -37,6 +39,14 @@ jobs:
     # Setup NuGet for .NET Framework package restoration
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v2
+
+    # Setup Node.js for Angular
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: '${{ env.ANGULAR_WEB_PATH }}/package-lock.json'
 
     # Restore NuGet packages for .NET Framework projects
     - name: Restore NuGet packages (.NET Framework)
@@ -70,6 +80,21 @@ jobs:
     - name: Run Unit Tests
       run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
 
+    # Install Angular dependencies
+    - name: Install Angular dependencies
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm ci
+
+    # Build Angular project
+    - name: Build Angular project
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm run build -- --configuration production
+
+    # Run Angular unit tests
+    - name: Run Angular unit tests
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm test -- --watch=false --code-coverage
+
     # Upload test results
     - name: Upload Test Results
       uses: actions/upload-artifact@v4
@@ -85,6 +110,14 @@ jobs:
       with:
         name: code-coverage
         path: '**/TestResults/**/coverage.cobertura.xml'
+
+    # Upload Angular test results
+    - name: Upload Angular Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: angular-test-results
+        path: '${{ env.ANGULAR_WEB_PATH }}/coverage'
 
     # Publish API Service
     - name: Publish API Service

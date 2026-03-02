@@ -1,0 +1,125 @@
+name: Angular CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths: [ 'SampleAuthentication/angular-web/**' ]
+  pull_request:
+    branches: [ main, develop ]
+    paths: [ 'SampleAuthentication/angular-web/**' ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18.x'
+  ANGULAR_WEB_PATH: 'SampleAuthentication/angular-web'
+
+jobs:
+  build-and-test:
+    name: Build and Test Angular
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: '${{ env.ANGULAR_WEB_PATH }}/package-lock.json'
+
+    - name: Install dependencies
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm ci
+
+    - name: Lint code
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm run lint 2>/dev/null || echo "No lint script configured"
+
+    - name: Build Angular
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm run build -- --configuration production
+
+    - name: Run Tests
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm test -- --watch=false --code-coverage
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: angular-test-results
+        path: '${{ env.ANGULAR_WEB_PATH }}/junit.xml'
+
+    - name: Upload code coverage
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: angular-coverage
+        path: '${{ env.ANGULAR_WEB_PATH }}/coverage'
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      if: always()
+      with:
+        files: ${{ env.ANGULAR_WEB_PATH }}/coverage/cobertura-coverage.xml
+        flags: angular
+        name: angular-coverage
+
+  build-dist:
+    name: Build Distribution Package
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: '${{ env.ANGULAR_WEB_PATH }}/package-lock.json'
+
+    - name: Install dependencies
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm ci
+
+    - name: Build production bundle
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm run build -- --configuration production
+
+    - name: Upload distribution artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: angular-dist
+        path: '${{ env.ANGULAR_WEB_PATH }}/dist'
+
+  security-scan:
+    name: Security Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Run npm audit
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm audit --audit-level=moderate
+
+    - name: Check for critical vulnerabilities
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: |
+        npm audit --json > npm-audit-report.json || true
+        if grep -q '"severity":"critical"' npm-audit-report.json; then
+          echo "Critical vulnerabilities found!"
+          cat npm-audit-report.json
+          exit 1
+        fi

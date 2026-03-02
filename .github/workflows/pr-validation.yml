@@ -6,6 +6,8 @@ on:
 
 env:
   DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '18.x'
+  ANGULAR_WEB_PATH: 'SampleAuthentication/angular-web'
 
 jobs:
   validate:
@@ -27,6 +29,13 @@ jobs:
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v2
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: '${{ env.ANGULAR_WEB_PATH }}/package-lock.json'
+
     - name: Restore packages
       run: |
         nuget restore web/web.csproj -PackagesDirectory packages
@@ -42,6 +51,18 @@ jobs:
 
     - name: Run tests with coverage
       run: dotnet test TestProject/TestProject.csproj --configuration Release --logger "trx" --collect:"XPlat Code Coverage" /p:CollectCoverage=true
+
+    - name: Install Angular dependencies
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm ci
+
+    - name: Build Angular project
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm run build -- --configuration production
+
+    - name: Run Angular tests with coverage
+      working-directory: ${{ env.ANGULAR_WEB_PATH }}
+      run: npm test -- --watch=false --code-coverage
 
     - name: Code Coverage Summary
       uses: irongut/CodeCoverageSummary@v1.3.0
