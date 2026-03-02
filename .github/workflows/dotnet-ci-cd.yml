@@ -93,7 +93,7 @@ jobs:
     # Run Angular unit tests
     - name: Run Angular unit tests
       working-directory: ${{ env.ANGULAR_WEB_PATH }}
-      run: npm test -- --watch=false --code-coverage
+      run: npm test -- --watch=false --code-coverage --browsers=ChromeHeadless
 
     # Upload test results
     - name: Upload Test Results
