@@ -11,6 +11,7 @@
     <link href="~/Content/page-styles/shared.css" rel="stylesheet" />
     <link href="~/Content/page-styles/auth-board.css" rel="stylesheet" />
     <link href="~/Content/page-styles/notification.css" rel="stylesheet" />
+    <link href="~/Content/page-styles/no-content.css" rel="stylesheet" />
     <link href="~/Content/page-styles/page-loader.css" rel="stylesheet" />
     <script src="~/Scripts/jquery-3.7.0.min.js"></script>
     <script src="~/Scripts/jquery.validate.min.js"></script>
@@ -44,32 +45,39 @@
         @if (Model.User.IsAdmin)
         {
             <div class="user-table-layout">
-                <table id="user-table" cellspacing="15px">
-                    <thead id="user-table-header">
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Verified</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-table-body">
-                        @foreach (var user in Model.Data.Users)
-                        {
+                @if (Model.Data.UserCount > 0)
+                {
+                    <table id="user-table" cellspacing="15px">
+                        <thead id="user-table-header">
                             <tr>
-                                <td>@user.Name</td>
-                                <td>@user.Email</td>
-                                @if(Convert.ToBoolean(user.IsVerified))
-                                {
-                                    <td><i class="fa-solid fa-circle-check"></i></td>
-                                }
-                                else
-                                {
-                                    <td><i class="fa-solid fa-circle-xmark"></i></td>
-                                }
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Verified</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody id="user-table-body">
+                            @foreach (var user in Model.Data.Users)
+                            {
+                                <tr>
+                                    <td>@user.Name</td>
+                                    <td>@user.Email</td>
+                                    @if (Convert.ToBoolean(user.IsVerified))
+                                    {
+                                        <td><i class="fa-solid fa-circle-check"></i></td>
+                                    }
+                                    else
+                                    {
+                                        <td><i class="fa-solid fa-circle-xmark"></i></td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    @Html.Partial("_NoContent")
+                }
             </div>
         }
     </div>

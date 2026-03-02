@@ -45,5 +45,8 @@
 
 .user-table-layout {
     padding: 5%;
-    display: inline-grid;
+}
+
+.user-table-layout #user-table {
+    display: inline-block
 }
