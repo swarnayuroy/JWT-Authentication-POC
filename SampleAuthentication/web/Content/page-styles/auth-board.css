@@ -37,3 +37,13 @@
     background-color: lightgrey;
     cursor: pointer;
 }
+
+.board-content {
+    width: 500px;
+    text-align: center;
+}
+
+.user-table-layout {
+    padding: 5%;
+    display: inline-grid;
+}

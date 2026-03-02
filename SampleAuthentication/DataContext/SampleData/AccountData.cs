@@ -18,7 +18,7 @@ namespace DataContext.SampleData
                 Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
                 Name = "John Doe",
                 Email = "doe.john@gmail.com",
-                IsVerfied = false
+                IsVerfied = true
             },
             new User
             {

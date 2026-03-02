@@ -88,7 +88,7 @@ namespace web.Utils
                 Message = response.ReasonPhrase ?? "Failed to process the request"
             };
         }
-        public async Task<ResponseDetail> ProcessData<TData>(HttpResponseMessage response)
+        public async Task<ResponseDetail> ProcessData<TData>(HttpResponseMessage response, string userId = "000-000-000")
         {
             if (response.Content != null)
             {
@@ -128,6 +128,23 @@ namespace web.Utils
                                         Message = message ?? string.Empty,
                                         Data = responseData
                                     };
+                                }
+                                else if (typeof(TData).Equals(typeof(IList<UserDetail>)))
+                                {
+                                    IList<UserDetail> userList = data.ToObject<IList<UserDetail>>();
+                                    if (userList.Count() > 0)
+                                    {
+                                        // Remove the user with the specified userId from the list
+                                        userList.Remove(userList.FirstOrDefault(u => u.Id == userId));
+
+                                        return new ResponseDataDetail<IList<UserDetail>>
+                                        {
+                                            Status = status,
+                                            StatusCode = response.StatusCode,
+                                            Message = message ?? string.Empty,
+                                            Data = userList
+                                        };
+                                    }
                                 }
                                 else if (typeof(TData).Equals(typeof(UserDetail)))
                                 {

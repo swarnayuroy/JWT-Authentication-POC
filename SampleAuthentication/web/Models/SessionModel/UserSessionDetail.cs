@@ -12,11 +12,18 @@ namespace web.Models.SessionModel
         public string Email { get; set; }
         public string Role { get; set; }
         public bool? IsVerified { get; set; }
+        public bool IsAdmin { get { return Role.Equals("Admin") ? true : false; } }
     }
     public class UserSessionDetail
     {
         public string ViewText { get { return "Razor"; } }
         public UserDetail User { get; set; }
+        public SessionData Data { get; set; } = null;
         public ToastNotification ToastNotification { get; set; }
+    }
+    public class SessionData
+    {
+        public int UserCount { get{ return Users.Count(); } }
+        public IEnumerable<UserDetail> Users { get; set; }
     }
 }

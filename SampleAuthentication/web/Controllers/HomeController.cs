@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -43,10 +44,44 @@ namespace web.Controllers
                     await SetCacheControl();
 
                     response = await _repository.GetUserDetail(sessionToken, userId);
+
                     if (response.Status)
                     {
                         if ((response is ResponseDataDetail<UserDetail> userDetailResponse) && (userDetailResponse.Data != null))
                         {
+                            if (userDetailResponse.Data.IsAdmin)
+                            {
+                                ResponseDetail sessionDataResponse = await _repository.GetAllUser(sessionToken, userId);
+                                if (sessionDataResponse.Status)
+                                {
+                                    if ((sessionDataResponse is ResponseDataDetail<IList<UserDetail>> usersListResponse) && (usersListResponse.Data != null))
+                                    {
+                                        return View("DashBoard", new UserSessionDetail
+                                        {
+                                            User = userDetailResponse.Data,
+                                            Data = new SessionData
+                                            {
+                                                Users = usersListResponse.Data
+                                            },
+                                            ToastNotification = new ToastNotification
+                                            {
+                                                IsEnable = false,
+                                            }
+                                        });
+                                    }
+                                }
+                                return View("DashBoard", new UserSessionDetail
+                                {
+                                    User = userDetailResponse.Data,                                    
+                                    ToastNotification = new ToastNotification
+                                    {
+                                        IsEnable = true,
+                                        Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.BadRequest,
+                                        StatusIcon = ToastNotification.WARNING_ICON,
+                                        Message = "Oops! failed to fetch users."
+                                    }
+                                });
+                            }
                             return View("DashBoard", new UserSessionDetail
                             {
                                 User = userDetailResponse.Data,

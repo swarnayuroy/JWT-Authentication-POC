@@ -1,0 +1,141 @@
+name: Dependency Updates Check
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  check-updates:
+    name: Check for Outdated Packages
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Check outdated packages in API Service
+      run: |
+        dotnet list API_Service/API_Service.csproj package --outdated > api-outdated.txt
+        Get-Content api-outdated.txt
+      shell: pwsh
+      continue-on-error: true
+
+    - name: Check outdated packages in Test Project
+      run: |
+        dotnet list TestProject/TestProject.csproj package --outdated > test-outdated.txt
+        Get-Content test-outdated.txt
+      shell: pwsh
+      continue-on-error: true
+
+    - name: Check outdated packages in Web Project
+      run: |
+        dotnet list web/web.csproj package --outdated > web-outdated.txt
+        Get-Content web-outdated.txt
+      shell: pwsh
+      continue-on-error: true
+
+    - name: Check outdated packages in DataContext
+      run: |
+        dotnet list DataContext/DataContext.csproj package --outdated > datacontext-outdated.txt
+        Get-Content datacontext-outdated.txt
+      shell: pwsh
+      continue-on-error: true
+
+    - name: Check for vulnerabilities
+      run: |
+        dotnet list API_Service/API_Service.csproj package --vulnerable --include-transitive > api-vulnerabilities.txt
+        dotnet list TestProject/TestProject.csproj package --vulnerable --include-transitive > test-vulnerabilities.txt
+        dotnet list web/web.csproj package --vulnerable --include-transitive > web-vulnerabilities.txt
+        dotnet list DataContext/DataContext.csproj package --vulnerable --include-transitive > datacontext-vulnerabilities.txt
+        Get-Content api-vulnerabilities.txt
+        Get-Content test-vulnerabilities.txt
+        Get-Content web-vulnerabilities.txt
+        Get-Content datacontext-vulnerabilities.txt
+      shell: pwsh
+      continue-on-error: true
+
+    - name: Upload reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: dependency-reports
+        path: |
+          *-outdated.txt
+          *-vulnerabilities.txt
+
+    - name: Create Issue for Updates
+      if: github.event_name == 'schedule'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const apiOutdated = fs.readFileSync('api-outdated.txt', 'utf8');
+          const testOutdated = fs.readFileSync('test-outdated.txt', 'utf8');
+          const webOutdated = fs.readFileSync('web-outdated.txt', 'utf8');
+          const datacontextOutdated = fs.readFileSync('datacontext-outdated.txt', 'utf8');
+          const apiVulnerabilities = fs.readFileSync('api-vulnerabilities.txt', 'utf8');
+          const testVulnerabilities = fs.readFileSync('test-vulnerabilities.txt', 'utf8');
+          const webVulnerabilities = fs.readFileSync('web-vulnerabilities.txt', 'utf8');
+          const datacontextVulnerabilities = fs.readFileSync('datacontext-vulnerabilities.txt', 'utf8');
+          
+          const body = `## Weekly Dependency Update Report
+          
+          ### API Service - Outdated Packages
+          \`\`\`
+          ${apiOutdated}
+          \`\`\`
+          
+          ### Test Project - Outdated Packages
+          \`\`\`
+          ${testOutdated}
+          \`\`\`
+          
+          ### Web Project - Outdated Packages
+          \`\`\`
+          ${webOutdated}
+          \`\`\`
+          
+          ### DataContext - Outdated Packages
+          \`\`\`
+          ${datacontextOutdated}
+          \`\`\`
+          
+          ### API Service - Vulnerabilities
+          \`\`\`
+          ${apiVulnerabilities}
+          \`\`\`
+          
+          ### Test Project - Vulnerabilities
+          \`\`\`
+          ${testVulnerabilities}
+          \`\`\`
+          
+          ### Web Project - Vulnerabilities
+          \`\`\`
+          ${webVulnerabilities}
+          \`\`\`
+          
+          ### DataContext - Vulnerabilities
+          \`\`\`
+          ${datacontextVulnerabilities}
+          \`\`\`
+          
+          ---
+          *This issue was automatically created by the dependency update workflow.*`;
+          
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `Weekly Dependency Update Report - ${new Date().toISOString().split('T')[0]}`,
+            body: body,
+            labels: ['dependencies', 'automated']
+          });
