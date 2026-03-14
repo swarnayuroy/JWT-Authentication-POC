@@ -50,17 +50,21 @@ namespace web.Controllers
                         {
                             if (userDetailResponse.Data.IsAdmin)
                             {
-                                ResponseDetail sessionDataResponse = await _repository.GetAllUser(sessionToken, userId);
+                                ResponseDetail sessionDataResponse = await _repository.GetAllUser(sessionToken, userId, 1);
                                 if (sessionDataResponse.Status)
                                 {
-                                    if ((sessionDataResponse is ResponseDataDetail<IList<UserDetail>> usersListResponse) && (usersListResponse.Data != null))
+                                    if ((sessionDataResponse is ResponseDataDetail<PagedResult<UserDetail>> pagedUsers) && (pagedUsers.Data != null))
                                     {
                                         return View("DashBoard", new AdminSessionDetail
                                         {
                                             User = userDetailResponse.Data,
                                             Data = new SessionData
                                             {
-                                                Users = usersListResponse.Data
+                                                Users = pagedUsers.Data.Items,
+                                                UserCount = pagedUsers.Data.ItemCount,
+                                                PageSize = pagedUsers.Data.PageSize,
+                                                TotalPages = pagedUsers.Data.TotalPages,
+                                                CurrentPage = pagedUsers.Data.CurrentPage,
                                             },
                                             ToastNotification = new ToastNotification
                                             {
@@ -69,7 +73,7 @@ namespace web.Controllers
                                         });
                                     }
                                 }
-                                return View("DashBoard", new UserSessionDetail
+                                return View("DashBoard", new AdminSessionDetail
                                 {
                                     User = userDetailResponse.Data,                                    
                                     ToastNotification = new ToastNotification
@@ -81,6 +85,7 @@ namespace web.Controllers
                                     }
                                 });
                             }
+                            
                             return View("DashBoard", new UserSessionDetail
                             {
                                 User = userDetailResponse.Data,
@@ -93,6 +98,52 @@ namespace web.Controllers
                     }
                 }
                 return RedirectToAction("Logout");
+            }
+            return RedirectToAction("Login", "Account");
+        }
+
+        // GET: Home/PaginateOperation
+        public async Task<ActionResult> PaginateOperation(UserDetail userDetail, int page = 1)
+        {
+            await SetCacheControl();
+            if (page < 1) 
+            {
+                return RedirectToAction("DashBoard");
+            }
+            
+            string sessionToken = Request.Cookies["sessionToken"]?.Value;
+            if (!String.IsNullOrEmpty(sessionToken))
+            {                
+                if (!String.IsNullOrEmpty(userDetail.Id) && userDetail.IsAdmin)
+                {
+                    ResponseDetail sessionDataResponse = await _repository.GetAllUser(sessionToken, userDetail.Id, page);
+                    if (sessionDataResponse.Status) 
+                    {
+                        if ((sessionDataResponse is ResponseDataDetail<PagedResult<UserDetail>> pagedUsers) && (pagedUsers.Data != null))
+                        {
+                            if (page > pagedUsers.Data.TotalPages)
+                            {
+                                return RedirectToAction("DashBoard");
+                            }
+                            return View("DashBoard", new AdminSessionDetail
+                            {
+                                User = userDetail,
+                                Data = new SessionData
+                                {
+                                    Users = pagedUsers.Data.Items,
+                                    UserCount = pagedUsers.Data.ItemCount,
+                                    PageSize = pagedUsers.Data.PageSize,
+                                    TotalPages = pagedUsers.Data.TotalPages,
+                                    CurrentPage = pagedUsers.Data.CurrentPage,
+                                },
+                                ToastNotification = new ToastNotification
+                                {
+                                    IsEnable = false,
+                                }
+                            });
+                        }
+                    }
+                }
             }
             return RedirectToAction("Login", "Account");
         }

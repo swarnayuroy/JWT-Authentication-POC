@@ -13,6 +13,6 @@ namespace web.Service
         Task<HttpResponseMessage> CheckCredential(Credential credential);
         Task<HttpResponseMessage> RegisterUser(Registration detail);
         Task<HttpResponseMessage> GetUserDetail(string token, string userId);
-        Task<HttpResponseMessage> GetAllUsers(string token);
+        Task<HttpResponseMessage> GetAllUsers(string token, string userId, int page, int pageSize);
     }
 }

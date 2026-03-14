@@ -26,7 +26,10 @@ namespace web.Models.SessionModel
     }
     public class SessionData
     {
-        public int UserCount { get{ return Users.Count(); } }
+        public int UserCount { get; set; }
         public IEnumerable<UserDetail> Users { get; set; }
+        public int CurrentPage { get; set; } = 1;
+        public int PageSize { get; set; } = 5;
+        public int TotalPages { get; set; }
     }
 }

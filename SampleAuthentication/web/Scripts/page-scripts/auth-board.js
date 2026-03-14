@@ -14,4 +14,17 @@
             window.location.href = logoutUrl;
         }, 1000);
     });
+
+    // Pagination handler
+    $(".pagination-btn:not(.disabled)").on("click", function (e) {
+        e.preventDefault();
+
+        showLoader();
+
+        var pageUrl = $(this).attr('href');
+
+        setTimeout(function () {
+            window.location.href = pageUrl;
+        }, 500);
+    });
 });

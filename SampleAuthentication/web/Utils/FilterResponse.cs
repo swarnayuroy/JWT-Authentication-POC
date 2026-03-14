@@ -88,7 +88,7 @@ namespace web.Utils
                 Message = response.ReasonPhrase ?? "Failed to process the request"
             };
         }
-        public async Task<ResponseDetail> ProcessData<TData>(HttpResponseMessage response, string userId = "000-000-000")
+        public async Task<ResponseDetail> ProcessData<TData>(HttpResponseMessage response)
         {
             if (response.Content != null)
             {
@@ -129,20 +129,17 @@ namespace web.Utils
                                         Data = responseData
                                     };
                                 }
-                                else if (typeof(TData).Equals(typeof(IList<UserDetail>)))
+                                else if (typeof(TData).Equals(typeof(PagedResult<UserDetail>)))
                                 {
-                                    IList<UserDetail> userList = data.ToObject<IList<UserDetail>>();
-                                    if (userList.Count() > 0)
+                                    PagedResult<UserDetail> pagedResult = data.ToObject<PagedResult<UserDetail>>();
+                                    if (pagedResult.Items.Any())
                                     {
-                                        // Remove the user with the specified userId from the list
-                                        userList.Remove(userList.FirstOrDefault(u => u.Id == userId));
-
-                                        return new ResponseDataDetail<IList<UserDetail>>
+                                        return new ResponseDataDetail<PagedResult<UserDetail>>
                                         {
                                             Status = status,
                                             StatusCode = response.StatusCode,
                                             Message = message ?? string.Empty,
-                                            Data = userList
+                                            Data = pagedResult
                                         };
                                     }
                                 }

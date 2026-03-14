@@ -91,13 +91,13 @@ namespace web.Repository
             #endregion
         }
 
-        public async Task<ResponseDetail> GetAllUser(string token, string userId)
+        public async Task<ResponseDetail> GetAllUser(string token, string userId, int page, int pageSize = 5)
         {
             #region HTTP Service Call
             try
             {
-                _response = await _httpService.GetAllUsers(token);
-                return await new FilterResponse<WebRepository>().ProcessData<IList<UserDetail>>(_response, userId);
+                _response = await _httpService.GetAllUsers(token, userId, page, pageSize);
+                return await new FilterResponse<WebRepository>().ProcessData<PagedResult<UserDetail>>(_response);
             }
             catch (Exception ex)
             {

@@ -14,6 +14,6 @@ namespace web.Repository
         Task<ResponseDetail> CheckCredential(Credential userCredential);
         Task<ResponseDetail> RegisterUser(Registration userRegistrationDetail);
         Task<ResponseDetail> GetUserDetail(string token, string userId);
-        Task<ResponseDetail> GetAllUser(string token, string userId);
+        Task<ResponseDetail> GetAllUser(string token, string userId, int page, int pageSize = 5);
     }
 }
