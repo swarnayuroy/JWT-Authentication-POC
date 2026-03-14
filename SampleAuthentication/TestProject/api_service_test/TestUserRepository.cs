@@ -42,7 +42,7 @@ namespace TestProject.api_service_test
             _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>());
 
             // Act
-            var result = await _repository.GetAllUsersAsync();
+            var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5);
 
             // Assert
             Assert.That(result.Status, Is.False);
@@ -65,14 +65,16 @@ namespace TestProject.api_service_test
             });
 
             // Act
-            var result = await _repository.GetAllUsersAsync();
-            var dataResult = result as ResponseDataDetail<IEnumerable<UserDetail>>;
-            var userDetail = dataResult!.Data.First();
+            var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5);
+            var dataResult = result as ResponseDataDetail<PagedResult<UserDetail>>;
+            var userDetail = dataResult!.Data.Items.First();
 
             // Assert
             Assert.That(result.Status, Is.True);
             Assert.That(result.Message, Is.EqualTo("1 user fetched successfully"));
-            Assert.That(result, Is.TypeOf<ResponseDataDetail<IEnumerable<UserDetail>>>());
+            Assert.That(result, Is.TypeOf<ResponseDataDetail<PagedResult<UserDetail>>>());
+            Assert.That(dataResult.Data.ItemCount, Is.EqualTo(1));
+            Assert.That(dataResult.Data.CurrentPage, Is.EqualTo(1));
 
             Assert.That(userDetail.Password, Is.EqualTo(string.Empty)); // Ensure password hidden
             Assert.That(userDetail.Email, Is.EqualTo("doe.john@gmail.com"));
@@ -101,13 +103,13 @@ namespace TestProject.api_service_test
             });
 
             // Act
-            var result = await _repository.GetAllUsersAsync();
-            var dataResult = result as ResponseDataDetail<IEnumerable<UserDetail>>;
+            var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5);
+            var dataResult = result as ResponseDataDetail<PagedResult<UserDetail>>;
 
             // Assert
             Assert.That(result.Status, Is.True);
             Assert.That(result.Message, Is.EqualTo("2 users fetched successfully"));
-            Assert.That(dataResult!.Data.Count(), Is.EqualTo(2));
+            Assert.That(dataResult!.Data.ItemCount, Is.EqualTo(2));
         }
         #endregion
 

@@ -30,15 +30,15 @@ namespace API_Service.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] string userId, [FromQuery] int page = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
                 // Placeholder for actual user retrieval logic
-                var response = await _userRepository.GetAllUsersAsync();
+                var response = await _userRepository.GetAllUsersAsync(userId, page, pageSize);
                 if (response.Status)
                 {
-                    return Ok(response as ResponseDataDetail<IEnumerable<UserDetail>>);
+                    return Ok(response as ResponseDataDetail<PagedResult<UserDetail>>);
                 }
                 else
                 {

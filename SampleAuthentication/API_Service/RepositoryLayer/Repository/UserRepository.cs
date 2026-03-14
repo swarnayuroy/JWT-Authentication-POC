@@ -16,26 +16,37 @@ namespace API_Service.RepositoryLayer.Repository
             this._logger = new LoggerService<UserRepository>(logger);
             this._userService = userService;
         }
-        public async Task<ResponseDetail> GetAllUsersAsync()
+        public async Task<ResponseDetail> GetAllUsersAsync(string userId, int page, int pageSize)
         {
             var users = await _userService.Get();
-            if (users.Count() > 0)
+            if (users.Any())
             {
-                _logger.LogDetails(LogType.INFO, $"Fetched {users.Count()} users");
-                var userDetails = users.Select(user => new UserDetail
-                {
-                    Id = user.Id.ToString(),
-                    Name = user.Name,
-                    Email = user.Email,
-                    Role = user.Role,
-                    IsVerified = user.IsVerified,
-                    Password = string.Empty // Do not expose password
-                });
-                return new ResponseDataDetail<IEnumerable<UserDetail>>
+                var filteredUsers = users.Where(user => user.Id.ToString() != userId);
+                int totalUserCount = filteredUsers.Count();
+                var paginatedUsers = filteredUsers
+                                     .Skip((page - 1) * pageSize)
+                                     .Take(pageSize)
+                                     .Select(user => new UserDetail 
+                                     {
+                                         Id = user.Id.ToString(),
+                                         Name = user.Name,
+                                         Email = user.Email,
+                                         Role = user.Role,
+                                         IsVerified = user.IsVerified
+                                     });
+                _logger.LogDetails(LogType.INFO, $"Fetched page {page} ({paginatedUsers.Count()} of {totalUserCount} users)");
+                
+                return new ResponseDataDetail<PagedResult<UserDetail>>
                 {
                     Status = true,
-                    Message = userDetails.Count() > 1 ? $"{userDetails.Count()} users fetched successfully" : "1 user fetched successfully",
-                    Data = userDetails
+                    Message = totalUserCount > 1 ? $"{totalUserCount} users fetched successfully" : "1 user fetched successfully",
+                    Data = new PagedResult<UserDetail>
+                    {
+                        Items = paginatedUsers,
+                        ItemCount = totalUserCount,
+                        CurrentPage = page,
+                        PageSize = pageSize
+                    }
                 };
             }
             return new ResponseDetail
@@ -48,7 +59,7 @@ namespace API_Service.RepositoryLayer.Repository
         public async Task<ResponseDetail> GetUserAsync(string id)
         {
             var users = await _userService.Get();
-            if (users.Count() > 0)
+            if (users.Any())
             {
                 var user = users.FirstOrDefault(u => u.Id.ToString() == id);
                 if (user != null)
