@@ -55,7 +55,7 @@ namespace web.Controllers
                                 {
                                     if ((sessionDataResponse is ResponseDataDetail<IList<UserDetail>> usersListResponse) && (usersListResponse.Data != null))
                                     {
-                                        return View("DashBoard", new UserSessionDetail
+                                        return View("DashBoard", new AdminSessionDetail
                                         {
                                             User = userDetailResponse.Data,
                                             Data = new SessionData

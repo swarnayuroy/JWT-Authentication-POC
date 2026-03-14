@@ -45,7 +45,7 @@
         @if (Model.User.IsAdmin)
         {
             <div class="user-table-layout">
-                @if (Model.Data.UserCount > 0)
+                @if (((Model as web.Models.SessionModel.AdminSessionDetail).Data != null) && ((Model as web.Models.SessionModel.AdminSessionDetail).Data.UserCount > 0))
                 {
                     <table id="user-table" cellspacing="15px">
                         <thead id="user-table-header">
@@ -56,7 +56,7 @@
                             </tr>
                         </thead>
                         <tbody id="user-table-body">
-                            @foreach (var user in Model.Data.Users)
+                            @foreach (var user in (Model as web.Models.SessionModel.AdminSessionDetail).Data.Users)
                             {
                                 <tr>
                                     <td>@user.Name</td>

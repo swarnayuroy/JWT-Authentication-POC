@@ -18,8 +18,11 @@ namespace web.Models.SessionModel
     {
         public string ViewText { get { return "Razor"; } }
         public UserDetail User { get; set; }
-        public SessionData Data { get; set; } = null;
         public ToastNotification ToastNotification { get; set; }
+    }
+    public class AdminSessionDetail : UserSessionDetail
+    {
+        public SessionData Data { get; set; } = null;
     }
     public class SessionData
     {
