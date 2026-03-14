@@ -48,6 +48,8 @@ namespace web.Controllers
                     {
                         if ((response is ResponseDataDetail<UserDetail> userDetailResponse) && (userDetailResponse.Data != null))
                         {
+                            // Store user in session
+                            Session["currentUser"] = userDetailResponse.Data;
                             if (userDetailResponse.Data.IsAdmin)
                             {
                                 ResponseDetail sessionDataResponse = await _repository.GetAllUser(sessionToken, userId, 1);
@@ -103,21 +105,22 @@ namespace web.Controllers
         }
 
         // GET: Home/PaginateOperation
-        public async Task<ActionResult> PaginateOperation(UserDetail userDetail, int page = 1)
+        public async Task<ActionResult> PaginateOperation(int page = 1)
         {
             await SetCacheControl();
             if (page < 1) 
             {
                 return RedirectToAction("DashBoard");
             }
-            
+
             string sessionToken = Request.Cookies["sessionToken"]?.Value;
-            if (!String.IsNullOrEmpty(sessionToken))
-            {                
-                if (!String.IsNullOrEmpty(userDetail.Id) && userDetail.IsAdmin)
+            UserDetail currentUser = Session["currentUser"] as UserDetail;
+            if (!String.IsNullOrEmpty(sessionToken) && currentUser != null)
+            {
+                if (currentUser.IsAdmin)
                 {
-                    ResponseDetail sessionDataResponse = await _repository.GetAllUser(sessionToken, userDetail.Id, page);
-                    if (sessionDataResponse.Status) 
+                    ResponseDetail sessionDataResponse = await _repository.GetAllUser(sessionToken, currentUser.Id, page);
+                    if (sessionDataResponse.Status)
                     {
                         if ((sessionDataResponse is ResponseDataDetail<PagedResult<UserDetail>> pagedUsers) && (pagedUsers.Data != null))
                         {
@@ -127,7 +130,7 @@ namespace web.Controllers
                             }
                             return View("DashBoard", new AdminSessionDetail
                             {
-                                User = userDetail,
+                                User = currentUser,
                                 Data = new SessionData
                                 {
                                     Users = pagedUsers.Data.Items,
@@ -162,6 +165,7 @@ namespace web.Controllers
                     cookie.Value = String.Empty;
                     Response.Cookies.Add(cookie);
                     Request.Cookies.Remove("sessionToken");
+                    Request.Cookies.Remove("currentUser");
                 }
                 await SetCacheControl();
                 Response.AppendHeader("Cache-Control", "no-cache, no-store, must-revalidate");

@@ -80,7 +80,7 @@
                             @if ((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage > 1)
                             {
                                 <a href="@Url.Action("PaginateOperation", "Home", 
-                                        new { userDetail = Model.User, page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage - 1 })" 
+                                        new { page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage - 1 })" 
                                         class="pagination-btn" data-page="@((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage - 1)">
                                     <i class="fa-solid fa-chevron-left"></i> Previous
                                 </a>
@@ -93,13 +93,13 @@
                             }
 
                             <div class="pagination-info">
-                                Page <span class="current-page">@(Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage</span> of <span class="total-pages">@(Model as web.Models.SessionModel.AdminSessionDetail).Data.TotalPages</span>
+                                Page <span class="current-page">@((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage)</span> of <span class="total-pages">@((Model as web.Models.SessionModel.AdminSessionDetail).Data.TotalPages)</span>
                             </div>
 
                             @if ((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage < (Model as web.Models.SessionModel.AdminSessionDetail).Data.TotalPages)
                             {
                                 <a href="@Url.Action("PaginateOperation", "Home", 
-                                        new { userDetail = Model.User, page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage + 1 })" 
+                                        new { page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage + 1 })" 
                                         class="pagination-btn" data-page="@((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage + 1)">
                                     Next <i class="fa-solid fa-chevron-right"></i>
                                 </a>
