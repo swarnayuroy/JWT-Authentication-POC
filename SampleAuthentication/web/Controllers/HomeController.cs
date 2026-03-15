@@ -81,7 +81,7 @@ namespace web.Controllers
                                     ToastNotification = new ToastNotification
                                     {
                                         IsEnable = true,
-                                        Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.BadRequest,
+                                        Type = sessionDataResponse.StatusCode != null ? (HttpStatusCode)sessionDataResponse.StatusCode : HttpStatusCode.BadRequest,
                                         StatusIcon = ToastNotification.WARNING_ICON,
                                         Message = "Oops! failed to fetch users."
                                     }
@@ -146,6 +146,17 @@ namespace web.Controllers
                             });
                         }
                     }
+                    return View("DashBoard", new AdminSessionDetail
+                    {
+                        User = currentUser,
+                        ToastNotification = new ToastNotification
+                        {
+                            IsEnable = true,
+                            Type = sessionDataResponse.StatusCode != null ? (HttpStatusCode)sessionDataResponse.StatusCode : HttpStatusCode.BadRequest,
+                            StatusIcon = ToastNotification.WARNING_ICON,
+                            Message = "Oops! failed to fetch users."
+                        }
+                    });
                 }
             }
             return RedirectToAction("Login", "Account");
