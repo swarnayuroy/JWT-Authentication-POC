@@ -38,19 +38,19 @@ jobs:
 
     - name: Restore packages
       run: |
-        nuget restore web/web.csproj -PackagesDirectory packages
-        nuget restore DataContext/DataContext.csproj -PackagesDirectory packages
-        dotnet restore API_Service/API_Service.csproj
-        dotnet restore TestProject/TestProject.csproj
+        nuget restore SampleAuthentication/web/web.csproj -PackagesDirectory packages
+        nuget restore SampleAuthentication/DataContext/DataContext.csproj -PackagesDirectory packages
+        dotnet restore SampleAuthentication/API_Service/API_Service.csproj
+        dotnet restore SampleAuthentication/TestProject/TestProject.csproj
 
     - name: Build all projects
       run: |
-        msbuild DataContext/DataContext.csproj /p:Configuration=Release
-        msbuild web/web.csproj /p:Configuration=Release
-        dotnet build API_Service/API_Service.csproj --configuration Release --no-restore
+        msbuild SampleAuthentication/DataContext/DataContext.csproj /p:Configuration=Release
+        msbuild SampleAuthentication/web/web.csproj /p:Configuration=Release
+        dotnet build SampleAuthentication/API_Service/API_Service.csproj --configuration Release --no-restore
 
     - name: Run tests with coverage
-      run: dotnet test TestProject/TestProject.csproj --configuration Release --logger "trx" --collect:"XPlat Code Coverage" /p:CollectCoverage=true
+      run: dotnet test SampleAuthentication/TestProject/TestProject.csproj --configuration Release --logger "trx" --collect:"XPlat Code Coverage" /p:CollectCoverage=true
 
     - name: Install Angular dependencies
       working-directory: ${{ env.ANGULAR_WEB_PATH }}
@@ -64,14 +64,11 @@ jobs:
       working-directory: ${{ env.ANGULAR_WEB_PATH }}
       run: npm test -- --watch=false --code-coverage --browsers=ChromeHeadless
 
-    - name: Code Coverage Summary
-      uses: irongut/CodeCoverageSummary@v1.3.0
-      if: always()
-      with:
-        filename: '**/coverage.cobertura.xml'
-        badge: true
-        format: markdown
-        output: both
+    - name: Generate Coverage Report
+      run: |
+        dotnet tool install --global dotnet-reportgenerator-globaltool --ignore-failed-sources
+        reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:MarkdownSummaryGithub
+        Copy-Item coverage-report/SummaryGithub.md code-coverage-results.md -ErrorAction SilentlyContinue
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2
@@ -82,7 +79,7 @@ jobs:
 
     - name: Check for vulnerabilities
       run: |
-        dotnet list API_Service/API_Service.csproj package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
+        dotnet list SampleAuthentication/API_Service/API_Service.csproj package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
         if (Select-String -Path vulnerability-report.txt -Pattern "has the following vulnerable packages") { 
           Write-Warning "Vulnerabilities found!"
           exit 1 
