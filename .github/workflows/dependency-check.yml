@@ -8,6 +8,11 @@ on:
 
 env:
   DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '20.x'
+  ANGULAR_PROJECT_PATH: 'SampleAuthentication/angular-web'
+
+permissions:
+  issues: write
 
 jobs:
   check-updates:
@@ -22,6 +27,11 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
     - name: Check outdated packages in API Service
       run: |
@@ -46,6 +56,26 @@ jobs:
       shell: pwsh
       continue-on-error: true
 
+    - name: Install Angular dependencies
+      run: npm ci
+      working-directory: ${{ env.ANGULAR_PROJECT_PATH }}
+
+    - name: Check outdated Angular packages
+      run: |
+        npm outdated > angular-outdated.txt 2>&1
+        Get-Content angular-outdated.txt
+      shell: pwsh
+      working-directory: ${{ env.ANGULAR_PROJECT_PATH }}
+      continue-on-error: true
+
+    - name: Check Angular vulnerabilities
+      run: |
+        npm audit --json > angular-vulnerabilities.txt 2>&1
+        Get-Content angular-vulnerabilities.txt
+      shell: pwsh
+      working-directory: ${{ env.ANGULAR_PROJECT_PATH }}
+      continue-on-error: true
+
     - name: Upload reports
       uses: actions/upload-artifact@v4
       with:
@@ -53,6 +83,8 @@ jobs:
         path: |
           *-outdated.txt
           *-vulnerabilities.txt
+          ${{ env.ANGULAR_PROJECT_PATH }}/angular-outdated.txt
+          ${{ env.ANGULAR_PROJECT_PATH }}/angular-vulnerabilities.txt
 
     - name: Create Issue for Updates
       if: github.event_name == 'schedule'
@@ -64,6 +96,8 @@ jobs:
           const testOutdated = fs.readFileSync('test-outdated.txt', 'utf8');
           const apiVulnerabilities = fs.readFileSync('api-vulnerabilities.txt', 'utf8');
           const testVulnerabilities = fs.readFileSync('test-vulnerabilities.txt', 'utf8');
+          const angularOutdated = fs.readFileSync('SampleAuthentication/angular-web/angular-outdated.txt', 'utf8');
+          const angularVulnerabilities = fs.readFileSync('SampleAuthentication/angular-web/angular-vulnerabilities.txt', 'utf8');
           
           const body = `## Weekly Dependency Update Report
           
@@ -85,6 +119,16 @@ jobs:
           ### Test Project - Vulnerabilities
           \`\`\`
           ${testVulnerabilities}
+          \`\`\`
+          
+          ### Angular Web - Outdated Packages
+          \`\`\`
+          ${angularOutdated}
+          \`\`\`
+          
+          ### Angular Web - Vulnerabilities
+          \`\`\`
+          ${angularVulnerabilities}
           \`\`\`
           
           ---

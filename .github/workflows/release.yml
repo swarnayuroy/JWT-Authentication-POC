@@ -7,6 +7,8 @@ on:
 
 env:
   DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '20.x'
+  ANGULAR_PROJECT_PATH: 'SampleAuthentication/angular-web'
 
 jobs:
   create-release:
@@ -28,6 +30,11 @@ jobs:
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v2
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
     - name: Get version from tag
       id: get_version
       run: |
@@ -45,6 +52,18 @@ jobs:
         msbuild web/web.csproj /p:Configuration=Release
         dotnet build API_Service/API_Service.csproj --configuration Release --no-restore
 
+    - name: Install Angular dependencies
+      run: npm ci
+      working-directory: ${{ env.ANGULAR_PROJECT_PATH }}
+
+    - name: Run Angular tests
+      run: npm test -- --watch=false --browsers=ChromeHeadless
+      working-directory: ${{ env.ANGULAR_PROJECT_PATH }}
+
+    - name: Build Angular
+      run: npm run build -- --configuration production
+      working-directory: ${{ env.ANGULAR_PROJECT_PATH }}
+
     - name: Run tests
       run: dotnet test TestProject/TestProject.csproj --configuration Release --no-build
 
@@ -58,6 +77,7 @@ jobs:
       run: |
         Compress-Archive -Path ./release/api/* -DestinationPath api-service-${{ steps.get_version.outputs.version }}.zip
         Compress-Archive -Path ./release/web/* -DestinationPath web-mvc-${{ steps.get_version.outputs.version }}.zip
+        Compress-Archive -Path ./${{ env.ANGULAR_PROJECT_PATH }}/dist/angular-web/* -DestinationPath angular-web-${{ steps.get_version.outputs.version }}.zip
       shell: pwsh
 
     - name: Generate Release Notes
@@ -70,12 +90,14 @@ jobs:
         - JWT Authentication POC Release
         - ASP.NET Core Web API (.NET 8)
         - ASP.NET MVC Web Application (.NET Framework 4.8.1)
+        - Angular Web Application (Angular 19)
         
         ### Deployment Instructions
         1. Download the appropriate artifact
         2. Extract to your deployment directory
-        3. Configure appsettings.json / Web.config
+        3. Configure appsettings.json / Web.config for .NET projects
         4. Deploy to IIS or Azure Web Apps
+        5. For Angular, serve the dist output via a static host or reverse proxy
         
         **Full Changelog**: https://github.com/${{ github.repository }}/compare/....${{ github.ref_name }}
         "@
@@ -94,5 +116,6 @@ jobs:
         files: |
           api-service-${{ steps.get_version.outputs.version }}.zip
           web-mvc-${{ steps.get_version.outputs.version }}.zip
+          angular-web-${{ steps.get_version.outputs.version }}.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

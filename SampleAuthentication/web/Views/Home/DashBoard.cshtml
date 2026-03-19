@@ -45,6 +45,14 @@
         @if (Model.User.IsAdmin)
         {
             <div class="user-table-layout">
+                <div class="search-layout">
+                    <div class="search-icon-layout">
+                        <i class="fa-brands fa-sistrix" style="width: 30px;"></i>
+                    </div>
+                    <div class="search-textbox-layout">
+                        <input type="text" class="search-textbox" placeholder="Search by name or email" />
+                    </div>
+                </div>
                 @if (((Model as web.Models.SessionModel.AdminSessionDetail).Data != null) && ((Model as web.Models.SessionModel.AdminSessionDetail).Data.UserCount > 0))
                 {
                     <table id="user-table" cellspacing="15px">
@@ -73,15 +81,15 @@
                             }
                         </tbody>
                     </table>
-    
-                    if ((Model as web.Models.SessionModel.AdminSessionDetail).Data.TotalPages > 1) 
+
+                    if ((Model as web.Models.SessionModel.AdminSessionDetail).Data.TotalPages > 1)
                     {
                         <div class="pagination-controls">
                             @if ((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage > 1)
                             {
-                                <a href="@Url.Action("PaginateOperation", "Home", 
-                                        new { page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage - 1 })" 
-                                        class="pagination-btn" data-page="@((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage - 1)">
+                                <a href="@Url.Action("PaginateOperation", "Home",
+                                        new { page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage - 1 })"
+                                   class="pagination-btn" data-page="@((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage - 1)">
                                     <i class="fa-solid fa-chevron-left"></i> Previous
                                 </a>
                             }
@@ -98,9 +106,9 @@
 
                             @if ((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage < (Model as web.Models.SessionModel.AdminSessionDetail).Data.TotalPages)
                             {
-                                <a href="@Url.Action("PaginateOperation", "Home", 
-                                        new { page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage + 1 })" 
-                                        class="pagination-btn" data-page="@((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage + 1)">
+                                <a href="@Url.Action("PaginateOperation", "Home",
+                                        new { page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage + 1 })"
+                                   class="pagination-btn" data-page="@((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage + 1)">
                                     Next <i class="fa-solid fa-chevron-right"></i>
                                 </a>
                             }
