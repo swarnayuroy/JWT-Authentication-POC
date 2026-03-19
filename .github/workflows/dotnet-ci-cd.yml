@@ -73,7 +73,7 @@ jobs:
 
     # Upload test results
     - name: Upload Test Results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: always()
       with:
         name: test-results
@@ -81,7 +81,7 @@ jobs:
 
     # Upload code coverage
     - name: Upload Code Coverage
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: always()
       with:
         name: code-coverage
@@ -97,14 +97,14 @@ jobs:
 
     # Upload API artifacts
     - name: Upload API Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: api-service
         path: ./publish/api
 
     # Upload Web artifacts
     - name: Upload Web Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: web-mvc
         path: ./publish/web

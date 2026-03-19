@@ -46,14 +46,14 @@ jobs:
       run: npm test -- --watch=false --code-coverage --browsers=ChromeHeadless
 
     - name: Upload test results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: always()
       with:
         name: angular-test-results
         path: '${{ env.ANGULAR_WEB_PATH }}/junit.xml'
 
     - name: Upload code coverage
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: always()
       with:
         name: angular-coverage
@@ -92,7 +92,7 @@ jobs:
       run: npm run build -- --configuration production
 
     - name: Upload distribution artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: angular-dist
         path: '${{ env.ANGULAR_WEB_PATH }}/dist'
@@ -132,7 +132,7 @@ jobs:
 
     - name: Upload audit report
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: npm-audit-report
         path: ${{ env.ANGULAR_WEB_PATH }}/npm-audit-report.json
