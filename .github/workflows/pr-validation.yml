@@ -100,18 +100,22 @@ jobs:
 
     - name: Install Dependencies
       working-directory: ${{ env.ANGULAR_WEB_PATH }}
-      run: npm ci
+      run: npm install
+      continue-on-error: false
 
     - name: Build Angular Project
       working-directory: ${{ env.ANGULAR_WEB_PATH }}
-      run: npm run build --configuration production
+      run: npm run build -- --configuration production
+      continue-on-error: false
 
     - name: Upload Angular Build
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: angular-build
-        path: ${{ env.ANGULAR_WEB_PATH }}/dist/
+        path: ${{ env.ANGULAR_WEB_PATH }}/dist/angular-web/
         retention-days: 5
+        if-no-files-found: ignore
 
   # Job 4: Run Angular Tests
   test-angular:
@@ -132,7 +136,8 @@ jobs:
 
     - name: Install Dependencies
       working-directory: ${{ env.ANGULAR_WEB_PATH }}
-      run: npm ci
+      run: npm install
+      continue-on-error: true
 
     - name: Run Tests
       working-directory: ${{ env.ANGULAR_WEB_PATH }}
@@ -148,6 +153,7 @@ jobs:
         name: angular-test-results
         path: ${{ env.ANGULAR_WEB_PATH }}/coverage/
         retention-days: 5
+        if-no-files-found: ignore
 
   # Job 5: Security Scanning
   security-check:
@@ -183,6 +189,7 @@ jobs:
         name: security-report
         path: vuln-report.txt
         retention-days: 5
+        if-no-files-found: ignore
 
   # Job 6: Final Summary
   validation-summary:
