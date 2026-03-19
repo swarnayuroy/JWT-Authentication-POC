@@ -19,7 +19,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Setup .NET 8
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -35,6 +35,16 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
         cache-dependency-path: '${{ env.ANGULAR_WEB_PATH }}/package-lock.json'
+
+    - name: Configure Chrome for headless testing
+      run: |
+        # Verify Chrome installation for headless testing on Windows runner
+        $chromePath = (Get-Command chrome.exe -ErrorAction SilentlyContinue).Source
+        if (-not $chromePath) {
+          Write-Host "Chrome not found in PATH, Karma will use Chromium from node_modules"
+        } else {
+          Write-Host "Chrome found at: $chromePath"
+        }
 
     - name: Restore packages
       run: |
@@ -62,7 +72,9 @@ jobs:
 
     - name: Run Angular tests with coverage
       working-directory: ${{ env.ANGULAR_WEB_PATH }}
-      run: npm test -- --watch=false --code-coverage --browsers=ChromeHeadless
+      env:
+        CI: true
+      run: npm test -- --watch=false --code-coverage --browsers=ChromeHeadless --no-sandbox --disable-gpu
 
     - name: Generate Coverage Report
       run: |
@@ -79,8 +91,10 @@ jobs:
 
     - name: Check for vulnerabilities
       run: |
-        dotnet list SampleAuthentication/API_Service/API_Service.csproj package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
-        if (Select-String -Path vulnerability-report.txt -Pattern "has the following vulnerable packages") { 
-          Write-Warning "Vulnerabilities found!"
+        $output = dotnet list SampleAuthentication/API_Service/API_Service.csproj package --vulnerable --include-transitive 2>&1
+        $output | Tee-Object -FilePath vulnerability-report.txt
+        if ($output -match "has the following vulnerable packages") { 
+          Write-Error "Security vulnerabilities found in dependencies!"
           exit 1 
         }
+        Write-Host "No vulnerabilities detected."
