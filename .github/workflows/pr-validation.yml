@@ -74,17 +74,19 @@ jobs:
       working-directory: ${{ env.ANGULAR_WEB_PATH }}
       env:
         CI: true
-      run: npm test -- --watch=false --code-coverage --browsers=ChromeHeadless --no-sandbox --disable-gpu
+      run: npm test -- --watch=false --code-coverage --browsers=ChromeHeadlessNoSandbox
 
     - name: Generate Coverage Report
       run: |
-        dotnet tool install --global dotnet-reportgenerator-globaltool --ignore-failed-sources
-        reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:MarkdownSummaryGithub
-        Copy-Item coverage-report/SummaryGithub.md code-coverage-results.md -ErrorAction SilentlyContinue
+        dotnet tool install --global dotnet-reportgenerator-globaltool --ignore-failed-sources 2>$null || dotnet tool update --global dotnet-reportgenerator-globaltool
+        reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:MarkdownSummaryGithub 2>$null
+        if (Test-Path coverage-report/SummaryGithub.md) {
+          Copy-Item coverage-report/SummaryGithub.md code-coverage-results.md
+        }
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2
-      if: github.event_name == 'pull_request' && always()
+      if: github.event_name == 'pull_request' && always() && hashFiles('code-coverage-results.md') != ''
       with:
         recreate: true
         path: code-coverage-results.md
