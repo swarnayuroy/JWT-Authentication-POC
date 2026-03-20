@@ -23,10 +23,12 @@ namespace API_Service.RepositoryLayer.Repository
             {
                 var filteredUsers = users.Where(user => user.Id.ToString() != userId);
                 int totalUserCount = filteredUsers.Count();
-                var paginatedUsers = filteredUsers
+                if (totalUserCount > 0)
+                {
+                    var paginatedUsers = filteredUsers
                                      .Skip((page - 1) * pageSize)
                                      .Take(pageSize)
-                                     .Select(user => new UserDetail 
+                                     .Select(user => new UserDetail
                                      {
                                          Id = user.Id.ToString(),
                                          Name = user.Name,
@@ -34,20 +36,21 @@ namespace API_Service.RepositoryLayer.Repository
                                          Role = user.Role,
                                          IsVerified = user.IsVerified
                                      });
-                _logger.LogDetails(LogType.INFO, $"Fetched page {page} ({paginatedUsers.Count()} of {totalUserCount} users)");
-                
-                return new ResponseDataDetail<PagedResult<UserDetail>>
-                {
-                    Status = true,
-                    Message = totalUserCount > 1 ? $"{totalUserCount} users fetched successfully" : "1 user fetched successfully",
-                    Data = new PagedResult<UserDetail>
+                    _logger.LogDetails(LogType.INFO, $"Fetched page {page} ({paginatedUsers.Count()} of {totalUserCount} users)");
+
+                    return new ResponseDataDetail<PagedResult<UserDetail>>
                     {
-                        Items = paginatedUsers,
-                        ItemCount = totalUserCount,
-                        CurrentPage = page,
-                        PageSize = pageSize
-                    }
-                };
+                        Status = true,
+                        Message = totalUserCount > 1 ? $"{totalUserCount} users fetched successfully" : "1 user fetched successfully",
+                        Data = new PagedResult<UserDetail>
+                        {
+                            Items = paginatedUsers,
+                            ItemCount = totalUserCount,
+                            CurrentPage = page,
+                            PageSize = pageSize
+                        }
+                    };
+                }                
             }
             return new ResponseDetail
             {
@@ -55,7 +58,53 @@ namespace API_Service.RepositoryLayer.Repository
                 Message = "No users found"
             };
         }
+        public async Task<ResponseDetail> GetUserBySearch(string userId, int page, int pageSize, string searchText)
+        {
+            var users = await _userService.Get();
+            if (users.Any())
+            {
+                _logger.LogDetails(LogType.INFO, $"Searching users with term '{searchText}'");
+                var filteredUsers = users
+                                    .Where(user => user.Id.ToString() != userId)
+                                    .Where(user => string.IsNullOrEmpty(searchText) ||
+                                                   user.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                                                   user.Email.Contains(searchText, StringComparison.OrdinalIgnoreCase));
 
+                int totalUserCount = filteredUsers.Count();
+                if (totalUserCount > 0)
+                {
+                    var paginatedUsers = filteredUsers
+                                     .Skip((page - 1) * pageSize)
+                                     .Take(pageSize)
+                                     .Select(user => new UserDetail
+                                     {
+                                         Id = user.Id.ToString(),
+                                         Name = user.Name,
+                                         Email = user.Email,
+                                         Role = user.Role,
+                                         IsVerified = user.IsVerified
+                                     });
+                    _logger.LogDetails(LogType.INFO, $"Fetched page {page} ({paginatedUsers.Count()} of {totalUserCount} users) for search term '{searchText}'");
+                    return new ResponseDataDetail<PagedResult<UserDetail>>
+                    {
+                        Status = true,
+                        Message = totalUserCount > 1 ? $"{totalUserCount} users fetched successfully" : "1 user fetched successfully",
+                        Data = new PagedResult<UserDetail>
+                        {
+                            Items = paginatedUsers,
+                            ItemCount = totalUserCount,
+                            CurrentPage = page,
+                            PageSize = pageSize
+                        }
+                    };
+                }
+            }
+            return new ResponseDetail
+            {
+                Status = false,
+                Message = $"No users found matching with search text '{searchText}'"
+            };
+        }
         public async Task<ResponseDetail> GetUserAsync(string id)
         {
             var users = await _userService.Get();
