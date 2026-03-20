@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -236,6 +236,7 @@
     <Content Include="Content\page-styles\notification.css" />
     <Content Include="Content\page-styles\page-loader.css" />
     <Content Include="Content\page-styles\shared.css" />
+    <Content Include="Content\page-styles\no-content.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -274,6 +275,7 @@
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Shared\_ToastNotification.cshtml" />
     <Content Include="Views\Shared\_Loader.cshtml" />
+    <Content Include="Views\Shared\_NoContent.cshtml" />
     <Content Include="Views\Home\DashBoard.cshtml" />
   </ItemGroup>
   <ItemGroup />
