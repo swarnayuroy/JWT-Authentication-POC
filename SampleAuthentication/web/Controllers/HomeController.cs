@@ -104,8 +104,8 @@ namespace web.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        // GET: Home/PaginateOperation
-        public async Task<ActionResult> PaginateOperation(int page = 1)
+        // GET: Home/PaginateOperation/{page}/{searchText}
+        public async Task<ActionResult> PaginateOperation(int page = 1, string searchText = "")
         {
             await SetCacheControl();
             if (page < 1) 
@@ -119,7 +119,8 @@ namespace web.Controllers
             {
                 if (currentUser.IsAdmin)
                 {
-                    ResponseDetail sessionDataResponse = await _repository.GetAllUser(sessionToken, currentUser.Id, page);
+                    ResponseDetail sessionDataResponse = string.IsNullOrEmpty(searchText) ? await _repository.GetAllUser(sessionToken, currentUser.Id, page) : 
+                        await _repository.GetUsersBySearch(sessionToken, currentUser.Id, searchText, page);
                     if (sessionDataResponse.Status)
                     {
                         if ((sessionDataResponse is ResponseDataDetail<PagedResult<UserDetail>> pagedUsers) && (pagedUsers.Data != null))

@@ -110,7 +110,7 @@ namespace web.Repository
             #endregion
         }
 
-        public async Task<ResponseDetail> GetUsersBySearch(string token, string userId, int page, int pageSize = 5, string searchText = "")
+        public async Task<ResponseDetail> GetUsersBySearch(string token, string userId, string searchText, int page, int pageSize = 5)
         {
             #region HTTP Service Call
             try
