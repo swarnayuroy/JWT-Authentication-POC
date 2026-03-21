@@ -26,6 +26,7 @@ namespace web.Controllers
             this._repository = repository;
         }
         // GET: Home
+        [HttpGet]
         public async Task<ActionResult> DashBoard()
         {
             var claimsPrincipal = new ClaimsPrincipal();
@@ -104,7 +105,8 @@ namespace web.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        // GET: Home/PaginateOperation/{page}/{searchText}
+        // GET: Home/PaginateOperation?page={page}&searchText={searchText}
+        [HttpGet]
         public async Task<ActionResult> PaginateOperation(int page = 1, string searchText = "")
         {
             await SetCacheControl();
