@@ -109,5 +109,23 @@ namespace web.Repository
 
             #endregion
         }
+
+        public async Task<ResponseDetail> GetUsersBySearch(string token, string userId, int page, int pageSize = 5, string searchText = "")
+        {
+            #region HTTP Service Call
+            try
+            {
+                _response = await _httpService.GetUsersBySearch(token, userId, page, pageSize, searchText);
+                return await new FilterResponse<WebRepository>().ProcessData<PagedResult<UserDetail>>(_response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
+                return _response?.Content != null ?
+                    new ResponseDetail { Status = false, StatusCode = _response.StatusCode, Message = $"Invalid response." }
+                    : new ResponseDetail { Status = false, StatusCode = HttpStatusCode.BadRequest, Message = $"Failed to process your request" };
+            }
+            #endregion
+        }
     }
 }

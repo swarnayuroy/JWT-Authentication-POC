@@ -15,5 +15,6 @@ namespace web.Repository
         Task<ResponseDetail> RegisterUser(Registration userRegistrationDetail);
         Task<ResponseDetail> GetUserDetail(string token, string userId);
         Task<ResponseDetail> GetAllUser(string token, string userId, int page, int pageSize = 5);
+        Task<ResponseDetail> GetUsersBySearch(string token, string userId, int page, int pageSize = 5, string searchText="");
     }
 }
