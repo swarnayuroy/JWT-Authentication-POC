@@ -69,6 +69,10 @@
     font-size: medium;
 }
 
+.user-table-layout #fetched-results {
+    padding: 10px;
+}
+
 .user-table-layout #user-table {
     display: inline-block
 }
