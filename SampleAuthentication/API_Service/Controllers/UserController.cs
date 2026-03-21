@@ -34,9 +34,7 @@ namespace API_Service.Controllers
         {
             try
             {
-                // Placeholder for actual user retrieval logic
-                var response = new ResponseDetail();
-                response = string.IsNullOrEmpty(searchText) ? await _userRepository.GetAllUsersAsync(userId, page, pageSize) : 
+                var response = string.IsNullOrEmpty(searchText) ? await _userRepository.GetAllUsersAsync(userId, page, pageSize) : 
                             await _userRepository.GetUserBySearch(userId, page, pageSize, searchText);
                 if (response.Status)
                 {
