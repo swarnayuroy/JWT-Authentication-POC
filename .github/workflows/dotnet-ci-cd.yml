@@ -33,7 +33,7 @@ jobs:
 
     # Setup MSBuild for .NET Framework projects
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v2
+      uses: microsoft/setup-msbuild@v3
 
     # Setup NuGet for .NET Framework package restoration
     - name: Setup NuGet
@@ -126,7 +126,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v2
+      uses: microsoft/setup-msbuild@v3
 
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v2
