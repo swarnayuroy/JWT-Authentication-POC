@@ -177,6 +177,7 @@ namespace web.Controllers
                     showEmail_Field = true,
                     showOTP_Field = false,
                     showSetPassword_Field = false,
+                    Email_Field = new CheckEmail()
                 },
                 ToastNotification = new ToastNotification
                 {

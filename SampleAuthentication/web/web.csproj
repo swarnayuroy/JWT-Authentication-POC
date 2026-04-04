@@ -279,6 +279,9 @@
     <Content Include="Views\Shared\_Loader.cshtml" />
     <Content Include="Views\Shared\_NoContent.cshtml" />
     <Content Include="Views\Home\DashBoard.cshtml" />
+    <Content Include="Views\Account\_ForgotPasswordEmailCheck.cshtml" />
+    <Content Include="Views\Account\_ForgotPasswordVerifyOTP.cshtml" />
+    <Content Include="Views\Account\_ForgotPasswordSetPassword.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

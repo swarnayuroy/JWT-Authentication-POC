@@ -17,6 +17,7 @@ namespace web.Models
     {
         [Required(ErrorMessage = "Please enter the OTP")]
         [RegularExpression(@"^\d{6}$", ErrorMessage = "Please enter a valid 6-digit OTP")]
+        [Display(Name = "Enter OTP")]
         public string OTP { get; set; }
     }
 
@@ -24,10 +25,12 @@ namespace web.Models
     {
         [Required(ErrorMessage = "Please enter a new password")]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", ErrorMessage = "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character")]
+        [Display(Name = "New Password")]
         public string NewPassword { get; set; }
 
         [Required(ErrorMessage = "Please confirm your new password")]
         [Compare("NewPassword", ErrorMessage = "Passwords do not match")]
+        [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; }
     }
 

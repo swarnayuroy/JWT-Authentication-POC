@@ -36,8 +36,8 @@
         Html.RenderPartial("_ToastNotification", Model.ToastNotification);
     }
 
-    <div class="form-container">
-        @if (Model.showSignInForm)
+<div class="form-container">
+    @if (Model.showSignInForm)
         {
             using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form_signIn" }))
             {
@@ -68,7 +68,7 @@
     </div>
             }
         }
-        @if (Model.showSignUpForm)
+    @if (Model.showSignUpForm)
         {
             using (Html.BeginForm("SignUp", "Account", FormMethod.Post, new { @class = "form_registration" }))
             {
@@ -105,36 +105,36 @@
     </div>
             }
         }
-        @if (Model.showForgotPasswordForm)
+    @if (Model.showForgotPasswordForm)
         {
             using (Html.BeginForm("SignUp", "Account", FormMethod.Post, new { @class = "form_forgot_password" }))
             {
                 <h2 class="form_forgotPassword_header">Forgot Password</h2>
                 if (Model.Forgot.showEmail_Field)
                 {
-
+                    Html.RenderPartial("~/Views/Account/_ForgotPasswordEmailCheck", Model.Forgot);
                 }
 
                 if (Model.Forgot.showOTP_Field)
                 {
-
+                    Html.RenderPartial("~/Views/Account/_ForgotPasswordVerifyOTP", Model.Forgot);
                 }
 
                 if (Model.Forgot.showSetPassword_Field)
                 {
-
+                    Html.RenderPartial("~/Views/Account/_ForgotPasswordSetPassword", Model.Forgot);
                 }
 
-                <div class="form_setPassword_btn">
-                    @Html.AntiForgeryToken()
-                    <input type="submit" value="Submit" class="button" />
-                </div>
-                <div class="form_other_actions">
-                    <p>@Html.ActionLink("<< Back to login", "Login", "Account", null, new { @class = "login_here" })</p>
-                </div>
+    <div class="form_setPassword_btn">
+        @Html.AntiForgeryToken()
+        <input type="submit" value="Submit" class="button" />
+    </div>
+    <div class="form_other_actions">
+        <p>@Html.ActionLink("<< Back to login", "Login", "Account", null, new { @class = "login_here" })</p>
+    </div>
             }
         }
-    </div>
+</div>
 
     @Html.Partial("_Loader")
 </body>

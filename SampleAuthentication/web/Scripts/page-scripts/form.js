@@ -18,6 +18,15 @@
             registrationShowPasswordButton.style.display = "none";
             registrationHidePasswordButton.style.display = "block";
             break;
+        case "setNewPassword":
+            const newPasswordField = document.getElementById("set_newPassword_input");
+            const newPasswordShowButton = document.getElementById("set_newPassword_show");
+            const newPasswordHideButton = document.getElementById("set_newPassword_hide");
+
+            newPasswordField.type = "text";
+            newPasswordShowButton.style.display = "none";
+            newPasswordHideButton.style.display = "block";
+            break;
         default:
             console.error("Unknown formType in showPassword:", formType);
             break;
@@ -44,6 +53,15 @@ function hidePassword(formType) {
             registrationShowPasswordButton.style.display = "block";
             registrationHidePasswordButton.style.display = "none";
             break;
+        case "setNewPassword":
+            const newPasswordField = document.getElementById("set_newPassword_input");
+            const newPasswordShowButton = document.getElementById("set_newPassword_show");
+            const newPasswordHideButton = document.getElementById("set_newPassword_hide");
+
+            newPasswordField.type = "password";
+            newPasswordShowButton.style.display = "block";
+            newPasswordHideButton.style.display = "none";
+            break;
         default:
             console.error("Unknown formType in hidePassword:", formType);
             break;
@@ -61,6 +79,13 @@ $(document).ready(function () {
     });
 
     $(".form_registration").on("submit", function (e) {
+        var form = $(this);
+        if (form.valid()) {
+            showLoader();
+        }
+    });
+
+    $(".form_forgot_password").on("submit", function (e) {
         var form = $(this);
         if (form.valid()) {
             showLoader();
