@@ -112,17 +112,17 @@
                 <h2 class="form_forgotPassword_header">Forgot Password</h2>
                 if (Model.Forgot.showEmail_Field)
                 {
-                    Html.RenderPartial("~/Views/Account/_ForgotPasswordEmailCheck", Model.Forgot);
+                    Html.RenderPartial("_ForgotPasswordEmailCheck", Model.Forgot);
                 }
 
                 if (Model.Forgot.showOTP_Field)
                 {
-                    Html.RenderPartial("~/Views/Account/_ForgotPasswordVerifyOTP", Model.Forgot);
+                    Html.RenderPartial("_ForgotPasswordVerifyOTP", Model.Forgot);
                 }
 
                 if (Model.Forgot.showSetPassword_Field)
                 {
-                    Html.RenderPartial("~/Views/Account/_ForgotPasswordSetPassword", Model.Forgot);
+                    Html.RenderPartial("_ForgotPasswordSetPassword", Model.Forgot);
                 }
 
     <div class="form_setPassword_btn">
