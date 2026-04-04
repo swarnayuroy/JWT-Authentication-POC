@@ -21,8 +21,10 @@ namespace web.Models
         public string ViewText { get{ return "Razor"; } }
         public bool showSignInForm { get; set; }
         public bool showSignUpForm { get; set; }
+        public bool showForgotPasswordForm { get; set; }
         public Credential SignIn { get; set; }
         public Registration SignUp { get; set; }
+        public ForgotPassword Forgot { get; set; }
         public ToastNotification ToastNotification { get; set; }
     }
 }

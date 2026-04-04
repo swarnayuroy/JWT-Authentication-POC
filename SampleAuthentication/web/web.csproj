@@ -196,6 +196,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Credential.cs" />
+    <Compile Include="Models\ForgotPassword.cs" />
     <Compile Include="Models\Form.cs" />
     <Compile Include="Models\Registration.cs" />
     <Compile Include="Models\ResponseModel\ResponseDetail.cs" />
@@ -233,6 +234,7 @@
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\page-styles\account.css" />
     <Content Include="Content\page-styles\auth-board.css" />
+    <Content Include="Content\page-styles\forgot-password.css" />
     <Content Include="Content\page-styles\notification.css" />
     <Content Include="Content\page-styles\page-loader.css" />
     <Content Include="Content\page-styles\shared.css" />

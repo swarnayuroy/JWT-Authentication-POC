@@ -111,6 +111,14 @@
     padding: 5px;
 }
 
+.login_here, .forgot_passowrd {
+    text-decoration: none;
+    color: black;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
 .login_here, .register_here {
     text-decoration: none;
     color: black;

@@ -28,6 +28,7 @@ namespace web.Controllers
             {
                 showSignInForm = true,
                 showSignUpForm = false,
+                showForgotPasswordForm = false,
                 ToastNotification = new ToastNotification
                 {
                     IsEnable = false,
@@ -47,6 +48,7 @@ namespace web.Controllers
                     SignIn = formModel.SignIn,
                     showSignInForm = true,
                     showSignUpForm = false,
+                    showForgotPasswordForm = false,
                     ToastNotification = new ToastNotification
                     {
                         IsEnable = false,
@@ -71,6 +73,7 @@ namespace web.Controllers
                 {
                     showSignInForm = true,
                     showSignUpForm = false,
+                    showForgotPasswordForm = false,
                     ToastNotification = new ToastNotification
                     {
                         IsEnable = true,
@@ -85,6 +88,7 @@ namespace web.Controllers
             {
                 showSignInForm = true,
                 showSignUpForm = false,
+                showForgotPasswordForm = false,
                 ToastNotification = new ToastNotification
                 {
                     IsEnable = true,
@@ -102,6 +106,7 @@ namespace web.Controllers
             {
                 showSignInForm = false,
                 showSignUpForm = true,
+                showForgotPasswordForm = false,
                 ToastNotification = new ToastNotification
                 {
                     IsEnable = false,
@@ -121,6 +126,7 @@ namespace web.Controllers
                     SignUp = formModel.SignUp,
                     showSignInForm = false,
                     showSignUpForm = true,
+                    showForgotPasswordForm = false,
                     ToastNotification = new ToastNotification
                     {
                         IsEnable = false,
@@ -134,6 +140,7 @@ namespace web.Controllers
                 {
                     showSignInForm = true,
                     showSignUpForm = false,
+                    showForgotPasswordForm = false,
                     ToastNotification = new ToastNotification
                     {
                         IsEnable = true,
@@ -147,12 +154,33 @@ namespace web.Controllers
             {
                 showSignInForm = false,
                 showSignUpForm = true,
+                showForgotPasswordForm = false,
                 ToastNotification = new ToastNotification
                 {
                     IsEnable = true,
                     Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.BadRequest,
                     StatusIcon = ToastNotification.WARNING_ICON,
                     Message = response.Message
+                }
+            });
+        }
+
+        public ActionResult ForgotPassword()
+        {
+            return View("Login", new Form
+            {
+                showSignInForm = false,
+                showSignUpForm = false,
+                showForgotPasswordForm = true,
+                Forgot = new ForgotPassword
+                {
+                    showEmail_Field = true,
+                    showOTP_Field = false,
+                    showSetPassword_Field = false,
+                },
+                ToastNotification = new ToastNotification
+                {
+                    IsEnable = false,
                 }
             });
         }
