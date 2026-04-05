@@ -151,6 +151,97 @@ namespace API_Service.RepositoryLayer.Repository
                 Message = "Account created successfully"
             };
         }
+
+        public async Task<ResponseDetail> EmailExists(string email)
+        {
+            // Get all users
+            var users = await _userService.Get();
+            // Find user by email
+            _logger.LogDetails(LogType.INFO, $"getting user by email");
+            var user = users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            if (user == null)
+            {
+                _logger.LogDetails(LogType.WARNING, "incorrect email");
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "This email does not exist!"
+                };
+            }
+
+            _logger.LogDetails(LogType.INFO, $"Email exists, generating OTP...");
+            string newOtp = await Task.Run(() => ProcessOtpService.GenerateOtp(user.Id, user.Email));
+
+            _logger.LogDetails(LogType.INFO, $"OTP: {newOtp} generated successfully");
+            return new ResponseDetail
+            {
+                Status = true,
+                Message = "OTP has been sent to your email address"
+            };
+        }
+
+        public async Task<ResponseDetail> Verify(VerifyAccount detail)
+        {
+            bool isVerified = await Task.Run(() => ProcessOtpService.ValidateOtp(detail.Email, detail.Otp));
+
+            _logger.LogDetails(LogType.INFO, $"OTP verification for email {detail.Email} is {(isVerified ? "successful" : "failed")}");
+            return new ResponseDetail
+            {
+                Status = isVerified,
+                Message = isVerified ? "Account verified successfully" : "Invalid OTP"
+            };
+        }
+
+        public async Task<ResponseDetail> SetPassword(UserCredential userCredential)
+        {
+            var users = await _userService.Get();
+            // Find user by email
+            _logger.LogDetails(LogType.INFO, $"getting user by email");
+            var user = users.FirstOrDefault(u => u.Email.Equals(userCredential.Email, StringComparison.OrdinalIgnoreCase));
+
+            if (user != null)
+            {
+                bool isSuccess = await Task.Run(() => ProcessOtpService.GetSuccessStatus(user.Id, user.Email));
+
+                if (isSuccess)
+                {
+                    // Get all accounts
+                    var accounts = await _accountService.Get();
+
+                    // Find account by userId and verify password
+                    _logger.LogDetails(LogType.INFO, $"fetching account detail...");
+                    var account = accounts.FirstOrDefault(a => a.UserId == user.Id);
+
+                    if (account != null)
+                    {
+                        _logger.LogDetails(LogType.INFO, $"Successfully fetched account, setting new password for the account...");
+                        account.Password = userCredential.Password;
+                        bool isPasswordSet = await _accountService.Update(account);
+
+                        if (isPasswordSet)
+                        {
+                            _logger.LogDetails(LogType.INFO, $"Password has been set successfully.");
+                            await Task.Run(() => ProcessOtpService.ClearOtp(user.Email));
+
+                            return new ResponseDetail
+                            {
+                                Status = true,
+                                Message = "Password has been set successfully"
+                            };
+                        }
+                    }
+                }
+
+                _logger.LogDetails(LogType.WARNING, $"Denied to set password for email: {userCredential.Email}");
+            }
+
+            return new ResponseDetail
+            {
+                Status = false,
+                Message = "Error occurred while setting password!"
+            };
+        }
+
         public async Task RollBackUser(string userId)
         {            
             await _userService.Delete(userId);
