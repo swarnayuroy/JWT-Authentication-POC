@@ -12,6 +12,9 @@ namespace web.Service
     {
         Task<HttpResponseMessage> CheckCredential(Credential credential);
         Task<HttpResponseMessage> RegisterUser(Registration detail);
+        Task<HttpResponseMessage> CheckEmail(CheckEmail email);
+        Task<HttpResponseMessage> VerifyAccount(VerifyAccount detail);
+        Task<HttpResponseMessage> SetNewPassword(Credential credential);
         Task<HttpResponseMessage> GetUserDetail(string token, string userId);
         Task<HttpResponseMessage> GetAllUsers(string token, string userId, int page, int pageSize);
         Task<HttpResponseMessage> GetUsersBySearch(string token, string userId, int page, int pageSize, string searchText);

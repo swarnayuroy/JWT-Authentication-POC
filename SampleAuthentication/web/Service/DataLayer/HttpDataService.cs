@@ -1,5 +1,4 @@
-﻿using log4net.Repository.Hierarchy;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -79,7 +78,7 @@ namespace web.Service.DataLayer
                     $"{_client.BaseAddress}/account/register", 
                     userDetail
                 );
-                return response;    
+                return response;
             }
             catch (TaskCanceledException ex)
             {
@@ -95,6 +94,114 @@ namespace web.Service.DataLayer
                     return new HttpResponseMessage(HttpStatusCode.InternalServerError) 
                     { 
                         ReasonPhrase = "Request cancelled" 
+                    };
+                }
+            }
+        }
+
+        public async Task<HttpResponseMessage> CheckEmail(CheckEmail email)
+        {
+            try
+            {
+                StringContent userEmail = new StringContent
+                (
+                    JsonConvert.SerializeObject(email),
+                    Encoding.UTF8, "application/json"
+                );
+                _logger.LogDetails(LogType.INFO, $"Checking if email: {email} exists.");
+                HttpResponseMessage response = await _client.PostAsync
+                (
+                    $"{_client.BaseAddress}/account/emailexists",
+                    userEmail
+                );
+                return response;
+            }
+            catch (TaskCanceledException ex)
+            {
+                if (ex.InnerException is TimeoutException)
+                {
+                    return new HttpResponseMessage(HttpStatusCode.RequestTimeout)
+                    {
+                        ReasonPhrase = "Request timeout"
+                    };
+                }
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                    {
+                        ReasonPhrase = "Request cancelled"
+                    };
+                }
+            }
+        }
+
+        public async Task<HttpResponseMessage> VerifyAccount(VerifyAccount detail)
+        {
+            try
+            {
+                StringContent verifyDetail = new StringContent
+                (
+                    JsonConvert.SerializeObject(detail),
+                    Encoding.UTF8, "application/json"
+                );
+                _logger.LogDetails(LogType.INFO, "Verifying account in progress...");
+                HttpResponseMessage response = await _client.PostAsync
+                (
+                    $"{_client.BaseAddress}/account/verify",
+                    verifyDetail
+                );
+                return response;
+            }
+            catch (TaskCanceledException ex)
+            {
+                if (ex.InnerException is TimeoutException)
+                {
+                    return new HttpResponseMessage(HttpStatusCode.RequestTimeout)
+                    {
+                        ReasonPhrase = "Request timeout"
+                    };
+                }
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                    {
+                        ReasonPhrase = "Request cancelled"
+                    };
+                }
+            }
+        }
+
+        public async Task<HttpResponseMessage> SetNewPassword(Credential credential) 
+        {
+            try
+            {
+                StringContent credentialDetail = new StringContent
+                (
+                    JsonConvert.SerializeObject(credential),
+                    Encoding.UTF8, "application/json"
+                );
+                _logger.LogDetails(LogType.INFO, $"Setting new password for email: {credential.Email}");
+                HttpResponseMessage response = await _client.PutAsync
+                (
+                    $"{_client.BaseAddress}/account/setpassword",
+                    credentialDetail
+                );
+                return response;
+            }
+            catch (TaskCanceledException ex)
+            {
+                if (ex.InnerException is TimeoutException)
+                {
+                    return new HttpResponseMessage(HttpStatusCode.RequestTimeout)
+                    {
+                        ReasonPhrase = "Request timeout"
+                    };
+                }
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                    {
+                        ReasonPhrase = "Request cancelled"
                     };
                 }
             }

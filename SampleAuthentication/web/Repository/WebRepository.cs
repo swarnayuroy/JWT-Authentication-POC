@@ -30,7 +30,7 @@ namespace web.Repository
 
         public async Task<ResponseDetail> CheckCredential(Credential userCredential)
         {
-            #region HTTTP Service Call
+            #region HTTP Service Call
 
             try
             {
@@ -70,6 +70,64 @@ namespace web.Repository
 
             #endregion
         }
+
+        public async Task<ResponseDetail> CheckEmail(CheckEmail email)
+        {
+            #region HTTP Service Call
+            try
+            {
+                _response = await _httpService.CheckEmail(email);
+                return await new FilterResponse<WebRepository>().Process(_response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
+
+                return _response?.Content != null ?
+                    new ResponseDetail { Status = false, StatusCode = _response.StatusCode, Message = $"Invalid response." }
+                    : new ResponseDetail { Status = false, StatusCode = HttpStatusCode.BadRequest, Message = $"Failed to process your request" };
+            }
+            #endregion
+        }
+
+        public async Task<ResponseDetail> VerifyAccount(VerifyAccount detail)
+        {
+            #region HTTP Service Call
+            try
+            {
+                _response = await _httpService.VerifyAccount(detail);
+                return await new FilterResponse<WebRepository>().Process(_response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
+
+                return _response?.Content != null ?
+                    new ResponseDetail { Status = false, StatusCode = _response.StatusCode, Message = $"Invalid response." }
+                    : new ResponseDetail { Status = false, StatusCode = HttpStatusCode.BadRequest, Message = $"Failed to process your request" };
+            }
+            #endregion
+        }
+
+        public async Task<ResponseDetail> SetNewPassword(Credential credential) 
+        {
+            #region HTTP Service Call
+            try
+            {
+                _response = await _httpService.SetNewPassword(credential);
+                return await new FilterResponse<WebRepository>().Process(_response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
+
+                return _response?.Content != null ?
+                    new ResponseDetail { Status = false, StatusCode = _response.StatusCode, Message = $"Invalid response." }
+                    : new ResponseDetail { Status = false, StatusCode = HttpStatusCode.BadRequest, Message = $"Failed to process your request" };
+            }
+            #endregion
+        }
+
         public async Task<ResponseDetail> GetUserDetail(string token, string userId)
         {
             #region HTTP Service Call
