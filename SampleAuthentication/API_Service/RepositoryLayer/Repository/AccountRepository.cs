@@ -230,6 +230,7 @@ namespace API_Service.RepositoryLayer.Repository
                             };
                         }
                     }
+                    await Task.Run(() => ProcessOtpService.ClearOtp(user.Email));
                 }
 
                 _logger.LogDetails(LogType.WARNING, $"Denied to set password for email: {userCredential.Email}");

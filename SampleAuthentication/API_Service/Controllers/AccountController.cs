@@ -69,5 +69,72 @@ namespace API_Service.Controllers
                     "An error occurred while processing your request.");
             }
         }
+
+        #region Check/Verify/Set New Password
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("emailexists")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> EmailExists([FromBody] CheckEmail userEmail)
+        {
+            try
+            {
+                var response = await _accountService.EmailExists(userEmail.Email);
+                return response.Status ? StatusCode(StatusCodes.Status200OK, response.Message) : NotFound(response.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    "An error occurred while processing your request.");
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("verify")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Verify([FromBody] VerifyAccount detail)
+        {
+            try
+            {
+                var response = await _accountService.Verify(detail);
+                return response.Status ? StatusCode(StatusCodes.Status200OK, response.Message) : BadRequest(response.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "An error occurred while processing your request.");
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPut]
+        [Route("setpassword")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SetPassword([FromBody] UserCredential userCredential)
+        {
+            try
+            {
+                var response = await _accountService.SetPassword(userCredential);
+                return response.Status ? StatusCode(StatusCodes.Status200OK, response.Message) : BadRequest(response.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "An error occurred while processing your request.");
+            }
+        }
+
+        #endregion
     }
 }
