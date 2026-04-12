@@ -172,11 +172,20 @@ namespace API_Service.RepositoryLayer.Repository
             _logger.LogDetails(LogType.INFO, $"Email exists, generating OTP...");
             string newOtp = await Task.Run(() => ProcessOtpService.GenerateOtp(user.Id, user.Email));
 
-            _logger.LogDetails(LogType.INFO, $"OTP: {newOtp} generated successfully");
+            if (!string.IsNullOrEmpty(newOtp))
+            {
+                _logger.LogDetails(LogType.INFO, $"OTP: {newOtp} generated successfully");
+                return new ResponseDetail
+                {
+                    Status = true,
+                    Message = "OTP has been sent to your email address"
+                };
+            }
+            _logger.LogDetails(LogType.WARNING, $"Failed to generate OTP for email {user.Email}");
             return new ResponseDetail
             {
-                Status = true,
-                Message = "OTP has been sent to your email address"
+                Status = false,
+                Message = "Some error occurred!"
             };
         }
 

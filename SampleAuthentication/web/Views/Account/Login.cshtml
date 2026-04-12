@@ -67,7 +67,7 @@
                     <p>@Html.ActionLink("Don't have an account? Sign Up", "SignUp", "Account", null, new { @class = "register_here" }) </p>
                 </div>
             }
-        }
+         }
 
         @if (Model.showSignUpForm)
         {
@@ -105,7 +105,7 @@
                     <p>@Html.ActionLink("Have an account? LogIn", "Login", "Account", null, new { @class = "login_here" }) </p>
                 </div>
             }
-        }
+         }
 
         @if (Model.showForgotPasswordForm)
         {
@@ -114,17 +114,55 @@
                 <h2 class="form_forgotPassword_header">Forgot Password</h2>
                 if (Model.Forgot.showEmail_Field)
                 {
-                    Html.RenderPartial("_ForgotPasswordEmailCheck", Model.Forgot);
+                    <div class="form_userEmail_container">
+                        @Html.HiddenFor(formModel => formModel.Forgot.showEmail_Field)
+
+                        @Html.LabelFor(formModel => formModel.Forgot.Email_Field.Email, new { @class = "form_userEmail_label" })
+                        <div class="form_userEmail_input">
+                            @Html.TextBoxFor(formModel => formModel.Forgot.Email_Field.Email, new { autocomplete = "off", type = "email" })
+                        </div>
+                        <p>@Html.ValidationMessageFor(formModel => formModel.Forgot.Email_Field.Email)</p>
+                    </div>
                 }
 
                 if (Model.Forgot.showOTP_Field)
                 {
-                    Html.RenderPartial("_ForgotPasswordVerifyOTP", Model.Forgot);
+                    <div class="form_otp_container">
+                        @Html.HiddenFor(formModel => formModel.Forgot.showOTP_Field)
+                        @Html.HiddenFor(formModel => formModel.Forgot.UserEmail)
+
+                        @Html.LabelFor(formModel => formModel.Forgot.OTP_Field.OTP, new { @class = "form_otp_label" })
+                        <div class="form_otp_input">
+                            @Html.TextBoxFor(formModel => formModel.Forgot.OTP_Field.OTP, new { autocomplete = "off", style = "text-align: center;" })
+                        </div>
+                        <p>@Html.ValidationMessageFor(formModel => formModel.Forgot.OTP_Field.OTP)</p>
+                    </div>
                 }
 
                 if (Model.Forgot.showSetPassword_Field)
                 {
-                    Html.RenderPartial("_ForgotPasswordSetPassword", Model.Forgot);
+                    <div class="form_setPassword_container">
+                        @Html.HiddenFor(formModel => formModel.Forgot.showSetPassword_Field)
+                        @Html.HiddenFor(formModel => formModel.Forgot.UserEmail)
+
+                        <div class="form_newPassword_container">
+                            @Html.LabelFor(formModel => formModel.Forgot.SetPassword_Field.NewPassword, new { @class = "form_newPassword_label" })
+                            <div class="form_newPassword_input">
+                                @Html.PasswordFor(formModel => formModel.Forgot.SetPassword_Field.NewPassword, new { id = "set_newPassword_input" })
+                                <i class="fa-solid fa-eye" id="set_newPassword_show" onclick="showPassword('setNewPassword')"></i>
+                                <i class="fa-solid fa-eye-slash" id="set_newPassword_hide" onclick="hidePassword('setNewPassword')"></i>
+                            </div>
+                            <p>@Html.ValidationMessageFor(formModel => formModel.Forgot.SetPassword_Field.NewPassword)</p>
+                        </div>
+
+                        <div class="form_confirmPassword_container">
+                            @Html.LabelFor(formModel => formModel.Forgot.SetPassword_Field.ConfirmPassword, new { @class = "form_confirmPassword_label" })
+                            <div class="form_confirmPassword_input">
+                                @Html.TextBoxFor(formModel => formModel.Forgot.SetPassword_Field.ConfirmPassword, new { autocomplete = "off", id = "set_confirmPassword_input" })
+                            </div>
+                            <p>@Html.ValidationMessageFor(formModel => formModel.Forgot.SetPassword_Field.ConfirmPassword)</p>
+                        </div>
+                    </div>
                 }
 
                 <div class="form_setPassword_btn">
@@ -135,7 +173,7 @@
                     <p>@Html.ActionLink("<< Back to login", "Login", "Account", null, new { @class = "login_here" })</p>
                 </div>
             }
-        }
+         }
     </div>
 
     @Html.Partial("_Loader")

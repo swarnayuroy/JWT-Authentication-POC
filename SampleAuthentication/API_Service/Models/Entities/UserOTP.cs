@@ -17,14 +17,16 @@ namespace API_Service.Models.Entities
             }
             set
             {
-                value = Convert.ToString(RandomNumberGenerator.GetInt32(100000, 1000000));
-                this._otp = value;
+                if (!string.IsNullOrEmpty(value))
+                {
+                    this._otp = value;
+                }                
             }
         }
         public DateTime OtpGenerated 
         {
             get { return _otpGenerated; }
-            set { value = DateTime.Now; _otpGenerated = value; }
+            set { _otpGenerated = value; }
         }
 
         public bool IsChecked { get; set; } = false;

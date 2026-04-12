@@ -194,9 +194,7 @@ namespace web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ForgotPassword(Form formModel)
-        {   
-            if (formModel.showForgotPasswordForm)
-            {
+        {
                 ResponseDetail response = new ResponseDetail();
                 ForgotPassword forgotPassword = new ForgotPassword();
                 if (!ModelState.IsValid)
@@ -259,7 +257,7 @@ namespace web.Controllers
                             showEmail_Field = false,
                             showOTP_Field = true,
                             showSetPassword_Field = false,
-                            Email_Field = userEmail,
+                            UserEmail = userEmail.Email,
                             OTP_Field = new VerifyOTP()
                         };
 
@@ -305,10 +303,10 @@ namespace web.Controllers
                 }
                 #endregion
 
-                #region Step 2: checking for valid OTP and enabling set password field
+                #region Step 2: verifying OTP and enabling set password field
                 if (formModel.Forgot.showOTP_Field)
                 {
-                    string email = formModel.Forgot.Email_Field.Email;
+                    string email = formModel.Forgot.UserEmail;
                     string otp = formModel.Forgot.OTP_Field.OTP;
                     VerifyAccount detail = new VerifyAccount
                     {
@@ -324,7 +322,7 @@ namespace web.Controllers
                             showEmail_Field = false,
                             showOTP_Field = false,
                             showSetPassword_Field = true,
-                            Email_Field = new CheckEmail { Email = email },
+                            UserEmail=email,
                             SetPassword_Field = new SetNewPassword()
                         };
 
@@ -347,7 +345,7 @@ namespace web.Controllers
                         showEmail_Field = false,
                         showOTP_Field = true,
                         showSetPassword_Field = false,
-                        Email_Field = new CheckEmail { Email = email },
+                        UserEmail = email,
                         OTP_Field = new VerifyOTP()
                     };
 
@@ -371,7 +369,7 @@ namespace web.Controllers
                 #region Step 3: setting new password by the user
                 if (formModel.Forgot.showSetPassword_Field)
                 {
-                    string email = formModel.Forgot.Email_Field.Email;
+                    string email = formModel.Forgot.UserEmail;
                     Credential credential = new Credential
                     {
                         Email = email,
@@ -403,7 +401,7 @@ namespace web.Controllers
                         showEmail_Field = false,
                         showOTP_Field = false,
                         showSetPassword_Field = true,
-                        Email_Field = new CheckEmail { Email = email },
+                        UserEmail = email,
                         SetPassword_Field = new SetNewPassword()
                     };
 
@@ -419,9 +417,10 @@ namespace web.Controllers
                         }
                     });
                 }
-                #endregion
-            }
-            return View(new Form
+            #endregion
+
+            // default return statement if something goes wrong
+            return View("Login", new Form
             {
                 showSignInForm = true,
                 showSignUpForm = false,

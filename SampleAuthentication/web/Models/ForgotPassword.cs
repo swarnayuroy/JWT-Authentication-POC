@@ -36,9 +36,24 @@ namespace web.Models
 
     public class ForgotPassword
     {
+        private string _userEmail;
         public bool showEmail_Field { get; set; }
         public bool showOTP_Field { get; set; }
         public bool showSetPassword_Field { get; set; }
+        public string UserEmail 
+        { 
+            get
+            {
+                return _userEmail;
+            }
+            set
+            {
+                if (!String.IsNullOrEmpty(value))
+                {
+                    _userEmail = value;
+                }
+            } 
+        }
         public CheckEmail Email_Field { get; set; }
         public VerifyOTP OTP_Field { get; set; }
         public SetNewPassword SetPassword_Field { get; set; }

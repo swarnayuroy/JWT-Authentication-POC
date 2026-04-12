@@ -1,4 +1,5 @@
 ﻿using API_Service.Models.Entities;
+using System.Security.Cryptography;
 
 namespace API_Service.Utils
 {
@@ -16,26 +17,31 @@ namespace API_Service.Utils
         // below method will generate new OTP for the user or update the existing record by generating new OTP
         public static string GenerateOtp(Guid userId, string userEmail)
         {
+            var newOTPrecord = new UserOTP
+            {
+                Otp = Convert.ToString(RandomNumberGenerator.GetInt32(100000, 1000000)),
+                OtpGenerated = DateTime.Now,
+                IsChecked = true
+            };
             var record = _userOTPs.FirstOrDefault(u => u.UserId == userId);
+
+            // if record exists, update the OTP and OTP generated time
             if (record != null)
             {
-                var userOtp = new UserOTP();
-                record.Otp = userOtp.Otp;
-                record.OtpGenerated = userOtp.OtpGenerated;
+                record.Otp = newOTPrecord.Otp;
+                record.OtpGenerated = newOTPrecord.OtpGenerated;
                 _userOTPs[_userOTPs.IndexOf(_userOTPs.First(otp => otp.UserId == userId))] = record;
 
                 return record.Otp;
             }
 
-            var newRecord = new UserOTP
-            {
-                UserId = userId,
-                UserEmail = userEmail,
-                IsChecked = true
-            };
-            _userOTPs.Add(newRecord);
+            // if record does not exist, create new otp record then add to the list
+            newOTPrecord.UserId = userId;
+            newOTPrecord.UserEmail = userEmail;
 
-            return newRecord.Otp;
+            _userOTPs.Add(newOTPrecord);
+
+            return newOTPrecord.Otp;
         }
 
         // below method will validate the OTP for the user and update the success status if the OTP is valid
