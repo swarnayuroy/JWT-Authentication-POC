@@ -1,4 +1,5 @@
 ﻿using API_Service.Models.Entities;
+using DataContext.Models;
 using System.Security.Cryptography;
 
 namespace API_Service.Utils
@@ -17,31 +18,22 @@ namespace API_Service.Utils
         // below method will generate new OTP for the user or update the existing record by generating new OTP
         public static string GenerateOtp(Guid userId, string userEmail)
         {
-            var newOTPrecord = new UserOTP
-            {
-                Otp = Convert.ToString(RandomNumberGenerator.GetInt32(100000, 1000000)),
-                OtpGenerated = DateTime.Now,
-                IsChecked = true
-            };
+            var new_otp_record = new UserOTP(userId, userEmail);
             var record = _userOTPs.FirstOrDefault(u => u.UserId == userId);
 
-            // if record exists, update the OTP and OTP generated time
+            // if record exists, update the OTP record with new OTP
             if (record != null)
             {
-                record.Otp = newOTPrecord.Otp;
-                record.OtpGenerated = newOTPrecord.OtpGenerated;
-                _userOTPs[_userOTPs.IndexOf(_userOTPs.First(otp => otp.UserId == userId))] = record;
-
-                return record.Otp;
+                record = new_otp_record;
+                record.IsChecked = true;
+                return UpdateOtpRecord(record) ? record.Otp : string.Empty;
             }
 
-            // if record does not exist, create new otp record then add to the list
-            newOTPrecord.UserId = userId;
-            newOTPrecord.UserEmail = userEmail;
+            // if record does not exist just add new otp record to the list
+            new_otp_record.IsChecked = true;
+            AddOtpRecord(new_otp_record);
 
-            _userOTPs.Add(newOTPrecord);
-
-            return newOTPrecord.Otp;
+            return new_otp_record.Otp;
         }
 
         // below method will validate the OTP for the user and update the success status if the OTP is valid
@@ -54,8 +46,7 @@ namespace API_Service.Utils
             if (record != null)
             {
                 record.IsSuccess = true;
-                _userOTPs[_userOTPs.IndexOf(_userOTPs.First(otp => otp.UserId == record.UserId))] = record;
-                return true;
+                return UpdateOtpRecord(record);
             }
             return false;
         }
@@ -66,8 +57,26 @@ namespace API_Service.Utils
             var record = _userOTPs.FirstOrDefault(u => u.UserEmail.Equals(email, StringComparison.OrdinalIgnoreCase));
             if (record != null)
             {
-                _userOTPs.Remove(record);
+                RemoveOtpRecord(record);
             }
         }
+
+        #region OTP record service
+        public static void AddOtpRecord(UserOTP otpRecord)
+        {
+            _userOTPs.Add(otpRecord);
+        }
+
+        public static bool UpdateOtpRecord(UserOTP otpRecord)
+        {
+            _userOTPs[_userOTPs.IndexOf(_userOTPs.First(otp => otp.UserId == otpRecord.UserId))] = otpRecord;
+            return true;
+        }
+
+        public static void RemoveOtpRecord(UserOTP otpRecord)
+        {
+            _userOTPs.Remove(otpRecord);
+        }
+        #endregion
     }
 }
