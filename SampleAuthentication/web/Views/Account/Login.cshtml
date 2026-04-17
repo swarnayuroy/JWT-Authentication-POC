@@ -137,8 +137,31 @@
                         </div>
                         <p>@Html.ValidationMessageFor(formModel => formModel.Forgot.OTP_Field.OTP)</p>
                         <p class="resend_otp">
+                            <span id="timer">30</span>
                             @Html.ActionLink("Resend OTP", "ResendOTP", "Account", new { email = Model.Forgot.UserEmail }, new { @class = "resend_otp_link" })
                         </p>
+
+                        <script>
+                            const timerElement = document.getElementById('timer');
+                            const resendLink = document.querySelector('.resend_otp_link');
+
+                            let timeLeft = parseInt(timerElement.innerHTML);
+
+                            const countdown = setInterval(() => {
+                                if (timeLeft <= 0) {
+                                    clearInterval(countdown);
+                                    timerElement.style.display = 'none';
+                                    resendLink.style.display = 'inline';
+                                } else {
+                                    if (timeLeft === 1) {
+                                        timerElement.innerHTML = `1 second remaining`;
+                                    } else {
+                                        timerElement.innerHTML = `${timeLeft} seconds remaining`;
+                                    }
+                                }
+                                timeLeft -= 1;
+                            }, 1000);
+                        </script>
                     </div>
                 }
 

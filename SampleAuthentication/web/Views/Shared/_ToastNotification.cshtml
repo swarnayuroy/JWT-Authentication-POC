@@ -9,9 +9,10 @@
     </div>
 
     <button class="page_toast_notification_close_btn" onclick="hideToast()">
-        <i class="@Model.CloseToastIcon" style="font-size: 15px;"></i>
+        <i class="@Model.CloseToastIcon" style="font-size: 15px"></i>
     </button>
+
+    <script type="text/javascript">
+        setTimeout(hideToast, @Model.TimeOut);
+    </script>
 </div>
-<script type="text/javascript">
-    setTimeout(hideToast, @Model.TimeOut);
-</script>
