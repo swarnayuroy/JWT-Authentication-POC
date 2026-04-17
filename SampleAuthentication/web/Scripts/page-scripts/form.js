@@ -92,6 +92,29 @@ $(document).ready(function () {
         }
     });
 
+    const otpInput = $(".form_otp_input input");
+    if (otpInput) {
+        // Allow only digits on keypress
+        otpInput.on("keypress", function (e) {
+            const charCode = e.which || e.keyCode;
+
+            // Allow: backspace, delete, arrow keys
+            if (charCode === 8 || charCode === 46 || charCode === 37 || charCode === 39) {
+                return;
+            }
+
+            // Block non-numeric
+            if (charCode < 48 || charCode > 57) {
+                e.preventDefault();
+            }
+        });
+
+        // Handle paste / fallback
+        otpInput.on("input", function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 6);
+        });
+    }
+
     $(".resend_otp_link").on("click",function (e) {
         e.preventDefault();  // Prevent default link behavior
 
