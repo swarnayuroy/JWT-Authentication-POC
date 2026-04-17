@@ -431,6 +431,72 @@ namespace web.Controllers
                 }
             });
         }
+        
+        public async Task<ActionResult> ResendOTP(string email) 
+        {
+            ResponseDetail response = new ResponseDetail();
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                //This is a scenario for further attempt to generate new OTP for the user
+                ForgotPassword forgotPassword = new ForgotPassword
+                {
+                    showEmail_Field = false,
+                    showOTP_Field = true,
+                    showSetPassword_Field = false,
+                    UserEmail = email,
+                    OTP_Field = new VerifyOTP()
+                };
+
+                CheckEmail userEmail = new CheckEmail { Email = email };
+
+                response = await _repository.CheckEmail(userEmail);
+                if (response.Status)
+                {
+                    return View("Login", new Form
+                    {
+                        showSignInForm = false,
+                        showSignUpForm = false,
+                        showForgotPasswordForm = true,
+                        Forgot = forgotPassword,
+                        ToastNotification = new ToastNotification
+                        {
+                            IsEnable = true,
+                            Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.OK,
+                            StatusIcon = ToastNotification.SUCCESS_ICON,
+                            Message = "OTP has been sent to your email address."
+                        }
+                    });
+                }
+                return View("Login", new Form
+                {
+                    showSignInForm = false,
+                    showSignUpForm = false,
+                    showForgotPasswordForm = true,
+                    Forgot = forgotPassword,
+                    ToastNotification = new ToastNotification
+                    {
+                        IsEnable = true,
+                        Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.BadRequest,
+                        StatusIcon = ToastNotification.WARNING_ICON,
+                        Message = "Some error occurred while resending the OTP."
+                    }
+                });
+            }
+            return View("Login", new Form
+            {
+                showSignInForm = true,
+                showSignUpForm = false,
+                showForgotPasswordForm = false,
+                ToastNotification = new ToastNotification
+                {
+                    IsEnable = true,
+                    Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.BadRequest,
+                    StatusIcon = ToastNotification.WARNING_ICON,
+                    Message = "Please try again later."
+                }
+            });
+        }
 
         public Task SetCacheControl()
         {

@@ -136,6 +136,9 @@
                             @Html.TextBoxFor(formModel => formModel.Forgot.OTP_Field.OTP, new { autocomplete = "off", style = "text-align: center;" })
                         </div>
                         <p>@Html.ValidationMessageFor(formModel => formModel.Forgot.OTP_Field.OTP)</p>
+                        <p class="resend_otp">
+                            @Html.ActionLink("Resend OTP", "ResendOTP", "Account", new { email = Model.Forgot.UserEmail }, new { @class = "resend_otp_link" })
+                        </p>
                     </div>
                 }
 
@@ -173,7 +176,7 @@
                     <p>@Html.ActionLink("<< Back to login", "Login", "Account", null, new { @class = "login_here" })</p>
                 </div>
             }
-         }
+        }
     </div>
 
     @Html.Partial("_Loader")

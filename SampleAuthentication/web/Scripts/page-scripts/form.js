@@ -91,4 +91,18 @@ $(document).ready(function () {
             showLoader();
         }
     });
+
+    $(".resend_otp_link").on("click",function (e) {
+        e.preventDefault();  // Prevent default link behavior
+
+        showLoader();
+
+        // Store the href to avoid context issues
+        var resendOTP_Url = $(this).attr('href');
+
+        // Small delay before navigation to allow loader to display
+        setTimeout(function () {
+            window.location.href = resendOTP_Url;
+        }, 1000);
+    });
 });
