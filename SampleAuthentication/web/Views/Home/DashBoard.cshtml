@@ -12,13 +12,14 @@
     <link href="~/Content/page-styles/auth-board.css" rel="stylesheet" />
     <link href="~/Content/page-styles/notification.css" rel="stylesheet" />
     <link href="~/Content/page-styles/no-content.css" rel="stylesheet" />
+    <link href="~/Content/page-styles/user-verification.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
     <link href="~/Content/page-styles/page-loader.css" rel="stylesheet" />
     <script src="~/Scripts/jquery-3.7.0.min.js"></script>
     <script src="~/Scripts/jquery.validate.min.js"></script>
     <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
     <script src="~/Scripts/page-scripts/shared.js"></script>
     <script src="~/Scripts/page-scripts/restrict-prev.js"></script>
-    <script src="~/Scripts/page-scripts/auth-board.js"></script>
+    <script src="~/Scripts/page-scripts/auth-board.js?v=@DateTime.Now.Ticks"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
     <title>DashBoard</title>
 </head>
@@ -89,7 +90,7 @@
                                 @if ((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage > 1)
                                 {
                                     <a href="@Url.Action("PaginateOperation", "Home",
-                        new { page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage - 1 })"
+        new { page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage - 1 })"
                                        class="pagination-btn" data-page="@((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage - 1)">
                                         <i class="fa-solid fa-chevron-left"></i> Previous
                                     </a>
@@ -108,7 +109,7 @@
                                 @if ((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage < (Model as web.Models.SessionModel.AdminSessionDetail).Data.TotalPages)
                                 {
                                     <a href="@Url.Action("PaginateOperation", "Home",
-                        new { page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage + 1 })"
+        new { page = (Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage + 1 })"
                                        class="pagination-btn" data-page="@((Model as web.Models.SessionModel.AdminSessionDetail).Data.CurrentPage + 1)">
                                         Next <i class="fa-solid fa-chevron-right"></i>
                                     </a>
@@ -128,6 +129,89 @@
                     }
                 </div>          
             </div>
+        }
+        else {
+            
+            if (!Model.User.IsVerified)
+            {
+                <div class="user-verification-layout">
+                    <div class="verification-container">
+                        <div class="close_button_layout">
+                            <button class="verification_close_button">
+                                <i class="@Model.Verify.CloseVerifyModal" style="font-size: 15px"></i>
+                            </button>
+                        </div>                        
+
+                        @if(Model.Verify.showOTP_Field)
+                        {
+                            <div class="verification-initial-content">
+                                <div class="form_otp_container">
+                                    @Html.LabelFor(model => model.Verify.OTP_Field.OTP, new { @class = "form_otp_label" })
+                                    <div class="form_otp_input">
+                                        @Html.TextBoxFor(model => model.Verify.OTP_Field.OTP,
+                                            new {
+                                                maxlength = "6",
+                                                inputmode = "numeric",
+                                                autocomplete = "off",
+                                                style = "text-align: center;",
+                                                id = "otp_input"
+                                            })
+                                    </div>
+                                    <p>@Html.ValidationMessageFor(model => model.Verify.OTP_Field.OTP)</p>
+                                    <p class="resend_otp">
+                                        <span id="timer">00:30</span>
+                                        @Html.ActionLink("Resend OTP", "VerifyAccount", "Home",
+                                        new { value = "resend", haveOtpValue = false }, new { @class = "resend_otp_link" })
+                                    </p>
+
+                                    <script>
+                                        const timerElement = document.getElementById('timer');
+                                        const resendLink = document.querySelector('.resend_otp_link');
+
+                                        let timeLeft = parseInt(timerElement.innerHTML.split(':')[1]);
+
+                                        const countdown = setInterval(() => {
+                                            if (timeLeft <= 0) {
+                                                clearInterval(countdown);
+                                                timerElement.style.display = 'none';
+                                                resendLink.style.display = 'inline';
+                                            } else {
+                                                if (timeLeft < 10) {
+                                                    timerElement.innerHTML = `00:0${timeLeft}`;
+                                                } else {
+                                                    timerElement.innerHTML = `00:${timeLeft}`;
+                                                }
+                                            }
+                                            timeLeft -= 1;
+                                        }, 1000);
+                                    </script>
+
+                                    <div class="verify-submit-layout">
+                                        <p class="submit-container">
+                                            @Html.ActionLink("Submit", "VerifyAccount", "Home", null, new { @class = "submit_link" })
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            @*Initiate the verification*@
+
+                            <div class="verification-initial-content">
+                                <div class="verification-notify">
+                                    <p>Please verify your account</p>
+                                    <div class="verify-confirm">
+                                        <p class="user_verify">
+                                            @Html.ActionLink("Verify", "VerifyAccount", "Home", null, new { @class = "verify_link" })
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                     </div>
+                </div>
+            }            
         }
     </div>
 

@@ -25,6 +25,7 @@ namespace web.Controllers
         {
             this._repository = repository;
         }
+        
         // GET: Home
         [HttpGet]
         public async Task<ActionResult> DashBoard()
@@ -163,6 +164,105 @@ namespace web.Controllers
                 }
             }
             return RedirectToAction("Login", "Account");
+        }
+
+        public async Task<ActionResult> VerifyAccount(string value, bool haveOtpValue = false)
+        {
+            ResponseDetail response = new ResponseDetail();
+            UserDetail currentUser = Session["currentUser"] as UserDetail;            
+
+            if (haveOtpValue)
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    VerifyAccount detail = new VerifyAccount
+                    {
+                        Email = currentUser.Email,
+                        Otp = value,
+                        IsLoggedIn = true
+                    };
+                    response = await _repository.VerifyAccount(detail);
+                    if (response.Status)
+                    {
+                        return RedirectToAction("Dashboard", "Home");
+                    }
+                    return View("Dashboard", new UserSessionDetail
+                    {
+                        User = currentUser,
+                        Verify = new VerifyUser
+                        {
+                            showOTP_Field = true,
+                            OTP_Field = new VerifyOTP()
+                        },
+                        ToastNotification = new ToastNotification
+                        {
+                            IsEnable = true,
+                            Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.BadRequest,
+                            StatusIcon = ToastNotification.WARNING_ICON,
+                            Message = response.Message
+                        }
+                    });
+                }
+
+                // OTP input field is empty as user didn't type the OTP
+                return View("Dashboard", new UserSessionDetail
+                {
+                    User = currentUser,
+                    Verify = new VerifyUser
+                    {
+                        showOTP_Field = true,
+                        OTP_Field = new VerifyOTP()
+                    },
+                    ToastNotification = new ToastNotification
+                    {
+                        IsEnable = true,
+                        Type = HttpStatusCode.BadRequest,
+                        StatusIcon = ToastNotification.WARNING_ICON,
+                        Message = "Please enter the OTP"
+                    }
+                });
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    VerifyUser verification = new VerifyUser
+                    {
+                        showOTP_Field = true,
+                        OTP_Field = new VerifyOTP()
+                    };
+                    CheckEmail userEmail = new CheckEmail { Email = currentUser.Email };
+                    response = await _repository.CheckEmail(userEmail);
+
+                    if (response.Status)
+                    {                        
+                        return View("Dashboard", new UserSessionDetail
+                        {
+                            User = currentUser,
+                            Verify = verification,
+                            ToastNotification = new ToastNotification
+                            {
+                                IsEnable = true,
+                                Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.OK,
+                                StatusIcon = ToastNotification.SUCCESS_ICON,
+                                Message = "OTP has been sent to your email address."
+                            }
+                        });
+                    }
+                    return View("Dashboard", new UserSessionDetail
+                    {
+                        User = currentUser,
+                        ToastNotification = new ToastNotification
+                        {
+                            IsEnable = true,
+                            Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.BadRequest,
+                            StatusIcon = ToastNotification.WARNING_ICON,
+                            Message = response.Message
+                        }
+                    });
+                }
+            }
+            return RedirectToAction("Logout", "Home");
         }
 
         public async Task<ActionResult> Logout()

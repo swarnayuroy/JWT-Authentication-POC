@@ -15,6 +15,78 @@
         }, 1000);
     });
 
+    $(".verification_close_button").on("click", function (e) {
+        e.preventDefault();  // Prevent default link behavior
+
+        showLoader();
+
+        // Small delay before navigation to allow loader to display
+        setTimeout(function () {
+            window.location.href = `${window.location.origin}/Home/Logout`;
+        }, 1000);
+    });
+
+    $(".verify_link").on("click", function (e) {
+        e.preventDefault();  // Prevent default link behavior
+
+        showLoader();
+        const verifyUser = "verify"
+
+        // Small delay before navigation to allow loader to display
+        setTimeout(function () {
+            window.location.href = `${window.location.origin}/Home/VerifyAccount?value=${verifyUser}&haveOtpValue=${false}`;
+        }, 1000);
+    });
+
+    $(".submit_link").on("click", function (e) {
+        e.preventDefault();  // Prevent default link behavior
+
+        showLoader();
+        const value = document.getElementById('otp_input').value.toString();
+
+        // Small delay before navigation to allow loader to display
+        setTimeout(function () {
+            window.location.href = `${window.location.origin}/Home/VerifyAccount?value=${value}&haveOtpValue=${true}`;
+        }, 1000);
+    });
+
+    const otpInput = $(".form_otp_input input");
+    if (otpInput) {
+        // Allow only digits on keypress
+        otpInput.on("keypress", function (e) {
+            const charCode = e.which || e.keyCode;
+
+            // Allow: backspace, delete, arrow keys
+            if (charCode === 8 || charCode === 46 || charCode === 37 || charCode === 39) {
+                return;
+            }
+
+            // Block non-numeric
+            if (charCode < 48 || charCode > 57) {
+                e.preventDefault();
+            }
+        });
+
+        // Handle paste / fallback
+        otpInput.on("input", function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 6);
+        });
+    }
+
+    $(".resend_otp_link").on("click", function (e) {
+        e.preventDefault();  // Prevent default link behavior
+
+        showLoader();
+
+        // Store the href to avoid context issues
+        var resendOTP_Url = $(this).attr('href');
+
+        // Small delay before navigation to allow loader to display
+        setTimeout(function () {
+            window.location.href = resendOTP_Url;
+        }, 1000);
+    });
+
     // Pagination handler (delegated to support AJAX-injected pagination controls)
     $(document).on("click", ".pagination-btn:not(.disabled)", function (e) {
         e.preventDefault();

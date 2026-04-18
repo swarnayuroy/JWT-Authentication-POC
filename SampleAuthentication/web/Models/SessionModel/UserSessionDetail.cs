@@ -5,19 +5,26 @@ using System.Web;
 
 namespace web.Models.SessionModel
 {
+    public class VerifyUser
+    {
+        public bool showOTP_Field { get; set; } = false;
+        public VerifyOTP OTP_Field { get; set; }
+        public string CloseVerifyModal { get { return "fa-solid fa-circle-xmark"; } }
+    }
     public class UserDetail 
     {
         public string Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Role { get; set; }
-        public bool? IsVerified { get; set; }
+        public bool IsVerified { get; set; }
         public bool IsAdmin { get { return Role.Equals("Admin") ? true : false; } }
     }
     public class UserSessionDetail
     {
         public string ViewText { get { return "Razor"; } }
         public UserDetail User { get; set; }
+        public VerifyUser Verify { get; set; } = new VerifyUser();
         public ToastNotification ToastNotification { get; set; }
     }
     public class AdminSessionDetail : UserSessionDetail

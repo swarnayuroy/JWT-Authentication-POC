@@ -240,6 +240,7 @@
     <Content Include="Content\page-styles\page-loader.css" />
     <Content Include="Content\page-styles\shared.css" />
     <Content Include="Content\page-styles\no-content.css" />
+    <Content Include="Content\page-styles\user-verification.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
