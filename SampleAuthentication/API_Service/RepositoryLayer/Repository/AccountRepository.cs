@@ -193,12 +193,47 @@ namespace API_Service.RepositoryLayer.Repository
         {
             bool isVerified = await Task.Run(() => ProcessOtpService.ValidateOtp(detail.Email, detail.Otp));
 
+            // logged in user needs to update their account verification status once verified
             if (isVerified && detail.IsLoggedIn)
             {
-                await Task.Run(() => ProcessOtpService.ClearOtp(detail.Email));
+                _logger.LogDetails(LogType.INFO, $"OTP verification for email {detail.Email} is successful");
+                // Get all users
+                var users = await _userService.Get();
+                // Find user by email
+                _logger.LogDetails(LogType.INFO, $"getting user by email");
+                var user = users.FirstOrDefault(u => u.Email.Equals(detail.Email, StringComparison.OrdinalIgnoreCase));
+                if (user != null)
+                {                    
+                    user.IsVerified = true;
+                    bool isUpdated = await _userService.Update(user);
+                    await Task.Run(() => ProcessOtpService.ClearOtp(detail.Email));
+
+                    if (isUpdated) 
+                    {
+                        _logger.LogDetails(LogType.INFO, $"Email: {detail.Email} has been verified successfully");                       
+
+                        return new ResponseDetail
+                        {
+                            Status = true,
+                            Message = "Account verified successfully"
+                        };
+                    }                    
+                }
+                
+                _logger.LogDetails(LogType.WARNING, $"Failed to verify account for email: {detail.Email}");
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "Oops! some error ocurred."
+                };
             }
 
-            _logger.LogDetails(LogType.INFO, $"OTP verification for email {detail.Email} is {(isVerified ? "successful" : "failed")}");
+            if (isVerified)
+            {
+                await Task.Run(() => ProcessOtpService.ClearOtp(detail.Email));
+            }           
+            
+            _logger.LogDetails(LogType.INFO, $"OTP verification for email {detail.Email} is {(isVerified ? "successful" : "not successful")}");
             return new ResponseDetail
             {
                 Status = isVerified,
