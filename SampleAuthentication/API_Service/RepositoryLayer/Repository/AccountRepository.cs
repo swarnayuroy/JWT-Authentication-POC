@@ -193,6 +193,11 @@ namespace API_Service.RepositoryLayer.Repository
         {
             bool isVerified = await Task.Run(() => ProcessOtpService.ValidateOtp(detail.Email, detail.Otp));
 
+            if (isVerified && detail.IsLoggedIn)
+            {
+                await Task.Run(() => ProcessOtpService.ClearOtp(detail.Email));
+            }
+
             _logger.LogDetails(LogType.INFO, $"OTP verification for email {detail.Email} is {(isVerified ? "successful" : "failed")}");
             return new ResponseDetail
             {
