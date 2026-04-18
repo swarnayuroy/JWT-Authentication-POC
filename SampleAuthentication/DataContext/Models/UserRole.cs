@@ -9,7 +9,8 @@ namespace DataContext.Models
     public enum UserRoleType
     {
         User,
-        Admin   
+        Admin,
+        Superadmin
     }
     public class UserRole
     {

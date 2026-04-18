@@ -75,7 +75,7 @@ namespace DataContext.SampleData
             new UserRole
             {
                 UserId = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
-                Role = UserRoleType.Admin
+                Role = UserRoleType.Superadmin
             },
             new UserRole
             {

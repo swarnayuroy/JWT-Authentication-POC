@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.UI.WebControls;
 
 namespace web.Models.SessionModel
 {
@@ -18,7 +19,7 @@ namespace web.Models.SessionModel
         public string Email { get; set; }
         public string Role { get; set; }
         public bool IsVerified { get; set; }
-        public bool IsAdmin { get { return Role.Equals("Admin") ? true : false; } }
+        public bool IsAdmin { get { return Role.Equals("Superadmin") || Role.Equals("Admin") ? true : false; } }
     }
     public class UserSessionDetail
     {
@@ -27,8 +28,10 @@ namespace web.Models.SessionModel
         public VerifyUser Verify { get; set; } = new VerifyUser();
         public ToastNotification ToastNotification { get; set; }
     }
+    
     public class AdminSessionDetail : UserSessionDetail
     {
+        public AdminType AdminType { get { return User.Role.Equals("Superadmin") ? AdminType.Superadmin : AdminType.Admin; } }
         public SessionData Data { get; set; } = null;
     }
     public class SessionData
@@ -38,5 +41,10 @@ namespace web.Models.SessionModel
         public int CurrentPage { get; set; } = 1;
         public int PageSize { get; set; } = 5;
         public int TotalPages { get; set; }
+    }
+    public enum AdminType
+    {
+        Admin,
+        Superadmin,
     }
 }

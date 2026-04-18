@@ -25,7 +25,7 @@ namespace API_Service.Controllers
         /// </summary>
         [HttpGet]
         [Route("get")]
-        [Authorize(Roles = nameof(Role.Admin))]
+        [Authorize(Roles = "Superadmin, Admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]

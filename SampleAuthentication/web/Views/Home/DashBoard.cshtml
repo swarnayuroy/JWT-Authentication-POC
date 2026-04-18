@@ -60,6 +60,10 @@
                         <table id="user-table" cellspacing="15px">
                             <thead id="user-table-header">
                                 <tr>
+                                    @if ((Model as web.Models.SessionModel.AdminSessionDetail).AdminType == web.Models.SessionModel.AdminType.Superadmin)
+                                    {
+                                        <th>Id</th>
+                                    }
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Verified</th>
@@ -69,6 +73,10 @@
                                 @foreach (var user in (Model as web.Models.SessionModel.AdminSessionDetail).Data.Users)
                                 {
                                     <tr>
+                                        @if ((Model as web.Models.SessionModel.AdminSessionDetail).AdminType == web.Models.SessionModel.AdminType.Superadmin)
+                                        {
+                                            <td>@user.Id.ToString().Split('-')[0]</td>
+                                        }
                                         <td>@user.Name</td>
                                         <td>@user.Email</td>
                                         @if (Convert.ToBoolean(user.IsVerified))

@@ -72,7 +72,7 @@ namespace API_Service.AppData.DataService
                                  Id = user.Id, // Fix: assign Guid directly, not string
                                  Name = user.Name,
                                  Email = user.Email,
-                                 Role = userRole.Role == UserRoleType.Admin ? "Admin" : "User",
+                                 Role = userRole.Role == UserRoleType.Superadmin ? "Superadmin" : userRole.Role == UserRoleType.Admin ? "Admin" : "User",
                                  IsVerified = user.IsVerfied
                              }).ToList<Models.Entities.User>();
 
@@ -124,7 +124,7 @@ namespace API_Service.AppData.DataService
                     var userRole = new UserRole
                     {
                         UserId = userDetail.Id,
-                        Role = userDetail.Role == "Admin" ? UserRoleType.Admin : UserRoleType.User
+                        Role = userDetail.Role.Equals("Superadmin") ? UserRoleType.Superadmin : userDetail.Role.Equals("Admin") ? UserRoleType.Admin : UserRoleType.User
                     };
 
                     await Task.WhenAll(
