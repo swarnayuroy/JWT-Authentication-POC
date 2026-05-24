@@ -19,18 +19,21 @@ namespace TestProject.api_service_test
     {
         private Mock<ILogger<UserRepository>> _loggerMock;
         private Mock<IService<User>> _userServiceMock;
+        private Mock<IUserDetailService> _userDetailServiceMock;
 
         private UserRepository _repository;
 
         [SetUp]
         public void Setup()
         {
+            _userDetailServiceMock = new Mock<IUserDetailService>();
             _userServiceMock = new Mock<IService<User>>();
             _loggerMock = new Mock<ILogger<UserRepository>>();
 
             _repository = new UserRepository(
                 _loggerMock.Object,
-                _userServiceMock.Object
+                _userServiceMock.Object,
+                _userDetailServiceMock.Object
             );
         }
 
@@ -255,6 +258,49 @@ namespace TestProject.api_service_test
             
             Assert.That(dataResult!.Data.Password, Is.EqualTo(string.Empty)); // Password hidden
             Assert.That(dataResult.Data.Name, Is.EqualTo("John Doe"));
+        }
+        #endregion
+
+        #region GetUserDetailAsync
+        [Test]
+        public async Task GetUserDetailAsync_ReturnsFalse_WhenUserNotFound()
+        {
+            // Arrange
+            _userDetailServiceMock.Setup(x => x.GetUserDetail("4d96c0ff-6f5e-4433-b7ed-46fa38974d79")).ReturnsAsync(new FullUserDetail());
+
+            // Act
+            var result = await _repository.GetUserDetailAsync(Guid.NewGuid().ToString());
+
+            // Assert
+            Assert.That(result.Status, Is.False);
+            Assert.That(result.Message, Is.EqualTo("User detail not found"));
+        }
+
+        [Test]
+        public async Task GetUserDetailAsync_ReturnsUser_WhenUserExists()
+        {
+            // Arrange
+            string userId = "4d96c0ff-6f5e-4433-b7ed-46fa38974d79";
+            var fullUserDetail = new FullUserDetail
+            {
+                Id = userId,
+                Name = "John Doe",
+                Email = "doe.john@gmail.com",
+                IsVerified = true,
+                LoggedInAt = DateTime.Now,
+                AccountOld = Convert.ToString(DateTime.Parse("2026-03-01T10:15:30"))
+            };
+            _userDetailServiceMock.Setup(x => x.GetUserDetail(userId)).ReturnsAsync(fullUserDetail);
+
+            // Act
+            var result = await _repository.GetUserDetailAsync(userId);
+            var dataResult = result as ResponseDataDetail<FullUserDetail>;
+
+            // Assert
+            Assert.That(result.Status, Is.True);
+            Assert.That(result.Message, Is.EqualTo("User detail fetched successfully"));
+            Assert.That(result, Is.TypeOf<ResponseDataDetail<FullUserDetail>>());
+            Assert.That(dataResult!.Data.Name, Is.EqualTo("John Doe"));
         }
         #endregion
     }
