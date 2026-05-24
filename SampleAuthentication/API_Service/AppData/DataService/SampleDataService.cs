@@ -14,6 +14,7 @@ namespace API_Service.AppData.DataService
     {
         private IEnumerable<Models.Entities.User> _user = Enumerable.Empty<Models.Entities.User>();
         private IEnumerable<Models.Entities.Account> _usersAccount = Enumerable.Empty<Models.Entities.Account>();
+        private FullUserDetail _fullUserDetail = new FullUserDetail();
 
         public IEnumerable<Models.Entities.User> User
         {
@@ -24,12 +25,25 @@ namespace API_Service.AppData.DataService
 
             set
             {
-                if (value.Count() > 0)
+                if (value.Any())
                 {
                     _user = value;
                 }
             }
         }
+
+        public FullUserDetail UserDetail 
+        {
+            get { return _fullUserDetail; }
+            set
+            {
+                if (value != null)
+                {
+                    _fullUserDetail = value;
+                }
+            }
+        }
+
         public IEnumerable<Models.Entities.Account> AccountDetail
         {
             get
@@ -39,14 +53,14 @@ namespace API_Service.AppData.DataService
 
             set
             {
-                if (value.Count() > 0)
+                if (value.Any())
                 {
                     _usersAccount = value;
                 }
             }
         }
     }
-    public class SampleDataService<T> : IService<T> where T : class
+    public class SampleDataService<T> : IUserDetailService, IService<T> where T : class
     {
         private LoggerService<SampleDataService<T>> _logger;
         private readonly IDataProvider _dataProvider;
@@ -73,7 +87,7 @@ namespace API_Service.AppData.DataService
                                  Name = user.Name,
                                  Email = user.Email,
                                  Role = userRole.Role == UserRoleType.Superadmin ? "Superadmin" : userRole.Role == UserRoleType.Admin ? "Admin" : "User",
-                                 IsVerified = user.IsVerfied
+                                 IsVerified = user.IsVerified
                              }).ToList<Models.Entities.User>();
 
                 _logger.LogDetails(LogType.INFO, $"Fetched {users.Count()} users from data provider.");
@@ -119,7 +133,7 @@ namespace API_Service.AppData.DataService
                         Id = userDetail.Id,
                         Name = userDetail.Name,
                         Email = userDetail.Email,                        
-                        IsVerfied = userDetail.IsVerified
+                        IsVerified = userDetail.IsVerified
                     };
                     var userRole = new UserRole
                     {
@@ -182,7 +196,7 @@ namespace API_Service.AppData.DataService
                             Id = userDetail.Id,
                             Name = userDetail.Name,
                             Email = userDetail.Email,
-                            IsVerfied = userDetail.IsVerified
+                            IsVerified = userDetail.IsVerified
                         });
                     }
                 }
@@ -238,6 +252,35 @@ namespace API_Service.AppData.DataService
                 _logger.LogDetails(LogType.ERROR, $"{ex.Message}");
                 return Task.FromResult(false);
             }
+        }
+
+        public Task<FullUserDetail> GetUserDetail(string id)
+        {            
+            if (!string.IsNullOrEmpty(id))
+            {
+                var dataContext = new Data();
+                var userDetail = (from user in _dataProvider.User
+                                 join role in _dataProvider.UserRole on user.Id equals role.UserId
+                                 join account in _dataProvider.Account on user.Id equals account.UserId
+                                 where user.Id.ToString() == id
+                                 select new FullUserDetail
+                                 {
+                                     Id = user.Id.ToString(),
+                                     Name = user.Name,
+                                     Email = user.Email,
+                                     Role = role.Role == UserRoleType.Superadmin ? "Superadmin" : role.Role == UserRoleType.Admin ? "Admin" : "User",
+                                     IsVerified = user.IsVerified,
+                                     LoggedInAt = account.LoggedInAt,
+                                     AccountOld = Convert.ToString(account.CreatedAt)
+                                 }).FirstOrDefault<FullUserDetail>();
+                
+                if (userDetail != null)
+                {
+                    dataContext.UserDetail = userDetail;
+                    return Task.FromResult(dataContext.UserDetail);
+                }
+            }
+            return Task.FromResult(new FullUserDetail());
         }
     }
 }

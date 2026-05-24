@@ -1,5 +1,6 @@
 using API_Service.AppData;
 using API_Service.AppData.DataService;
+using API_Service.Models.DTO;
 using API_Service.Models.Entities;
 using API_Service.RepositoryLayer.Interface;
 using API_Service.RepositoryLayer.Repository;
@@ -10,8 +11,8 @@ using DataContext.SampleData;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Security.Claims;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 
 // Configure log4net to use project directory instead of bin directory
@@ -71,6 +72,7 @@ builder.Services.AddScoped<IDataProvider, AccountData>();
 builder.Services.AddScoped<IDataService, AccountData>();
 builder.Services.AddScoped<IService<User>, SampleDataService<User>>();
 builder.Services.AddScoped<IService<Account>, SampleDataService<Account>>();
+builder.Services.AddScoped<IUserDetailService, SampleDataService<FullUserDetail>>();
 builder.Services.AddScoped<IJwtManager, JwtManager>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

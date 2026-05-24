@@ -21,7 +21,7 @@ namespace API_Service.Controllers
         }
 
         /// <summary>
-        /// Get all users - Admin only
+        /// Get all users - Admins only
         /// </summary>
         [HttpGet]
         [Route("get")]
@@ -69,6 +69,35 @@ namespace API_Service.Controllers
             {
                 // Placeholder for actual user retrieval logic by ID
                 var response = await _userRepository.GetUserAsync(id);
+                if (response.Status)
+                {
+                    return Ok(response as ResponseDataDetail<UserDetail>);
+                }
+                else
+                {
+                    return NotFound(response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "An error occurred while processing your request.");
+            }
+        }
+
+        [HttpGet]
+        [Route("getDetails/{id}")]
+        [Authorize(Roles = "Superadmin, Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetDetails(string id)
+        {
+            try
+            {
+                var response = await _userRepository.GetUserDetailAsync(id);
                 if (response.Status)
                 {
                     return Ok(response as ResponseDataDetail<UserDetail>);

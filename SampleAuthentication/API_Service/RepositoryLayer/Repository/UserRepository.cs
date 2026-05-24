@@ -11,10 +11,12 @@ namespace API_Service.RepositoryLayer.Repository
     {
         private LoggerService<UserRepository> _logger;
         private readonly IService<User> _userService;
-        public UserRepository(ILogger<UserRepository> logger, IService<User> userService)
+        private readonly IUserDetailService _userDetailService;
+        public UserRepository(ILogger<UserRepository> logger, IService<User> userService, IUserDetailService userDetailService)
         {
             this._logger = new LoggerService<UserRepository>(logger);
             this._userService = userService;
+            this._userDetailService = userDetailService;
         }
         public async Task<ResponseDetail> GetAllUsersAsync(string userId, int page, int pageSize)
         {
@@ -134,6 +136,25 @@ namespace API_Service.RepositoryLayer.Repository
             {
                 Status = false,
                 Message = "User not found"
+            };
+        }
+        public async Task<ResponseDetail> GetUserDetailAsync(string id)
+        {
+            var userDetail = await _userDetailService.GetUserDetail(id);
+            if (userDetail != null)
+            {
+                _logger.LogDetails(LogType.INFO, $"Successfully fetched user detail: {userDetail.Id}");
+                return new ResponseDataDetail<FullUserDetail>
+                {
+                    Status = true,
+                    Message = "User detail fetched successfully",
+                    Data = userDetail
+                };
+            }
+            return new ResponseDetail
+            {
+                Status = false,
+                Message = "User detail not found"
             };
         }
     }

@@ -7,4 +7,8 @@
         Task<bool> Update(T entity);
         Task<bool> Delete(string id);
     }
+    public interface IUserDetailService
+    { 
+        Task<Models.DTO.FullUserDetail> GetUserDetail(string id);
+    }
 }
