@@ -8,7 +8,8 @@
         Task<bool> Delete(string id);
     }
     public interface IUserDetailService
-    { 
+    {
+        Task<Models.DTO.UserDetail> GetUser(string id);
         Task<Models.DTO.FullUserDetail> GetUserDetail(string id);
     }
 }

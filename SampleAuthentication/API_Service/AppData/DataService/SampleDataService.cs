@@ -14,6 +14,7 @@ namespace API_Service.AppData.DataService
     {
         private IEnumerable<Models.Entities.User> _user = Enumerable.Empty<Models.Entities.User>();
         private IEnumerable<Models.Entities.Account> _usersAccount = Enumerable.Empty<Models.Entities.Account>();
+        private UserDetail _userDetail = new UserDetail();
         private FullUserDetail _fullUserDetail = new FullUserDetail();
 
         public IEnumerable<Models.Entities.User> User
@@ -32,7 +33,19 @@ namespace API_Service.AppData.DataService
             }
         }
 
-        public FullUserDetail UserDetail 
+        public UserDetail UserDetail
+        {
+            get { return _userDetail; }
+            set
+            {
+                if (value != null)
+                {
+                    _userDetail = value;
+                }
+            }
+        }
+
+        public FullUserDetail FullUserDetail 
         {
             get { return _fullUserDetail; }
             set
@@ -254,6 +267,33 @@ namespace API_Service.AppData.DataService
             }
         }
 
+        public Task<UserDetail> GetUser(string id)
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                var dataContext = new Data();
+                var userDetail = (from user in _dataProvider.User
+                                  join role in _dataProvider.UserRole on user.Id equals role.UserId
+                                  where user.Id.ToString() == id
+                                  select new UserDetail
+                                  {
+                                      Id = user.Id.ToString(),
+                                      Name = user.Name,
+                                      Email = user.Email,
+                                      Role = role.Role == UserRoleType.Superadmin ? "Superadmin" : role.Role == UserRoleType.Admin ? "Admin" : "User",
+                                      IsVerified = user.IsVerified,
+                                      Password = string.Empty
+                                  }).FirstOrDefault<UserDetail>();
+
+                if (userDetail != null)
+                {
+                    dataContext.UserDetail = userDetail;
+                    return Task.FromResult(dataContext.UserDetail);
+                }
+            }
+            return Task.FromResult(new UserDetail());
+        }
+        
         public Task<FullUserDetail> GetUserDetail(string id)
         {            
             if (!string.IsNullOrEmpty(id))
@@ -276,8 +316,8 @@ namespace API_Service.AppData.DataService
                 
                 if (userDetail != null)
                 {
-                    dataContext.UserDetail = userDetail;
-                    return Task.FromResult(dataContext.UserDetail);
+                    dataContext.FullUserDetail = userDetail;
+                    return Task.FromResult(dataContext.FullUserDetail);
                 }
             }
             return Task.FromResult(new FullUserDetail());

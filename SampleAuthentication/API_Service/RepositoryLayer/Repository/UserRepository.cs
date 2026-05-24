@@ -109,29 +109,17 @@ namespace API_Service.RepositoryLayer.Repository
         }
         public async Task<ResponseDetail> GetUserAsync(string id)
         {
-            var users = await _userService.Get();
-            if (users.Any())
+            var user = await _userDetailService.GetUser(id);
+            if (user != null)
             {
-                var user = users.FirstOrDefault(u => u.Id.ToString() == id);
-                if (user != null)
+                _logger.LogDetails(LogType.INFO, $"Successfully fetched user: {user.Id}");
+                return new ResponseDataDetail<UserDetail>
                 {
-                    _logger.LogDetails(LogType.INFO, $"Successfully fetched user: {user.Id}");
-                    return new ResponseDataDetail<UserDetail>
-                    {
-                        Status = true,
-                        Message = "User fetched successfully",
-                        Data = new UserDetail
-                        {
-                            Id = user.Id.ToString(),
-                            Name = user.Name,
-                            Email = user.Email,
-                            Role = user.Role,
-                            IsVerified = user.IsVerified,
-                            Password = string.Empty // Do not expose password
-                        }
-                    };
-                }
-            }
+                    Status = true,
+                    Message = "User fetched successfully",
+                    Data = user
+                };
+            }            
             return new ResponseDetail
             {
                 Status = false,

@@ -218,7 +218,7 @@ namespace TestProject.api_service_test
         public async Task GetUserAsync_ReturnsFalse_WhenUserNotFound()
         {
             // Arrange
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>());
+            _userDetailServiceMock.Setup(x => x.GetUser("4d96c0ff-6f5e-4433-b7ed-46fa38974d79")).ReturnsAsync(new UserDetail());
 
             // Act
             var result = await _repository.GetUserAsync(Guid.NewGuid().ToString());
@@ -233,17 +233,15 @@ namespace TestProject.api_service_test
         {
             //Arrange
             string userId = "1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e";
-
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>
-            {                
-                new User
-                {
-                    Id = Guid.Parse(userId),
-                    Name = "John Doe",
-                    Email = "doe.john@gmail.com",
-                    IsVerified = true
-                }
-            });
+            var user = new UserDetail
+            {
+                Id = userId,
+                Name = "John Doe",
+                Email = "doe.john@gmail.com",
+                Role = "SuperAdmin",
+                IsVerified = true,
+            };
+            _userDetailServiceMock.Setup(x => x.GetUser(userId)).ReturnsAsync(user);
 
             //Act
             var result = await _repository.GetUserAsync(userId);
