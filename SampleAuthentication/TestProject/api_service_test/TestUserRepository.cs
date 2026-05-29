@@ -45,7 +45,7 @@ namespace TestProject.api_service_test
             _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>());
 
             // Act
-            var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5);
+            var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), userType: "User", page: 1, pageSize: 5);
 
             // Assert
             Assert.That(result.Status, Is.False);
@@ -63,12 +63,13 @@ namespace TestProject.api_service_test
                     Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
                     Name = "John Doe",
                     Email = "doe.john@gmail.com",
+                    Role = "User",
                     IsVerified = true
                 }
             });
 
             // Act
-            var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5);
+            var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), userType: "User", page: 1, pageSize: 5);
             var dataResult = result as ResponseDataDetail<PagedResult<UserDetail>>;
             var userDetail = dataResult!.Data.Items.First();
 
@@ -94,6 +95,7 @@ namespace TestProject.api_service_test
                     Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
                     Name = "John Doe",
                     Email = "doe.john@gmail.com",
+                    Role = "Superadmin",
                     IsVerified = false
                 },
                 new User
@@ -101,12 +103,13 @@ namespace TestProject.api_service_test
                     Id = Guid.Parse("4b79aeeb-96cd-49bf-abf0-8b5f6f693467"),
                     Name = "Jane Doe",
                     Email = "doe.jane@gmail.com",
+                    Role = "Admin",
                     IsVerified = true
                 }
             });
 
             // Act
-            var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5);
+            var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), userType: "Admin", page: 1, pageSize: 5);
             var dataResult = result as ResponseDataDetail<PagedResult<UserDetail>>;
 
             // Assert

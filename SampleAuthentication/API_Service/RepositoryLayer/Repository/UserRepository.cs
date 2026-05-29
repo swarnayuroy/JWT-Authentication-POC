@@ -18,16 +18,25 @@ namespace API_Service.RepositoryLayer.Repository
             this._userService = userService;
             this._userDetailService = userDetailService;
         }
-        public async Task<ResponseDetail> GetAllUsersAsync(string userId, int page, int pageSize)
+        public async Task<ResponseDetail> GetAllUsersAsync(string userId, string userType, int page, int pageSize)
         {
             var users = await _userService.Get();
             if (users.Any())
             {
-                var filteredUsers = users.Where(user => user.Id.ToString() != userId);
-                int totalUserCount = filteredUsers.Count();
+                IEnumerable<User> filteredUser = new List<User>();
+                if (userType == "Admin") 
+                {
+                    filteredUser = users.Where(user => user.Role == "Superadmin" || user.Role == "Admin");
+                }
+                else
+                {
+                    filteredUser = users.Where(user => user.Role == "User");
+                }               
+                
+                int totalUserCount = filteredUser.Count();
                 if (totalUserCount > 0)
                 {
-                    var paginatedUsers = filteredUsers
+                    var paginatedUsers = filteredUser
                                      .Skip((page - 1) * pageSize)
                                      .Take(pageSize)
                                      .Select(user => new UserDetail
