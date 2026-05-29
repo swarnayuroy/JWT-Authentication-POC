@@ -9,7 +9,7 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <link href="~/Content/page-styles/shared.css" rel="stylesheet" />
-    <link href="~/Content/page-styles/auth-board.css" rel="stylesheet" />
+    <link href="~/Content/page-styles/auth-board.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
     <link href="~/Content/page-styles/notification.css" rel="stylesheet" />
     <link href="~/Content/page-styles/no-content.css" rel="stylesheet" />
     <link href="~/Content/page-styles/user-verification.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
@@ -60,17 +60,16 @@
                         <table id="user-table" cellspacing="15px">
                             <thead id="user-table-header">
                                 <tr>
-                                    <th>Id</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Verified</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="user-table-body">
                                 @foreach (var user in (Model as web.Models.SessionModel.AdminSessionDetail).Data.Users)
                                 {
                                     <tr>
-                                        <td>@user.Id.ToString().Split('-')[0]</td>
                                         <td>@user.Name</td>
                                         <td>@user.Email</td>
                                         @if (Convert.ToBoolean(user.IsVerified))
@@ -81,6 +80,7 @@
                                         {
                                             <td><i class="fa-solid fa-circle-xmark"></i></td>
                                         }
+                                        <td>View | Delete</td>
                                     </tr>
                                 }
                             </tbody>
