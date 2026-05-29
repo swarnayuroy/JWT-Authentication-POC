@@ -131,6 +131,7 @@ namespace TestProject.api_service_test
                     Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
                     Name = "John Doe",
                     Email = "doe.john@gmail.com",
+                    Role = "User",
                     IsVerified = true
                 },
                 new User
@@ -138,6 +139,7 @@ namespace TestProject.api_service_test
                     Id = Guid.Parse("4b79aeeb-96cd-49bf-abf0-8b5f6f693467"),
                     Name = "Jane Doe",
                     Email = "doe.jane@gmail.com",
+                    Role = "User",
                     IsVerified = true
                 }
             });
@@ -163,6 +165,7 @@ namespace TestProject.api_service_test
                     Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
                     Name = "John Doe",
                     Email = "doe.john@gmail.com",
+                    Role= "User",
                     IsVerified = true
                 },
                 new User
@@ -170,6 +173,7 @@ namespace TestProject.api_service_test
                     Id = Guid.Parse("4b79aeeb-96cd-49bf-abf0-8b5f6f693467"),
                     Name = "Jane Doe",
                     Email = "doe.jane@outlook.com",
+                    Role = "User",
                     IsVerified = true
                 }
             });
@@ -195,6 +199,7 @@ namespace TestProject.api_service_test
                     Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
                     Name = "John Doe",
                     Email = "doe.john@gmail.com",
+                    Role = "User",
                     IsVerified = true
                 },
                 new User
@@ -202,6 +207,7 @@ namespace TestProject.api_service_test
                     Id = Guid.Parse("4b79aeeb-96cd-49bf-abf0-8b5f6f693467"),
                     Name = "Jane Doe",
                     Email = "doe.jane@outlook.com",
+                    Role = "User",
                     IsVerified = true
                 }
             });

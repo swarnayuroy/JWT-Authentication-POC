@@ -76,7 +76,7 @@ namespace API_Service.RepositoryLayer.Repository
             {
                 _logger.LogDetails(LogType.INFO, $"Searching users with term '{searchText}'");
                 var filteredUsers = users
-                                    .Where(user => user.Id.ToString() != userId)
+                                    .Where(user => user.Role == "User")
                                     .Where(user => string.IsNullOrEmpty(searchText) ||
                                                    user.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                                                    user.Email.Contains(searchText, StringComparison.OrdinalIgnoreCase));
