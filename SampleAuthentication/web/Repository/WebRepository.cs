@@ -149,12 +149,12 @@ namespace web.Repository
             #endregion
         }
 
-        public async Task<ResponseDetail> GetAllUser(string token, string userId, int page, int pageSize = 5)
+        public async Task<ResponseDetail> GetAllUser(string token, string userId, string userType, int page, int pageSize = 5)
         {
             #region HTTP Service Call
             try
             {
-                _response = await _httpService.GetAllUsers(token, userId, page, pageSize);
+                _response = await _httpService.GetAllUsers(token, userId, userType, page, pageSize);
                 return await new FilterResponse<WebRepository>().ProcessData<PagedResult<UserDetail>>(_response);
             }
             catch (Exception ex)

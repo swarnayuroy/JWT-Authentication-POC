@@ -17,7 +17,7 @@ namespace web.Repository
         Task<ResponseDetail> VerifyAccount(VerifyAccount detail);
         Task<ResponseDetail> SetNewPassword(Credential credential);
         Task<ResponseDetail> GetUserDetail(string token, string userId);
-        Task<ResponseDetail> GetAllUser(string token, string userId, int page, int pageSize = 5);
+        Task<ResponseDetail> GetAllUser(string token, string userId, string userType, int page, int pageSize = 5);
         Task<ResponseDetail> GetUsersBySearch(string token, string userId, string searchText, int page, int pageSize = 5);
     }
 }

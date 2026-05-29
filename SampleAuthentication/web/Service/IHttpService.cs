@@ -16,7 +16,7 @@ namespace web.Service
         Task<HttpResponseMessage> VerifyAccount(VerifyAccount detail);
         Task<HttpResponseMessage> SetNewPassword(Credential credential);
         Task<HttpResponseMessage> GetUserDetail(string token, string userId);
-        Task<HttpResponseMessage> GetAllUsers(string token, string userId, int page, int pageSize);
+        Task<HttpResponseMessage> GetAllUsers(string token, string userId, string userType, int page, int pageSize);
         Task<HttpResponseMessage> GetUsersBySearch(string token, string userId, int page, int pageSize, string searchText);
     }
 }

@@ -242,7 +242,7 @@ namespace web.Service.DataLayer
             }
         }
 
-        public async Task<HttpResponseMessage> GetAllUsers(string token, string userId, int page, int pageSize)
+        public async Task<HttpResponseMessage> GetAllUsers(string token, string userId, string userType, int page, int pageSize)
         {
             try
             {
@@ -254,7 +254,7 @@ namespace web.Service.DataLayer
                 _logger.LogDetails(LogType.INFO, $"Getting all users");
                 HttpResponseMessage response = await _client.GetAsync
                 (
-                    $"{_client.BaseAddress}/user/get?userId={userId}&page={page}&pageSize={pageSize}"
+                    $"{_client.BaseAddress}/user/get?userId={userId}&userType={userType}&page={page}&pageSize={pageSize}"
                 );
                 return response;
             }

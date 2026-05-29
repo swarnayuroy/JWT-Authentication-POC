@@ -54,7 +54,7 @@ namespace web.Controllers
                             Session["currentUser"] = userDetailResponse.Data;
                             if (userDetailResponse.Data.IsAdmin)
                             {
-                                ResponseDetail sessionDataResponse = await _repository.GetAllUser(sessionToken, userId, 1);
+                                ResponseDetail sessionDataResponse = await _repository.GetAllUser(sessionToken, userId, "User", 1);
                                 if (sessionDataResponse.Status)
                                 {
                                     if ((sessionDataResponse is ResponseDataDetail<PagedResult<UserDetail>> pagedUsers) && (pagedUsers.Data != null))
@@ -122,7 +122,7 @@ namespace web.Controllers
             {
                 if (currentUser.IsAdmin)
                 {
-                    ResponseDetail sessionDataResponse = string.IsNullOrEmpty(searchText) ? await _repository.GetAllUser(sessionToken, currentUser.Id, page) : 
+                    ResponseDetail sessionDataResponse = string.IsNullOrEmpty(searchText) ? await _repository.GetAllUser(sessionToken, currentUser.Id, "User", page) : 
                         await _repository.GetUsersBySearch(sessionToken, currentUser.Id, searchText, page);
                     if (sessionDataResponse.Status)
                     {
