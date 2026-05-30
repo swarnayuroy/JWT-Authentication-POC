@@ -77,6 +77,32 @@
     display: inline-block
 }
 
+.user-table-layout #user-table .action-group{
+    display:flex;
+    gap: 10px;
+}
+
+.user-table-layout #user-table .action-link a{
+    text-decoration: none;
+    color: black;
+    outline: none;
+}
+
+.user-table-layout #user-table .action-tooltip {
+    display:none;
+    position: absolute;
+    font-size: 12px;
+    background-color: lightgray;
+    border: 1px solid;
+    border-radius: 8px;
+    padding: 2px;
+    cursor:pointer;
+}
+
+.user-table-layout #user-table .action-link:hover + .action-tooltip {
+    display: block;
+}
+
 .pagination-controls {
     display: flex;
     align-items: center;
