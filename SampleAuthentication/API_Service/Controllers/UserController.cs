@@ -100,7 +100,7 @@ namespace API_Service.Controllers
                 var response = await _userRepository.GetUserDetailAsync(id);
                 if (response.Status)
                 {
-                    return Ok(response as ResponseDataDetail<UserDetail>);
+                    return Ok(response as ResponseDataDetail<FullUserDetail>);
                 }
                 else
                 {
