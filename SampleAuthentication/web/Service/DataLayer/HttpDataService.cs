@@ -289,7 +289,7 @@ namespace web.Service.DataLayer
                 _logger.LogDetails(LogType.INFO, $"Getting all users");
                 HttpResponseMessage response = await _client.GetAsync
                 (
-                    $"{_client.BaseAddress}/user/get?userId={userId}&page={page}&pageSize={pageSize}&searchText={searchText}"
+                    $"{_client.BaseAddress}/user/get?userId={userId}&userType=User&page={page}&pageSize={pageSize}&searchText={searchText}"
                 );
                 return response;
             }
