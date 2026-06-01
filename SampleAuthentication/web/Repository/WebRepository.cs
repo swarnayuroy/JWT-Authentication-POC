@@ -134,7 +134,7 @@ namespace web.Repository
 
             try
             {
-                _response = await _httpService.GetUserDetail(token, userId);
+                _response = await _httpService.GetUser(token, userId);
 
                 return await new FilterResponse<WebRepository>().ProcessData<UserDetail>(_response);
             }
