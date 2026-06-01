@@ -157,6 +157,20 @@ namespace web.Utils
                                         };
                                     }
                                 }
+                                else if (typeof(TData).Equals(typeof(FullUserDetail)))
+                                {
+                                    FullUserDetail userDetail = data.ToObject<FullUserDetail>();
+                                    if (userDetail != null)
+                                    {
+                                        return new ResponseDataDetail<FullUserDetail>
+                                        {
+                                            Status = status,
+                                            StatusCode = response.StatusCode,
+                                            Message = message ?? string.Empty,
+                                            Data = userDetail
+                                        };
+                                    }
+                                }
                             }
                             catch
                             {

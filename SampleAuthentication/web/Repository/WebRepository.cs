@@ -128,7 +128,7 @@ namespace web.Repository
             #endregion
         }
 
-        public async Task<ResponseDetail> GetUserDetail(string token, string userId)
+        public async Task<ResponseDetail> GetUser(string token, string userId)
         {
             #region HTTP Service Call
 
@@ -137,6 +137,27 @@ namespace web.Repository
                 _response = await _httpService.GetUserDetail(token, userId);
 
                 return await new FilterResponse<WebRepository>().ProcessData<UserDetail>(_response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
+                return _response?.Content != null ?
+                    new ResponseDetail { Status = false, StatusCode = _response.StatusCode, Message = $"Invalid response." }
+                    : new ResponseDetail { Status = false, StatusCode = HttpStatusCode.BadRequest, Message = $"Failed to process your request" };
+            }
+
+            #endregion
+        }
+
+        public async Task<ResponseDetail> GetUserDetail(string token, string userId)
+        {
+            #region HTTP Service Call
+
+            try
+            {
+                _response = await _httpService.GetUserDetail(token, userId);
+
+                return await new FilterResponse<WebRepository>().ProcessData<FullUserDetail>(_response);
             }
             catch (Exception ex)
             {

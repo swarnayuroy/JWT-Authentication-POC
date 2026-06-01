@@ -21,12 +21,18 @@ namespace web.Models.SessionModel
         public bool IsVerified { get; set; }
         public bool IsAdmin { get { return Role.Equals("Superadmin") || Role.Equals("Admin") ? true : false; } }
     }
+    public class FullUserDetail : UserDetail
+    {
+        public DateTime LoggedInAt { get; set; }
+        public string AccountOld { get; set; }
+    }
     public class UserSessionDetail
     {
         public string ViewText { get { return "Razor"; } }
         public UserDetail User { get; set; }
         public VerifyUser Verify { get; set; } = new VerifyUser();
         public ToastNotification ToastNotification { get; set; }
+        public bool EnableModal { get; set; } = false;
     }
     
     public class AdminSessionDetail : UserSessionDetail

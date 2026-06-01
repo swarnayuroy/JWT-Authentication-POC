@@ -207,7 +207,7 @@ namespace web.Service.DataLayer
             }
         }
 
-        public async Task<HttpResponseMessage> GetUserDetail(string token, string userId)
+        public async Task<HttpResponseMessage> GetUser(string token, string userId)
         {
             try
             {
@@ -220,6 +220,41 @@ namespace web.Service.DataLayer
                 HttpResponseMessage response = await _client.GetAsync
                 (
                     $"{_client.BaseAddress}/user/get/{userId}"
+                );
+                return response;
+            }
+            catch (TaskCanceledException ex)
+            {
+                if (ex.InnerException is TimeoutException)
+                {
+                    return new HttpResponseMessage(HttpStatusCode.RequestTimeout)
+                    {
+                        ReasonPhrase = "Request timeout"
+                    };
+                }
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                    {
+                        ReasonPhrase = "Request cancelled"
+                    };
+                }
+            }
+        }
+
+        public async Task<HttpResponseMessage> GetUserDetail(string token, string userId)
+        {
+            try
+            {
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue
+                (
+                    "Bearer",
+                    token
+                );
+                _logger.LogDetails(LogType.INFO, $"Fetching details for user: {userId}");
+                HttpResponseMessage response = await _client.GetAsync
+                (
+                    $"{_client.BaseAddress}/user/getDetails/{userId}"
                 );
                 return response;
             }
