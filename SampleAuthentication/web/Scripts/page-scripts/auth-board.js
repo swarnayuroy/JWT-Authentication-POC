@@ -125,6 +125,29 @@
         }
     });
 
+    $(".view-user-detail").on("click", function (e) {
+
+        e.preventDefault();
+
+        var detailUrl = $(this).attr("href");
+
+        showLoader();
+
+        $.ajax({
+            url: detailUrl,
+            type: "GET",
+            success: function (partialHtml) {
+                $("#user-modal-root").html(partialHtml);
+                $(".user-detail-layout").addClass("is-visible");
+                hideLoader();
+            },
+            error: function () {
+                hideLoader();
+                alert("Failed to load user details.");
+            }
+        });
+    });
+
     function fetchSearchResults(searchText, page) {
         showLoader();
 
@@ -155,4 +178,19 @@
             }
         });
     }
+});
+
+$(document).on("click", ".user-detail-close-button, .user-detail-layout", function (e) {
+    if (
+        $(e.target).hasClass("user-detail-layout") ||
+        $(e.target).hasClass("user-detail-close-button") ||
+        $(e.target).closest(".user-detail-close-button").length > 0
+    ) {
+        e.preventDefault();
+        $("#user-modal-root").empty();
+    }
+});
+
+$(document).on("click", ".user-detail-container", function (e) {
+    e.stopPropagation();
 });

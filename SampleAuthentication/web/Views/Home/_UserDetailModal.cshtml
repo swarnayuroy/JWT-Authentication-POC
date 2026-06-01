@@ -1,0 +1,61 @@
+﻿@model web.Models.SessionModel.FullUserDetail
+
+<div class="user-detail-layout">
+    <div class="user-detail-container">
+        <div class="user-detail-header">
+            <div>
+                <h3>User Details</h3>
+                <p class="user-detail-subtitle">Read-only account information</p>
+            </div>
+            <button type="button" class="user-detail-close-button" aria-label="Close user detail modal">
+                <i class="fa-solid fa-circle-xmark"></i>
+            </button>
+        </div>
+
+        <div class="user-detail-body">
+            <div class="user-detail-grid">
+                <div class="user-detail-item">
+                    <span class="user-detail-label">Id</span>
+                    <span class="user-detail-value">@Model.Id</span>
+                </div>
+                <div class="user-detail-item">
+                    <span class="user-detail-label">Name</span>
+                    <span class="user-detail-value">@Model.Name</span>
+                </div>
+                <div class="user-detail-item">
+                    <span class="user-detail-label">Email</span>
+                    <span class="user-detail-value">@Model.Email</span>
+                </div>
+                <div class="user-detail-item">
+                    <span class="user-detail-label">Last Login</span>
+                    <span class="user-detail-value">@Model.LoggedInAt</span>
+                </div>
+                <div class="user-detail-item">
+                    <span class="user-detail-label">Account Old</span>
+                    <span class="user-detail-value">@Model.AccountOld</span>
+                </div>
+                <div class="user-detail-item">
+                    <span class="user-detail-label">Verified</span>
+                    <span class="user-detail-value">
+                        @if (Model.IsVerified)
+                        {
+                            <i class="fa-solid fa-circle-check user-detail-success"></i>
+                            <span>Verified</span>
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-circle-xmark user-detail-danger"></i>
+                            <span>Not verified</span>
+                        }
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="user-detail-footer">
+            <button type="button" class="user-detail-close-button secondary-button">
+                Close
+            </button>
+        </div>
+    </div>
+</div>

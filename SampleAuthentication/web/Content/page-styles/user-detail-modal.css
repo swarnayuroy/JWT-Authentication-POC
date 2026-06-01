@@ -1,0 +1,126 @@
+﻿.user-detail-layout {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.55);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.user-detail-container {
+    background-color: #ffffff;
+    width: min(620px, 95vw);
+    max-height: 90vh;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+    animation: userDetailFadeIn 0.25s ease forwards;
+}
+
+@keyframes userDetailFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.user-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 18px 22px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.user-detail-header h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.user-detail-subtitle {
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: #777777;
+}
+
+.user-detail-close-button {
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #333333;
+}
+
+.user-detail-body {
+    padding: 24px 22px;
+    display: flex;
+    gap: 22px;
+}
+
+.user-detail-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.user-detail-item {
+    border: 1px solid #eeeeee;
+    border-radius: 8px;
+    padding: 12px;
+    background-color: #fafafa;
+}
+
+.user-detail-label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    color: #777777;
+    margin-bottom: 6px;
+}
+
+.user-detail-value {
+    font-size: 14px;
+    color: #222222;
+    word-break: break-word;
+}
+
+.user-detail-success {
+    color: #198754;
+}
+
+.user-detail-danger {
+    color: #dc3545;
+}
+
+.user-detail-footer {
+    padding: 16px 22px;
+    border-top: 1px solid #eeeeee;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.secondary-button {
+    border: 1px solid #333333;
+    border-radius: 5px;
+    padding: 7px 14px;
+    background-color: darkgray;
+    color: #000000;
+}
+
+@media screen and (max-width: 600px) {
+    .user-detail-body {
+        flex-direction: column;
+    }
+
+    .user-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}

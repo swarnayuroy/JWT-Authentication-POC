@@ -13,6 +13,7 @@
     <link href="~/Content/page-styles/notification.css" rel="stylesheet" />
     <link href="~/Content/page-styles/no-content.css" rel="stylesheet" />
     <link href="~/Content/page-styles/user-verification.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
+    <link href="~/Content/page-styles/user-detail-modal.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
     <link href="~/Content/page-styles/page-loader.css" rel="stylesheet" />
     <script src="~/Scripts/jquery-3.7.0.min.js"></script>
     <script src="~/Scripts/jquery.validate.min.js"></script>
@@ -57,6 +58,7 @@
                 <div id="fetched-results">
                     @if (((Model as web.Models.SessionModel.AdminSessionDetail).Data != null) && ((Model as web.Models.SessionModel.AdminSessionDetail).Data.UserCount > 0))
                     {
+                        //The table below displays a list of users with their name, email, verification status, and available actions.
                         <table id="user-table" cellspacing="15px">
                             <thead id="user-table-header">
                                 <tr>
@@ -85,11 +87,19 @@
                                             <td>
                                                 <div class="action-group">
                                                     <div class="action-container">
-                                                        <span class="action-link"><a href=""><i class="fa-solid fa-folder-open"></i></a></span>
+                                                        <span class="action-link">
+                                                            <a href="@Url.Action("ViewUser", "Home", new { userId = user.Id })" class="view-user-detail">
+                                                                <i class="fa-solid fa-folder-open"></i>
+                                                            </a>
+                                                        </span>
                                                         <span class="action-tooltip">View</span>
                                                     </div>
                                                     <div class="action-container">
-                                                        <span class="action-link"><a href=""><i class="fa-solid fa-trash-can"></i></a></span>
+                                                        <span class="action-link">
+                                                            <a href="@Url.Action("DeleteUser", "Home", new { userId = user.Id })" class="remove-user">
+                                                                <i class="fa-solid fa-trash-can"></i>
+                                                            </a>
+                                                        </span>
                                                         <span class="action-tooltip">Delete</span>
                                                     </div>
                                                 </div>
@@ -99,9 +109,13 @@
                                         {
                                             <td>
                                                 <div class="action-container">
-                                                    <span class="action-link"><a href=""><i class="fa-solid fa-folder-open"></i></a></span>
+                                                    <span class="action-link">
+                                                        <a href="@Url.Action("ViewUser", "Home", new { userId = user.Id })" class="view-user-detail">
+                                                            <i class="fa-solid fa-folder-open"></i>
+                                                        </a>
+                                                    </span>
                                                     <span class="action-tooltip">View</span>
-                                                </div>                                               
+                                                </div>                                         
                                             </td>
                                         }
                                     </tr>
@@ -109,6 +123,7 @@
                             </tbody>
                         </table>
 
+                        // Pagination controls for navigating through multiple pages of user data
                         if ((Model as web.Models.SessionModel.AdminSessionDetail).Data.TotalPages > 1)
                         {
                             <div class="pagination-controls">
@@ -152,6 +167,10 @@
                         @Html.Partial("_NoContent")
                     }
                 </div>          
+            </div>
+
+            <div id="user-modal-root">
+
             </div>
         }
         else {

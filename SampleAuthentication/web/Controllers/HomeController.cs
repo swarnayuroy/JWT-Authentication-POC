@@ -44,7 +44,7 @@ namespace web.Controllers
                     // Set cache control headers to prevent back navigation
                     await SetCacheControl();
 
-                    response = await _repository.GetUserDetail(sessionToken, userId);
+                    response = await _repository.GetUser(sessionToken, userId);
 
                     if (response.Status)
                     {
@@ -133,7 +133,7 @@ namespace web.Controllers
                                 return RedirectToAction("DashBoard");
                             }
                             return View("DashBoard", new AdminSessionDetail
-                            {
+                            {                                
                                 User = currentUser,
                                 Data = new SessionData
                                 {
@@ -163,7 +163,32 @@ namespace web.Controllers
                     });
                 }
             }
-            return RedirectToAction("Login", "Account");
+            return RedirectToAction("Logout", "Home");
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> ViewUser(string userId)
+        {
+            await SetCacheControl();
+            string sessionToken = Request.Cookies["sessionToken"]?.Value;
+            UserDetail currentUser = Session["currentUser"] as UserDetail;
+
+            if (!String.IsNullOrEmpty(sessionToken) && currentUser != null) {
+                if (currentUser.IsAdmin) 
+                {
+                    ResponseDetail response = await _repository.GetUserDetail(sessionToken, userId);
+                    if (response.Status)
+                    {
+                        if (response is ResponseDataDetail<FullUserDetail> userDetail)
+                        {
+                            return PartialView("_UserDetailModal", userDetail.Data);
+                        }
+                    }
+                    Response.StatusCode = 404;
+                    return PartialView("_UserDetailError");
+                }
+            }
+            return RedirectToAction("Logout", "Home");
         }
 
         public async Task<ActionResult> VerifyAccount(string value, bool haveOtpValue = false)
