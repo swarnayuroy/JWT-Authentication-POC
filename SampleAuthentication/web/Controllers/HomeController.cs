@@ -178,7 +178,6 @@ namespace web.Controllers
                 if (currentUser.IsAdmin) 
                 {
                     ResponseDetail response = await _repository.GetUserDetail(sessionToken, userId);
-                    response.Status = false;
                     if (response.Status)
                     {
                         if (response is ResponseDataDetail<FullUserDetail> userDetail)
