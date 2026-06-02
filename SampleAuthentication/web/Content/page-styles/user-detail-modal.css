@@ -124,3 +124,32 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Error modal style */
+
+.user-detail-error-container {
+    width: min(460px, 95vw);
+}
+
+.user-detail-error-body {
+    min-height: 180px;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+}
+
+.user-detail-error-icon {
+    color: #dc3545;
+    font-size: 34px;
+}
+
+.user-detail-error-body p {
+    margin: 0;
+    color: #222222;
+    font-size: 15px;
+    font-weight: 600;
+}

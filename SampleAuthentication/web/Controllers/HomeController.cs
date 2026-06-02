@@ -178,6 +178,7 @@ namespace web.Controllers
                 if (currentUser.IsAdmin) 
                 {
                     ResponseDetail response = await _repository.GetUserDetail(sessionToken, userId);
+                    response.Status = false;
                     if (response.Status)
                     {
                         if (response is ResponseDataDetail<FullUserDetail> userDetail)
@@ -185,7 +186,6 @@ namespace web.Controllers
                             return PartialView("_UserDetailModal", userDetail.Data);
                         }
                     }
-                    Response.StatusCode = 404;
                     return PartialView("_UserDetailError");
                 }
             }

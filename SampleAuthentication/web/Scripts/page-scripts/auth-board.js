@@ -125,7 +125,7 @@
         }
     });
 
-    $(".view-user-detail").on("click", function (e) {
+    $(document).on("click", ".view-user-detail", function (e) {
 
         e.preventDefault();
 
@@ -137,16 +137,22 @@
             url: detailUrl,
             type: "GET",
             success: function (partialHtml) {
-                $("#user-modal-root").html(partialHtml);
-                $(".user-detail-layout").addClass("is-visible");
+                renderUserDetailModal(partialHtml);
                 hideLoader();
             },
-            error: function () {
+            error: function (xhr) {
+                if (xhr && xhr.responseText) {
+                    renderUserDetailModal(xhr.responseText);
+                }
                 hideLoader();
-                alert("Failed to load user details.");
             }
         });
     });
+
+    function renderUserDetailModal(modalHtml) {
+        $("#user-modal-root").html(modalHtml);
+        $(".user-detail-layout").addClass("is-visible");
+    }
 
     function fetchSearchResults(searchText, page) {
         showLoader();

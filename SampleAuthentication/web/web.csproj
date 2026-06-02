@@ -283,6 +283,7 @@
     <Content Include="Views\Shared\_NoContent.cshtml" />
     <Content Include="Views\Home\DashBoard.cshtml" />
     <Content Include="Views\Home\_UserDetailModal.cshtml" />
+    <Content Include="Views\Home\_UserDetailError.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
