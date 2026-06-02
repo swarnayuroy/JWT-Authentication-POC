@@ -166,6 +166,7 @@ namespace web.Controllers
             return RedirectToAction("Logout", "Home");
         }
 
+        // GET: Home/ViewUser?userId={userId}
         [HttpGet]
         public async Task<ActionResult> ViewUser(string userId)
         {

@@ -32,7 +32,6 @@ namespace web.Models.SessionModel
         public UserDetail User { get; set; }
         public VerifyUser Verify { get; set; } = new VerifyUser();
         public ToastNotification ToastNotification { get; set; }
-        public bool EnableModal { get; set; } = false;
     }
     
     public class AdminSessionDetail : UserSessionDetail
