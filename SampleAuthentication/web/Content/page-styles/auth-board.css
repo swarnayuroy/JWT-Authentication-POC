@@ -28,6 +28,31 @@
     justify-content: space-between;
 }
 
+.board-header-right-content {
+    width: auto;
+    gap: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.check-admin-btn-container button {
+    width: 120px;
+    height: 35px;
+    border: 0.5px solid black;
+    border-radius: 8px;
+    outline: none;
+    background: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.check-admin-btn-container button:hover {
+    background: black;
+    color: white;
+    transition: background 0.5s ease;
+}
+
 .board-header-content a {
     text-decoration: none;
     color: black;
@@ -101,6 +126,14 @@
 
 .user-table-layout #user-table .action-link:hover + .action-tooltip {
     display: block;
+}
+
+#user-table #user-table-body .verified-status i {
+    color: green;
+}
+
+#user-table #user-table-body .not-verified-status i {
+    color: black;
 }
 
 .pagination-controls {

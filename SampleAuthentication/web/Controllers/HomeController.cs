@@ -25,8 +25,8 @@ namespace web.Controllers
         {
             this._repository = repository;
         }
-        
-        // GET: Home
+
+        // GET: Home/DashBoard
         [HttpGet]
         public async Task<ActionResult> DashBoard()
         {

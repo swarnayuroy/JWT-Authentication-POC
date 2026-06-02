@@ -31,9 +31,20 @@
                 <img src="~/Content/animation/razor.png" class="board-logo" style="width: 20px; height: 20px;" />
                 <b>@Model.ViewText</b>
             </div>
-            <a href="@Url.Action("Logout", "Home")" class="logout-btn">
-                <i class="fa-solid fa-power-off"></i>
-            </a>
+            <div class="board-header-right-content">
+                @if (Model.User.IsAdmin)
+                {
+                    <div class="check-admin-btn-container">
+                        <button type="button">
+                            <i class="fa-solid fa-user-tie"></i>
+                            View admins
+                        </button>
+                    </div>
+                }
+                <a href="@Url.Action("Logout", "Home")" class="logout-btn">
+                    <i class="fa-solid fa-power-off"></i>
+                </a>
+            </div>            
         </div>
     </div>
     
@@ -64,7 +75,6 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Verified</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -72,16 +82,15 @@
                                 @foreach (var user in (Model as web.Models.SessionModel.AdminSessionDetail).Data.Users)
                                 {
                                     <tr>
-                                        <td>@user.Name</td>
-                                        <td>@user.Email</td>
                                         @if (Convert.ToBoolean(user.IsVerified))
                                         {
-                                            <td><i class="fa-solid fa-circle-check"></i></td>
+                                            <td class="verified-status"><i class="fa-solid fa-circle-check"></i>&nbsp;@user.Name</td>
                                         }
                                         else
                                         {
-                                            <td><i class="fa-solid fa-circle-xmark"></i></td>
+                                            <td class="not-verified-status"><i class="fa-solid fa-circle-xmark"></i>&nbsp;@user.Name</td>
                                         }
+                                        <td>@user.Email</td>
                                         @if ((Model as web.Models.SessionModel.AdminSessionDetail).AdminType == web.Models.SessionModel.AdminType.Superadmin)
                                         {
                                             <td>
@@ -115,7 +124,7 @@
                                                         </a>
                                                     </span>
                                                     <span class="action-tooltip">View</span>
-                                                </div>                                         
+                                                </div>
                                             </td>
                                         }
                                     </tr>
