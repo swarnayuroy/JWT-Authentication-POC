@@ -32,7 +32,7 @@ namespace API_Service.RepositoryLayer.Repository
                 {
                     filteredUser = users.Where(user => user.Role == "User");
                 }               
-                
+
                 int totalUserCount = filteredUser.Count();
                 if (totalUserCount > 0)
                 {
@@ -46,21 +46,41 @@ namespace API_Service.RepositoryLayer.Repository
                                          Email = user.Email,
                                          Role = user.Role,
                                          IsVerified = user.IsVerified
-                                     });
+                                     }).ToList();
                     _logger.LogDetails(LogType.INFO, $"Fetched page {page} ({paginatedUsers.Count()} of {totalUserCount} users)");
 
-                    return new ResponseDataDetail<PagedResult<UserDetail>>
+                    if (userType == "Admin")
                     {
-                        Status = true,
-                        Message = totalUserCount > 1 ? $"{totalUserCount} users fetched successfully" : "1 user fetched successfully",
-                        Data = new PagedResult<UserDetail>
+                        return new ResponseDataDetail<AdminResult>
                         {
-                            Items = paginatedUsers,
-                            ItemCount = totalUserCount,
-                            CurrentPage = page,
-                            PageSize = pageSize
-                        }
-                    };
+                            Status = true,
+                            Message = totalUserCount > 1 ? $"{totalUserCount} users fetched successfully" : "1 user fetched successfully",
+                            Data = new AdminResult
+                            {
+                                Items = new AdminResult().SuffixIdentifiedAdmin(userId, paginatedUsers),
+                                ItemCount = totalUserCount,
+                                CurrentPage = page,
+                                PageSize = pageSize,
+                                AdminCount = filteredUser.Count(u => u.Role == "Admin"),
+                                SuperadminCount = filteredUser.Count(u => u.Role == "Superadmin")
+                            }
+                        };
+                    }
+                    else
+                    {
+                        return new ResponseDataDetail<PagedResult<UserDetail>>
+                        {
+                            Status = true,
+                            Message = totalUserCount > 1 ? $"{totalUserCount} users fetched successfully" : "1 user fetched successfully",
+                            Data = new PagedResult<UserDetail>
+                            {
+                                Items = paginatedUsers,
+                                ItemCount = totalUserCount,
+                                CurrentPage = page,
+                                PageSize = pageSize
+                            }
+                        };
+                    }
                 }                
             }
             return new ResponseDetail

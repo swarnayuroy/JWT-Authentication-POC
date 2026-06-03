@@ -21,7 +21,7 @@ namespace API_Service.Controllers
         }
 
         /// <summary>
-        /// Get all users - Admins only
+        /// Get all users with respect to user type - Admins only
         /// </summary>
         [HttpGet]
         [Route("get")]
@@ -38,7 +38,7 @@ namespace API_Service.Controllers
                             await _userRepository.GetUserBySearch(userId, page, pageSize, searchText);
                 if (response.Status)
                 {
-                    return Ok(response as ResponseDataDetail<PagedResult<UserDetail>>);
+                    return Ok(userType == "Admin" ? response as ResponseDataDetail<AdminResult> : response as ResponseDataDetail<PagedResult<UserDetail>>);
                 }
                 else
                 {
