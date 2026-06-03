@@ -13,4 +13,10 @@ namespace web.Models.SessionModel
         public int ItemCount { get; set; }
         public int TotalPages { get { return (int)Math.Ceiling((double)ItemCount / PageSize); } }
     }
+
+    public class AdminResult : PagedResult<UserDetail>
+    {
+        public int AdminCount { get; set; }
+        public int SuperadminCount { get; set; }
+    }
 }

@@ -176,7 +176,9 @@ namespace web.Repository
             try
             {
                 _response = await _httpService.GetAllUsers(token, userId, userType, page, pageSize);
-                return await new FilterResponse<WebRepository>().ProcessData<PagedResult<UserDetail>>(_response);
+                return userType == "Admin" ?
+                    await new FilterResponse<WebRepository>().ProcessData<AdminResult>(_response) :
+                    await new FilterResponse<WebRepository>().ProcessData<PagedResult<UserDetail>>(_response);
             }
             catch (Exception ex)
             {

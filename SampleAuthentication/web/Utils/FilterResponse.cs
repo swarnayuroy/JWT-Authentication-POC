@@ -143,6 +143,20 @@ namespace web.Utils
                                         };
                                     }
                                 }
+                                else if (typeof(TData).Equals(typeof(AdminResult)))
+                                {
+                                    AdminResult adminResultSet = data.ToObject<AdminResult>();
+                                    if (adminResultSet.Items.Any()) 
+                                    {
+                                        return new ResponseDataDetail<AdminResult>
+                                        {
+                                            Status = status,
+                                            StatusCode = response.StatusCode,
+                                            Message = message ?? string.Empty,
+                                            Data = adminResultSet
+                                        };
+                                    }
+                                }
                                 else if (typeof(TData).Equals(typeof(UserDetail)))
                                 {
                                     UserDetail userData = data.ToObject<UserDetail>();

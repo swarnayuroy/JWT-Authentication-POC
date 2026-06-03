@@ -84,11 +84,11 @@
                                     <tr>
                                         @if (Convert.ToBoolean(user.IsVerified))
                                         {
-                                            <td class="verified-status"><i class="fa-solid fa-circle-check"></i>&nbsp;@user.Name</td>
+                                            <td class="verified-status">@user.Name&nbsp;<i class="fa-solid fa-circle-check"></i></td>
                                         }
                                         else
                                         {
-                                            <td class="not-verified-status"><i class="fa-solid fa-circle-xmark"></i>&nbsp;@user.Name</td>
+                                            <td class="not-verified-status">@user.Name&nbsp;<i class="fa-solid fa-circle-xmark"></i></td>
                                         }
                                         <td>@user.Email</td>
                                         @if ((Model as web.Models.SessionModel.AdminSessionDetail).AdminType == web.Models.SessionModel.AdminType.Superadmin)

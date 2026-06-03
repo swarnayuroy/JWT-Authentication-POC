@@ -166,6 +166,29 @@ namespace web.Controllers
             return RedirectToAction("Logout", "Home");
         }
 
+        // GET: Home/ViewAdmins
+        [HttpGet]
+        public async Task<ActionResult> ViewAdmins()
+        {
+            await SetCacheControl();
+            string sessionToken = Request.Cookies["sessionToken"]?.Value;
+            UserDetail currentUser = Session["currentUser"] as UserDetail;
+
+            if (!string.IsNullOrEmpty(sessionToken) && currentUser !=null)
+            {
+                if (currentUser.IsAdmin)
+                {
+                    ResponseDetail response = await _repository.GetAllUser(sessionToken, currentUser.Id, "Admin", 1);
+                    if (response.Status && response is ResponseDataDetail<AdminResult> adminResultSet)
+                    {
+                        return PartialView("_ViewAdminsModal", adminResultSet.Data);
+                    }
+                }
+                return PartialView("_ViewAdminsErrorModal");
+            }
+            return RedirectToAction("Logout", "Home");
+        }
+
         // GET: Home/ViewUser?userId={userId}
         [HttpGet]
         public async Task<ActionResult> ViewUser(string userId)
