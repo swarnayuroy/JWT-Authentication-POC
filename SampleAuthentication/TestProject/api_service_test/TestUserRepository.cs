@@ -109,13 +109,15 @@ namespace TestProject.api_service_test
             });
 
             // Act
-            var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), userType: "Admin", page: 1, pageSize: 5);
-            var dataResult = result as ResponseDataDetail<PagedResult<UserDetail>>;
+            var result = await _repository.GetAllUsersAsync(userId: "1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e", userType: "Admin", page: 1, pageSize: 5);
+            var dataResult = result as ResponseDataDetail<AdminResult>;
 
             // Assert
             Assert.That(result.Status, Is.True);
             Assert.That(result.Message, Is.EqualTo("2 users fetched successfully"));
             Assert.That(dataResult!.Data.ItemCount, Is.EqualTo(2));
+            Assert.That(dataResult!.Data.AdminCount, Is.EqualTo(1));
+            Assert.That(dataResult!.Data.SuperadminCount, Is.EqualTo(1));
         }
         #endregion
 

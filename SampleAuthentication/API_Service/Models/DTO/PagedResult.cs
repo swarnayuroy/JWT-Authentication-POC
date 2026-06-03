@@ -16,9 +16,12 @@
         public int SuperadminCount { get; set; }
         public IEnumerable<UserDetail> SuffixIdentifiedAdmin(string userId, List<UserDetail> admins)
         {
-            admins[admins.IndexOf(admins.First(admin => admin.Id == userId))].Name = (from admin in admins 
-                                                                                      where admin.Id == userId 
-                                                                                      select admin.Name).FirstOrDefault() + " (You)";
+            if (!string.IsNullOrEmpty(userId) && admins.Count > 0)
+            {
+                admins[admins.IndexOf(admins.First(admin => admin.Id == userId))].Name = (from admin in admins
+                                                                                          where admin.Id == userId
+                                                                                          select admin.Name).FirstOrDefault() + " (You)";                
+            }
             return admins;
         }
     }
