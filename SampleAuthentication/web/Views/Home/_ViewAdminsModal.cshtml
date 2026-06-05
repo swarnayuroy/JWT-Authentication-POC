@@ -1,0 +1,38 @@
+﻿@model web.Models.SessionModel.AdminResult
+
+<div class="view-admins-layout">
+    <div class="view-admins-container">
+        <div class="view-admins-header">
+            <div class="back-button-container">
+                <button class="view-admins-go-back-button"><i class="fa-solid fa-angles-left"></i></button>                
+            </div>
+            <div class="view-admins-header-text">
+                <h3>Admins</h3>
+            </div>
+        </div>
+        
+        <div class="view-admins-content">
+            <div class="view-admins-table-layout">
+                <table class="view-admins-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Admin Type</th>
+                        </tr>                       
+                    </thead>
+                    <tbody>
+                        @foreach (var admin in Model.Items)
+                        {
+                            <tr>
+                                <td>@admin.Name</td>
+                                <td>@admin.Email</td>
+                                <td>@admin.Role</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>            
+        </div>
+    </div>
+</div>

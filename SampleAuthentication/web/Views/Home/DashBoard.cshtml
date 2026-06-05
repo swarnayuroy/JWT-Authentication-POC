@@ -14,6 +14,7 @@
     <link href="~/Content/page-styles/no-content.css" rel="stylesheet" />
     <link href="~/Content/page-styles/user-verification.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
     <link href="~/Content/page-styles/user-detail-modal.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
+    <link href="~/Content/page-styles/view-admins-modal.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
     <link href="~/Content/page-styles/page-loader.css" rel="stylesheet" />
     <script src="~/Scripts/jquery-3.7.0.min.js"></script>
     <script src="~/Scripts/jquery.validate.min.js"></script>
@@ -35,7 +36,7 @@
                 @if (Model.User.IsAdmin)
                 {
                     <div class="check-admin-btn-container">
-                        <button type="button">
+                        <button type="button" class="view-admins-btn">
                             <i class="fa-solid fa-user-tie"></i>
                             View admins
                         </button>

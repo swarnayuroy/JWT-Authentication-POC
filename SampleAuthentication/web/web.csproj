@@ -242,6 +242,7 @@
     <Content Include="Content\page-styles\no-content.css" />
     <Content Include="Content\page-styles\user-detail-modal.css" />
     <Content Include="Content\page-styles\user-verification.css" />
+    <Content Include="Content\page-styles\view-admins-modal.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -284,6 +285,7 @@
     <Content Include="Views\Home\DashBoard.cshtml" />
     <Content Include="Views\Home\_UserDetailModal.cshtml" />
     <Content Include="Views\Home\_UserDetailError.cshtml" />
+    <Content Include="Views\Home\_ViewAdminsModal.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

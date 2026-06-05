@@ -149,9 +149,38 @@
         });
     });
 
+    $(document).on("click", ".view-admins-btn", function (e) {
+
+        e.preventDefault();
+
+        var viewAdminsUrl = `${window.location.origin}/Home/ViewAdmins`;
+
+        showLoader();
+
+        $.ajax({
+            url: viewAdminsUrl,
+            type: "GET",
+            success: function (partialHtml) {
+                renderViewAdminsModal(partialHtml);
+                hideLoader();
+            },
+            error: function (xhr) {
+                if (xhr && xhr.responseText) {
+                    renderViewAdminsModal(xhr.responseText);
+                }
+                hideLoader();
+            }
+        });
+    });
+
     function renderUserDetailModal(modalHtml) {
         $("#user-modal-root").html(modalHtml);
         $(".user-detail-layout").addClass("is-visible");
+    }
+    
+    function renderViewAdminsModal(modalHtml) {
+        $("#user-modal-root").html(modalHtml);
+        $(".view-admins-layout").addClass("is-visible");
     }
 
     function fetchSearchResults(searchText, page) {
@@ -186,11 +215,14 @@
     }
 });
 
-$(document).on("click", ".user-detail-close-button, .user-detail-layout", function (e) {
+$(document).on("click", ".user-detail-close-button, .user-detail-layout, .view-admins-go-back-button", function (e) {
     if (
         $(e.target).hasClass("user-detail-layout") ||
         $(e.target).hasClass("user-detail-close-button") ||
-        $(e.target).closest(".user-detail-close-button").length > 0
+        $(e.target).closest(".user-detail-close-button").length > 0 ||
+        $(e.target).hasClass("view-admins-layout") ||
+        $(e.target).hasClass("view-admins-go-back-button") ||
+        $(e.target).closest(".view-admins-go-back-button").length > 0
     ) {
         e.preventDefault();
         $("#user-modal-root").empty();
