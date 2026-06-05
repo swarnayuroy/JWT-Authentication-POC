@@ -27,7 +27,12 @@
                             @foreach (var admin in Model.Items)
                             {
                                 <tr>
-                                    <td>@admin.Name</td>
+                                    <td>
+                                        <span class="admin-name-text">@admin.Name</span>
+                                        <div class="admin-id-tooltip">
+                                            <span>@admin.Id</span>
+                                        </div>
+                                    </td>
                                     <td>@admin.Email</td>
                                     <td>@admin.Role</td>
                                 </tr>

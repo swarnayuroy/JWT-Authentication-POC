@@ -48,7 +48,25 @@
     width: 100%;
 }
 
+.admin-name-text{
+    cursor: pointer;
+}
+
+.admin-id-tooltip {
+    display: none;
+    padding: 2px;
+    position: absolute;
+    font-size: 10px;
+    background-color: lightgray;
+    border: 0.5px solid black;
+    border-radius: 5px;
+}
+
+.admin-name-text:hover + .admin-id-tooltip{
+    display: block;
+}
+
 /*No content*/
-.view-admins-table-layout .no-content-layout{
+.view-admins-table-layout .no-content-layout {
     border: none;
 }

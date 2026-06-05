@@ -184,7 +184,7 @@ namespace web.Controllers
                         return PartialView("_ViewAdminsModal", adminResultSet.Data);
                     }
                 }
-                return PartialView("_ViewAdminsErrorModal");
+                return PartialView("_UserDetailError");
             }
             return RedirectToAction("Logout", "Home");
         }
