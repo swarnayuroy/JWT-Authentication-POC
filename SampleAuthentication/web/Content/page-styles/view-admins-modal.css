@@ -44,8 +44,9 @@
     justify-content: center;
 }
 
-.view-admins-table{
+.view-admins-table {
     width: 100%;
+    border-spacing: 0px 12px;
 }
 
 .admin-name-text{
