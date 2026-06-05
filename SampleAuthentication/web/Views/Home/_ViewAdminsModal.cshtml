@@ -13,25 +13,35 @@
         
         <div class="view-admins-content">
             <div class="view-admins-table-layout">
-                <table class="view-admins-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Admin Type</th>
-                        </tr>                       
-                    </thead>
-                    <tbody>
-                        @foreach (var admin in Model.Items)
-                        {
+                @if (Model.ItemCount > 0)
+                {
+                    <table class="view-admins-table">
+                        <thead>
                             <tr>
-                                <td>@admin.Name</td>
-                                <td>@admin.Email</td>
-                                <td>@admin.Role</td>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Admin Type</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var admin in Model.Items)
+                            {
+                                <tr>
+                                    <td>@admin.Name</td>
+                                    <td>@admin.Email</td>
+                                    <td>@admin.Role</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div>
+                        <span>Some error ocurred while fetching admins! Please try later.</span>
+                        @Html.Partial("_NoContent")
+                    </div>                    
+                }
             </div>            
         </div>
     </div>

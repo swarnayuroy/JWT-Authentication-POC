@@ -47,3 +47,8 @@
 .view-admins-table{
     width: 100%;
 }
+
+/*No content*/
+.view-admins-table-layout .no-content-layout{
+    border: none;
+}
