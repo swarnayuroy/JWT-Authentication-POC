@@ -222,9 +222,20 @@ namespace TestProject.api_service_test
         public async Task Register_RollsBack_WhenAccountSaveFails()
         {
             //Arrange
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>());
-            _userServiceMock.Setup(x => x.Save(It.IsAny<User>())).ReturnsAsync(true);
+            User createdUser = new User();
 
+            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(() =>
+            {
+                if (createdUser != null)
+                    return new List<User> { createdUser };
+                return new List<User>();
+            });
+
+            _userServiceMock.Setup(x => x.Save(It.IsAny<User>()))
+                .Callback<User>(user => createdUser = user)
+                .ReturnsAsync(true);
+
+            _accountServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<Account>());
             _accountServiceMock.Setup(x => x.Save(It.IsAny<Account>())).ReturnsAsync(false);
             _userServiceMock.Setup(x => x.Delete(It.IsAny<string>())).ReturnsAsync(true);
 
@@ -237,7 +248,6 @@ namespace TestProject.api_service_test
 
             //Act
             var result = await _repository.RegisterUser(userDetail);
-
 
             //Assert
             Assert.That(result.Status, Is.False);
