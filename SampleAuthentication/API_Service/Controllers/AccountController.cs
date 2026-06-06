@@ -83,7 +83,7 @@ namespace API_Service.Controllers
             try
             {
                 var response = await _accountService.DeleteAccount(userId);
-                return response.Status ? Ok(response.Message) : BadRequest(response.Message);
+                return response.Status ? Ok(response) : BadRequest(response.Message);
             }
             catch (Exception ex)
             {

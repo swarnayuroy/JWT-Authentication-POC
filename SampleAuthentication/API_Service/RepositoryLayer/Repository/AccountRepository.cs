@@ -196,6 +196,7 @@ namespace API_Service.RepositoryLayer.Repository
                 var isUserDeleted = await _userService.Delete(user.Id.ToString());
                 var isAccountDeleted = await _accountService.Delete(account.Id.ToString());
                 if (isUserDeleted && isAccountDeleted) {
+                    _logger.LogDetails(LogType.INFO, $"User, {user.Name} has been deleted successfully.");
                     response = new ResponseDetail
                     {
                         Status = true,
