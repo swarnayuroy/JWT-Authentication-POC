@@ -1,0 +1,74 @@
+﻿.delete-user-layout {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.55);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.delete-confirmation-container {
+    background-color: #ffffff;
+    width: min(620px, 95vw);
+    max-height: 90vh;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+    animation: userDetailFadeIn 0.25s ease forwards;
+}
+
+.delete-header-layout {
+    padding: 10px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.delete-body-layout {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.delete-footer-layout {
+    padding: 10px;
+    display: flex;
+    justify-content: end;
+}
+
+.delete-operation-layout {
+    display: flex;
+    gap: 12px;
+}
+
+.delete-confirm-button-layout {
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 5px;
+    background: black;
+}
+
+.delete-cancel-button-layout {
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+    background: lightgray;
+}
+
+.delete-confirm-button-layout a {
+    text-decoration: none;
+    color: white;
+    outline: none;
+}
+
+.delete-cancel {
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}

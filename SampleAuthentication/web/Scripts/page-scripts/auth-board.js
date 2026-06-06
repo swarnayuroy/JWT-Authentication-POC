@@ -149,6 +149,30 @@
         });
     });
 
+    $(document).on("click", ".remove-user", function (e) {
+
+        e.preventDefault();
+
+        var detailUrl = $(this).attr("href");
+
+        showLoader();
+
+        $.ajax({
+            url: detailUrl,
+            type: "GET",
+            success: function (partialHtml) {
+                renderDeleteUserModal(partialHtml);
+                hideLoader();
+            },
+            error: function (xhr) {
+                if (xhr && xhr.responseText) {
+                    renderDeleteUserModal(xhr.responseText);
+                }
+                hideLoader();
+            }
+        });
+    });
+
     $(document).on("click", ".view-admins-btn", function (e) {
 
         e.preventDefault();
@@ -176,6 +200,11 @@
     function renderUserDetailModal(modalHtml) {
         $("#user-modal-root").html(modalHtml);
         $(".user-detail-layout").addClass("is-visible");
+    }
+
+    function renderDeleteUserModal(modalHtml) {
+        $("#user-modal-root").html(modalHtml);
+        $(".delete-user-layout").addClass("is-visible");
     }
     
     function renderViewAdminsModal(modalHtml) {
@@ -215,11 +244,16 @@
     }
 });
 
-$(document).on("click", ".user-detail-close-button, .user-detail-layout, .view-admins-go-back-button", function (e) {
+$(document).on("click", ".user-detail-close-button, .user-detail-layout, .delete-cancel, .view-admins-go-back-button", function (e) {
     if (
         $(e.target).hasClass("user-detail-layout") ||
         $(e.target).hasClass("user-detail-close-button") ||
         $(e.target).closest(".user-detail-close-button").length > 0 ||
+        
+        $(e.target).hasClass("delete-user-layout") ||
+        $(e.target).hasClass("delete-cancel") ||
+        $(e.target).closest(".delete-cancel").length > 0 ||
+
         $(e.target).hasClass("view-admins-layout") ||
         $(e.target).hasClass("view-admins-go-back-button") ||
         $(e.target).closest(".view-admins-go-back-button").length > 0

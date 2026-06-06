@@ -214,6 +214,31 @@ namespace web.Controllers
             return RedirectToAction("Logout", "Home");
         }
 
+        // Get: Home/DeleteUser?userId={userId}
+        [HttpGet]
+        public async Task<ActionResult> DeleteUser(string userId)
+        {
+            await SetCacheControl();
+            string sessionToken = Request.Cookies["sessionToken"]?.Value;
+            UserDetail currentUser = Session["currentUser"] as UserDetail;
+            if (!String.IsNullOrEmpty(sessionToken) && currentUser != null)
+            {
+                if (currentUser.IsAdmin)
+                {
+                    ResponseDetail response = await _repository.GetUser(sessionToken, userId);
+                    if (response.Status) 
+                    {
+                        if (response is ResponseDataDetail<UserDetail> userDetail)
+                        {
+                            return PartialView("_DeleteUserModal", userDetail.Data);
+                        }
+                    }
+                    return PartialView("_UserDetailError");
+                }
+            }
+            return RedirectToAction("Logout", "Home");
+        }
+
         public async Task<ActionResult> VerifyAccount(string value, bool haveOtpValue = false)
         {
             ResponseDetail response = new ResponseDetail();

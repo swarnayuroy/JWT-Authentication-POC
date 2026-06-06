@@ -235,6 +235,7 @@
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\page-styles\account.css" />
     <Content Include="Content\page-styles\auth-board.css" />
+    <Content Include="Content\page-styles\delete-user-modal.css" />
     <Content Include="Content\page-styles\forgot-password.css" />
     <Content Include="Content\page-styles\notification.css" />
     <Content Include="Content\page-styles\page-loader.css" />
@@ -286,6 +287,7 @@
     <Content Include="Views\Home\_UserDetailModal.cshtml" />
     <Content Include="Views\Home\_UserDetailError.cshtml" />
     <Content Include="Views\Home\_ViewAdminsModal.cshtml" />
+    <Content Include="Views\Home\_DeleteUserModal.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

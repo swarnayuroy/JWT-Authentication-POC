@@ -1,0 +1,24 @@
+﻿@model web.Models.SessionModel.UserDetail
+
+<div class="delete-user-layout">
+    <div class="delete-confirmation-container">
+        <div class="delete-header-layout">
+            <h3>Delete User</h3>
+        </div>
+
+        <div class="delete-body-layout">
+            <p>Are you sure you want to delete <span>@(Model.IsVerified ? " a verified" : "an unverified")</span> user, <b>@Model.Name</b>?</p>
+        </div>
+
+        <div class="delete-footer-layout">
+            <div class="delete-operation-layout">
+                <div class="delete-confirm-button-layout">
+                    <a href="@Url.Action("ConfirmDelete", "Home", new { userId = Model.Id })" class="btn btn-danger">Yes</a>
+                </div>
+                <div class="delete-cancel-button-layout">
+                    <button class="delete-cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
