@@ -135,7 +135,7 @@ namespace API_Service.RepositoryLayer.Repository
             if (!accountSaved)
             {
                 _logger.LogDetails(LogType.WARNING, $"Account saving process failed");
-                await RollBackUser(newUser.Id.ToString());
+                await RollBackProcess(newUser, newAccount, RollbackOperation.REMOVE);
 
                 return new ResponseDetail
                 {
@@ -150,6 +150,77 @@ namespace API_Service.RepositoryLayer.Repository
                 Status = true,
                 Message = "Account created successfully"
             };
+        }
+
+        public async Task<ResponseDetail> DeleteAccount(string userId) {
+            #region Find user and account details
+            // Get all users
+            var users = await _userService.Get();
+
+            // Find user by Id
+            _logger.LogDetails(LogType.INFO, $"getting user by id");
+            var user = users.FirstOrDefault(u => u.Id.ToString() == userId);
+            if (user == null)
+            {
+                _logger.LogDetails(LogType.WARNING, "Couldn't find user with the provided ID");
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "User not found"
+                };
+            }
+
+            // Get all accounts
+            var accounts = await _accountService.Get();
+
+            //Find account by userId
+            _logger.LogDetails(LogType.INFO, $"getting account by userId");
+            var account = accounts.FirstOrDefault(account=> account.UserId.ToString() == userId);
+            if (account == null) 
+            { 
+                _logger.LogDetails(LogType.WARNING, "Couldn't find account for the user ID");
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "Account details not found!"
+                };
+            }
+
+            #endregion
+
+            #region Proceed to delete user and account
+
+            ResponseDetail response = new ResponseDetail();
+            try
+            {
+                var isUserDeleted = await _userService.Delete(user.Id.ToString());
+                var isAccountDeleted = await _accountService.Delete(account.Id.ToString());
+                if (isUserDeleted && isAccountDeleted) {
+                    response = new ResponseDetail
+                    {
+                        Status = true,
+                        Message = $"User, {user.Name} has been deleted successfully."
+                    };                    
+                }
+                else
+                {
+                    throw new Exception($"Failed to delete user {user.Name}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, $"{ex.Message}");
+                await RollBackProcess(user, account, RollbackOperation.RETAIN);
+                response = new ResponseDetail
+                {
+                    Status = true,
+                    Message = $"Deletion of user, {user.Name} failed!"
+                };
+            }
+
+            return response;
+
+            #endregion
         }
 
         public async Task<ResponseDetail> EmailExists(string email)
@@ -292,10 +363,39 @@ namespace API_Service.RepositoryLayer.Repository
             };
         }
 
-        public async Task RollBackUser(string userId)
-        {            
-            await _userService.Delete(userId);
-            _logger.LogDetails(LogType.INFO, $"Rollback: User with id {userId} has been deleted.");
+        public async Task RollBackProcess(User userDetail, Account accountDetail, RollbackOperation operation)
+        {
+            bool isUserExists = _userService.Get().Result.Any(u => u.Id == userDetail.Id);
+            bool isAccountExists = _accountService.Get().Result.Any(a => a.Id == accountDetail.Id);
+
+            switch (operation)
+            {
+                case RollbackOperation.RETAIN:
+                    if (!isUserExists)
+                    {
+                        await _userService.Save(userDetail);
+                    }
+                    if (!isAccountExists)
+                    {
+                        await _accountService.Save(accountDetail);
+                    }
+                    _logger.LogDetails(LogType.INFO, $"Rollback: User with id {userDetail.Id} has been retained.");
+                    break;
+                case RollbackOperation.REMOVE:
+                    if (isUserExists)
+                    {
+                        await _userService.Delete(userDetail.Id.ToString());
+                    }
+                    if (isAccountExists)
+                    {
+                        await _accountService.Delete(accountDetail.Id.ToString());
+                    }
+                    _logger.LogDetails(LogType.INFO, $"Rollback: User with id {userDetail.Id} has been removed.");
+                    break;
+                default:
+                    _logger.LogDetails(LogType.WARNING, $"Rollback: Unknown operation '{operation}' specified."); 
+                    break;
+            }
         }
     }
 }

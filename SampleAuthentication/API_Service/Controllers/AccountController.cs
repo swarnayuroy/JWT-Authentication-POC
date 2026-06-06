@@ -70,6 +70,31 @@ namespace API_Service.Controllers
             }
         }
 
+        #region Delete Account
+
+        [HttpDelete]
+        [Route("delete/{userId}")]
+        [Authorize(Roles = "Superadmin")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteAccount(string userId)
+        {
+            try
+            {
+                var response = await _accountService.DeleteAccount(userId);
+                return response.Status ? Ok(response.Message) : BadRequest(response.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "An error occurred while processing your request.");
+            }
+        }
+
+        #endregion
+
         #region Check/Verify/Set New Password
 
         [AllowAnonymous]
