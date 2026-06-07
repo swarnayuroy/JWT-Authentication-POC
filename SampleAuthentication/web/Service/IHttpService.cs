@@ -19,5 +19,6 @@ namespace web.Service
         Task<HttpResponseMessage> GetUserDetail(string token, string userId);
         Task<HttpResponseMessage> GetAllUsers(string token, string userId, string userType, int page, int pageSize);
         Task<HttpResponseMessage> GetUsersBySearch(string token, string userId, int page, int pageSize, string searchText);
+        Task<HttpResponseMessage> DeleteAccount(string token, string userId);
     }
 }

@@ -173,6 +173,20 @@
         });
     });
 
+    $(document).on("click", ".confirm-button", function (e) {
+        e.preventDefault();  // Prevent default link behavior
+        $("#user-modal-root").empty();
+
+        // Store the href to avoid context issues
+        var confirmDeleteUrl = $(this).attr('href');
+        showLoader();
+
+        // Small delay before navigation to allow loader to display
+        setTimeout(function () {
+            window.location.href = confirmDeleteUrl;
+        }, 1000);
+    });
+
     $(document).on("click", ".view-admins-btn", function (e) {
 
         e.preventDefault();

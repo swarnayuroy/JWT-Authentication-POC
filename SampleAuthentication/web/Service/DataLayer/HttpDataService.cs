@@ -346,5 +346,41 @@ namespace web.Service.DataLayer
                 }
             }
         }
+
+        public async Task<HttpResponseMessage> DeleteAccount(string token, string userId)
+        {
+            try
+            {
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue
+                (
+                    "Bearer",
+                    token
+                );
+                _logger.LogDetails(LogType.INFO, $"Deleting user: {userId}");
+                HttpResponseMessage response = await _client.DeleteAsync
+                (
+                    $"{_client.BaseAddress}/account/delete/{userId}"
+                );
+                return response;
+
+            }
+            catch (TaskCanceledException ex)
+            {
+                if (ex.InnerException is TimeoutException)
+                {
+                    return new HttpResponseMessage(HttpStatusCode.RequestTimeout)
+                    {
+                        ReasonPhrase = "Request timeout"
+                    };
+                }
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                    {
+                        ReasonPhrase = "Request cancelled"
+                    };
+                }
+            }
+        }
     }
 }
