@@ -288,6 +288,7 @@
     <Content Include="Views\Home\_UserDetailError.cshtml" />
     <Content Include="Views\Home\_ViewAdminsModal.cshtml" />
     <Content Include="Views\Home\_DeleteUserModal.cshtml" />
+    <Content Include="Views\Shared\_ToastNotificationList.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

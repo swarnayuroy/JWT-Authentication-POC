@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width" />
     <link href="~/Content/page-styles/shared.css" rel="stylesheet" />
     <link href="~/Content/page-styles/auth-board.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
-    <link href="~/Content/page-styles/notification.css" rel="stylesheet" />
+    <link href="~/Content/page-styles/notification.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
     <link href="~/Content/page-styles/no-content.css" rel="stylesheet" />
     <link href="~/Content/page-styles/user-verification.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
     <link href="~/Content/page-styles/user-detail-modal.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
@@ -20,7 +20,7 @@
     <script src="~/Scripts/jquery-3.7.0.min.js"></script>
     <script src="~/Scripts/jquery.validate.min.js"></script>
     <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
-    <script src="~/Scripts/page-scripts/shared.js"></script>
+    <script src="~/Scripts/page-scripts/shared.js?v=@DateTime.Now.Ticks"></script>
     <script src="~/Scripts/page-scripts/restrict-prev.js"></script>
     <script src="~/Scripts/page-scripts/auth-board.js?v=@DateTime.Now.Ticks"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
@@ -52,12 +52,9 @@
     
     @if (Model.EnabledNotifications != null && Model.EnabledNotifications.Count > 1)
     {
-        foreach (var notification in Model.EnabledNotifications)
-        {
-            Html.RenderPartial("_ToastNotification", notification);
-        }
+        Html.RenderPartial("_ToastNotificationList", Model.EnabledNotifications);
     }
-    @if (Model.ToastNotification.IsEnable)
+    @if (Model.EnabledNotifications == null && Model.ToastNotification.IsEnable)
     {
         Html.RenderPartial("_ToastNotification", Model.ToastNotification);
     }

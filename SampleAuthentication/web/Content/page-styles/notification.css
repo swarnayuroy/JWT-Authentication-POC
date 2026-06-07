@@ -1,4 +1,5 @@
-﻿.page_toast_notification {
+﻿/*Single Notification Styles*/
+.page_toast_notification {
     position: fixed;
     display: flex;
     justify-content: inherit;
@@ -33,4 +34,33 @@
     background: none;
     border: none;
     cursor: pointer;
+}
+
+/*Multiple Notifications Styles*/
+.notification-list-container {
+    position: fixed;
+    top: 50px;
+    right: 10px;
+}
+
+.notification-container{
+    padding: 2px;
+}
+
+.notification-layout {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
+    border: 2px solid black;
+    border-radius: 10px;
+    width: 300px;
+    height: 65px;
+}
+
+.notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
 }

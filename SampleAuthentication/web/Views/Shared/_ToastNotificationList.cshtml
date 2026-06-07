@@ -1,0 +1,35 @@
+﻿﻿@model IEnumerable<web.Models.ToastNotification>
+
+<div class="notification-list-container">
+    @foreach (var notification in Model)
+    {
+        <div class="notification-container">
+            <div class="notification-layout">
+                <div class="notification-content">
+                    <i class="@notification.StatusIcon" style="font-size: 22px;"></i>
+                    <div class="notification-message">
+                        <p class="notification-message">@notification.Message</p>
+                    </div>
+                </div>
+                <button class="page_toast_notification_close_btn" onclick="hideToastList(event)" type="button" aria-label="Close notification">
+                    <i class="@notification.CloseToastIcon" style="font-size: 15px"></i>
+                </button>
+                <script type="text/javascript">
+                    (function() {
+                        // Get the close button element within this iteration
+                        const script = document.currentScript;
+                        const closeButton = script.previousElementSibling;
+
+                        if (closeButton && closeButton.classList.contains('page_toast_notification_close_btn')) {
+                            // Set timeout to auto-hide notification after specified duration
+                            setTimeout(function() {
+                            // Call hideToastList with the button element as parameter
+                            hideToastList(closeButton);
+                        }, @notification.TimeOut);
+                    }
+                    })();
+                </script>
+            </div>
+        </div>
+    }
+</div>
