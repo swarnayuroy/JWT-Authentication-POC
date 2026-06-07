@@ -50,6 +50,13 @@
         </div>
     </div>
     
+    @if (Model.EnabledNotifications != null && Model.EnabledNotifications.Count > 1)
+    {
+        foreach (var notification in Model.EnabledNotifications)
+        {
+            Html.RenderPartial("_ToastNotification", notification);
+        }
+    }
     @if (Model.ToastNotification.IsEnable)
     {
         Html.RenderPartial("_ToastNotification", Model.ToastNotification);

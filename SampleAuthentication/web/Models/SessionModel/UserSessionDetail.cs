@@ -32,6 +32,7 @@ namespace web.Models.SessionModel
         public UserDetail User { get; set; }
         public VerifyUser Verify { get; set; } = new VerifyUser();
         public ToastNotification ToastNotification { get; set; }
+        public IList<ToastNotification> EnabledNotifications { get; set; } = null;
     }
     
     public class AdminSessionDetail : UserSessionDetail

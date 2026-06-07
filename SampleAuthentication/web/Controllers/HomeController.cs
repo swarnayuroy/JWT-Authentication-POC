@@ -122,6 +122,18 @@ namespace web.Controllers
             {
                 if (currentUser.IsAdmin)
                 {
+                    // Initialize notifications list
+                    List<ToastNotification> notificationsList = new List<ToastNotification>();
+
+                    /*
+                     * Once admin performs delete operation then only one notification will be there in 
+                     * TempData with key "DeleteNotification" and it will be added to notificationsList.
+                    */
+                    if (TempData["DeleteNotification"] != null)
+                    {
+                        notificationsList.Add((ToastNotification)TempData["DeleteNotification"]);
+                    }
+                    
                     ResponseDetail sessionDataResponse = string.IsNullOrEmpty(searchText) ? await _repository.GetAllUser(sessionToken, currentUser.Id, "User", page) : 
                         await _repository.GetUsersBySearch(sessionToken, currentUser.Id, searchText, page);
                     if (sessionDataResponse.Status)
@@ -143,23 +155,34 @@ namespace web.Controllers
                                     TotalPages = pagedUsers.Data.TotalPages,
                                     CurrentPage = pagedUsers.Data.CurrentPage,
                                 },
-                                ToastNotification = new ToastNotification
+                                ToastNotification = notificationsList.Count == 1 ? notificationsList[0] : new ToastNotification
                                 {
                                     IsEnable = false,
-                                }
+                                },
+                                EnabledNotifications = notificationsList.Count > 1 ? notificationsList : null
                             });
                         }
                     }
+
+                    notificationsList.Add(new ToastNotification
+                    {
+                        IsEnable = true,
+                        Type = sessionDataResponse.StatusCode != null ? (HttpStatusCode)sessionDataResponse.StatusCode : HttpStatusCode.BadRequest,
+                        StatusIcon = ToastNotification.WARNING_ICON,
+                        Message = "Oops! failed to fetch users."
+                    });
+                    
                     return View("DashBoard", new AdminSessionDetail
                     {
                         User = currentUser,
-                        ToastNotification = new ToastNotification
+                        ToastNotification = notificationsList.Count == 1 ? notificationsList[0] : new ToastNotification
                         {
                             IsEnable = true,
                             Type = sessionDataResponse.StatusCode != null ? (HttpStatusCode)sessionDataResponse.StatusCode : HttpStatusCode.BadRequest,
                             StatusIcon = ToastNotification.WARNING_ICON,
                             Message = "Oops! failed to fetch users."
-                        }
+                        },
+                        EnabledNotifications = notificationsList.Count > 1 ? notificationsList : null
                     });
                 }
             }
@@ -214,7 +237,7 @@ namespace web.Controllers
             return RedirectToAction("Logout", "Home");
         }
 
-        // Get: Home/DeleteUser?userId={userId}
+        // GET: Home/DeleteUser?userId={userId}
         [HttpGet]
         public async Task<ActionResult> DeleteUser(string userId)
         {
@@ -234,6 +257,43 @@ namespace web.Controllers
                         }
                     }
                     return PartialView("_UserDetailError");
+                }
+            }
+            return RedirectToAction("Logout", "Home");
+        }
+
+        public async Task<ActionResult> ConfirmDelete(string userId)
+        {
+            await SetCacheControl();
+            string sessionToken = Request.Cookies["sessionToken"]?.Value;
+            UserDetail currentUser = Session["currentUser"] as UserDetail;
+
+            if (!String.IsNullOrEmpty(sessionToken) && currentUser != null)
+            {
+                if (currentUser.IsAdmin)
+                {
+                    ResponseDetail response = await _repository.DeleteAccount(sessionToken, userId);
+                    if (response.Status)
+                    {
+                        TempData["DeleteNotification"] = new ToastNotification
+                        {
+                            IsEnable = true,
+                            Type = HttpStatusCode.OK,
+                            StatusIcon = ToastNotification.SUCCESS_ICON,
+                            Message = response.Message
+                        };
+                    }
+                    else
+                    {
+                        TempData["DeleteNotification"] = new ToastNotification
+                        {
+                            IsEnable = true,
+                            Type = response.StatusCode != null ? (HttpStatusCode)response.StatusCode : HttpStatusCode.BadRequest,
+                            StatusIcon = ToastNotification.WARNING_ICON,
+                            Message = response.Message
+                        };                       
+                    }
+                    return RedirectToAction("PaginateOperation", "Home", new { page = 1, searchText = "" });
                 }
             }
             return RedirectToAction("Logout", "Home");
