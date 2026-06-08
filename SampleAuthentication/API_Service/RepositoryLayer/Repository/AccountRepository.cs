@@ -374,9 +374,14 @@ namespace API_Service.RepositoryLayer.Repository
 
         public async Task RollBackProcess(User userDetail, Account accountDetail, RollbackOperation operation)
         {
-            bool isUserExists = _userService.Get().Result.Any(u => u.Id == userDetail.Id);
-            bool isAccountExists = _accountService.Get().Result.Any(a => a.Id == accountDetail.Id);
-
+            var (isUserExists, isAccountExists) = await Task.WhenAll(
+                _userService.Get().ContinueWith(task => task.Result.Any(u => u.Id == userDetail.Id)),
+                _accountService.Get().ContinueWith(task => task.Result.Any(a => a.Id == accountDetail.Id))
+            ).ContinueWith(task =>
+            {
+                var results = task.Result;
+                return ((bool)results[0], (bool)results[1]);
+            });
             switch (operation)
             {
                 case RollbackOperation.RETAIN:
