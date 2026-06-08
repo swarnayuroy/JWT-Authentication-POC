@@ -193,8 +193,16 @@ namespace API_Service.RepositoryLayer.Repository
             ResponseDetail response = new ResponseDetail();
             try
             {
-                var isUserDeleted = await _userService.Delete(user.Id.ToString());
-                var isAccountDeleted = await _accountService.Delete(account.Id.ToString());
+                // Wait for both tasks to complete and collect results
+                var (isUserDeleted, isAccountDeleted) = await Task.WhenAll(
+                    _userService.Delete(user.Id.ToString()), 
+                    _accountService.Delete(account.Id.ToString())
+                ).ContinueWith(task =>
+                {
+                    var results = task.Result;
+                    return ((bool)results[0], (bool)results[1]);
+                });
+
                 if (isUserDeleted && isAccountDeleted) {
                     _logger.LogDetails(LogType.INFO, $"User, {user.Name} has been deleted successfully.");
                     response = new ResponseDetail
@@ -214,7 +222,7 @@ namespace API_Service.RepositoryLayer.Repository
                 await RollBackProcess(user, account, RollbackOperation.RETAIN);
                 response = new ResponseDetail
                 {
-                    Status = true,
+                    Status = false,
                     Message = $"Deletion of user, {user.Name} failed!"
                 };
             }
