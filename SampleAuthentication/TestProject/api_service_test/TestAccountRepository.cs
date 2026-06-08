@@ -311,58 +311,82 @@ namespace TestProject.api_service_test
         [Test]
         public async Task DeleteAccount_RollsBack_WhenDeletionFails()
         {
-            //Arrange
-            var user = new User { Id = Guid.NewGuid(), Name = "John Doe" };
-            var account = new Account { Id = Guid.NewGuid(), UserId = user.Id };
+            // Arrange
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Name = "John Doe"
+            };
 
-            // Track Get() call count for User service
+            var account = new Account
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id
+            };
+
             var userGetCallCount = 0;
             _userServiceMock.Setup(x => x.Get()).ReturnsAsync(() =>
             {
                 userGetCallCount++;
-                // First call: return user for finding by ID
-                // Later calls during rollback: return empty to trigger re-save
+
                 if (userGetCallCount == 1)
                     return new List<User> { user };
+
                 return new List<User>();
             });
 
-            // Track Get() call count for Account service
             var accountGetCallCount = 0;
             _accountServiceMock.Setup(x => x.Get()).ReturnsAsync(() =>
             {
                 accountGetCallCount++;
-                // First call: return account for finding by user ID
-                // Later call during rollback: return empty to trigger re-save
+
                 if (accountGetCallCount == 1)
                     return new List<Account> { account };
+
                 return new List<Account>();
             });
 
-            // Setup Delete - user delete throws exception, account delete succeeds
-            _userServiceMock.Setup(x => x.Delete(It.IsAny<string>()))
+            _userServiceMock
+                .Setup(x => x.Delete(It.IsAny<string>()))
                 .ThrowsAsync(new Exception("Database error during user deletion"));
 
-            _accountServiceMock.Setup(x => x.Delete(It.IsAny<string>()))
+            _accountServiceMock
+                .Setup(x => x.Delete(It.IsAny<string>()))
                 .ReturnsAsync(true);
 
-            // Setup Save for rollback process
-            _userServiceMock.Setup(x => x.Save(It.IsAny<User>())).ReturnsAsync(true);
-            _accountServiceMock.Setup(x => x.Save(It.IsAny<Account>())).ReturnsAsync(true);
+            _userServiceMock
+                .Setup(x => x.Save(It.IsAny<User>()))
+                .ReturnsAsync(true);
 
-            //Act
+            _accountServiceMock
+                .Setup(x => x.Save(It.IsAny<Account>()))
+                .ReturnsAsync(true);
+
+            // Act
             var result = await _repository.DeleteAccount(user.Id.ToString());
 
-            //Assert
-            Assert.That(result.Status, Is.True);
-            Assert.That(result.Message, Is.EqualTo($"Deletion of user, {user.Name} failed!"));
+            // Assert
+            Assert.That(result.Status, Is.False);
 
-            //Verify that Delete was attempted
-            _userServiceMock.Verify(x => x.Delete(user.Id.ToString()), Times.Once);
+            Assert.That(
+                result.Message,
+                Is.EqualTo($"Deletion of user, {user.Name} failed!"));
 
-            //Verify that rollback process was invoked - user and account should be re-saved
-            _userServiceMock.Verify(x => x.Save(It.IsAny<User>()), Times.Once);
-            _accountServiceMock.Verify(x => x.Save(It.IsAny<Account>()), Times.Once);
+            _userServiceMock.Verify(
+                x => x.Delete(user.Id.ToString()),
+                Times.Once);
+
+            _accountServiceMock.Verify(
+                x => x.Delete(account.Id.ToString()),
+                Times.Once);
+
+            _userServiceMock.Verify(
+                x => x.Save(It.IsAny<User>()),
+                Times.Once);
+
+            _accountServiceMock.Verify(
+                x => x.Save(It.IsAny<Account>()),
+                Times.Once);
         }
 
         #endregion
