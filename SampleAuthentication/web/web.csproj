@@ -209,6 +209,7 @@
     <Compile Include="Service\DataLayer\HttpDataService.cs" />
     <Compile Include="Service\IHttpService.cs" />
     <Compile Include="Utils\CustomFilter\RestrictAttribute.cs" />
+    <Compile Include="Utils\FeatureFlag\FlagList.cs" />
     <Compile Include="Utils\FilterResponse.cs" />
     <Compile Include="Utils\JwtHelper.cs" />
     <Compile Include="Utils\Logger.cs" />
