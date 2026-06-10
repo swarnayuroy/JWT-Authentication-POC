@@ -1,53 +1,76 @@
-﻿@model web.Models.SessionModel.AdminResult
+﻿@using System.Linq;
+@model web.Models.SessionModel.Modal.AdminModal
 
-<div class="view-admins-layout">
-    <div class="view-admins-container">
-        <div class="view-admins-header">
-            <div class="back-button-container">
-                <button class="view-admins-go-back-button"><i class="fa-solid fa-angles-left"></i></button>                
+@{
+    bool isPresentationFlagEnabled = (from flag in Model.Flag
+                                     where flag.Flag == web.Utils.FeatureFlag.AdminFlags.PRESENTATION
+                                     select flag.IsEnabled).FirstOrDefault<bool>();
+
+    <div class="view-admins-layout">
+        <div class="view-admins-container">
+            <div class="view-admins-header">
+                <div class="back-button-container">
+                    <button class="view-admins-go-back-button"><i class="fa-solid fa-angles-left"></i></button>
+                </div>
+                <div class="view-admins-header-text">
+                    <h3>
+                        Admins
+                        @if (isPresentationFlagEnabled)
+                        {
+                            <span class="presentation-flag-label">[ @Model.ModalData.ItemCount ]</span>
+                        }
+                    </h3>
+                </div>
             </div>
-            <div class="view-admins-header-text">
-                <h3>Admins</h3>
-            </div>
-        </div>
-        
-        <div class="view-admins-content">
-            <div class="view-admins-table-layout">
-                @if (Model.ItemCount > 0)
+
+            <div class="view-admins-content">
+                @if(isPresentationFlagEnabled) 
                 {
-                    <table class="view-admins-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Admin Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var admin in Model.Items)
-                            {
+                    <div class="view-admins-detail-container">
+                        <div class="view-admins-detail">
+                            <p>Superadmin: <b>@Model.ModalData.SuperadminCount</b></p>
+                            <p>Admin: <b>@Model.ModalData.AdminCount</b></p>
+                        </div>
+                    </div>
+                }
+
+                <div class="view-admins-table-layout">
+                    @if (Model.ModalData.ItemCount > 0)
+                    {
+                        <table class="view-admins-table">
+                            <thead>
                                 <tr>
-                                    <td>
-                                        <span class="admin-name-text">@admin.Name</span>
-                                        <div class="admin-id-tooltip">
-                                            <span>@admin.Id</span>
-                                        </div>
-                                    </td>
-                                    <td>@admin.Email</td>
-                                    <td>@admin.Role</td>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Admin Type</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <div>
-                        <span>Some error ocurred while fetching admins! Please try later.</span>
-                        @Html.Partial("_NoContent")
-                    </div>                    
-                }
-            </div>            
+                            </thead>
+                            <tbody>
+                                @foreach (var admin in Model.ModalData.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="admin-name-text">@admin.Name</span>
+                                            <div class="admin-id-tooltip">
+                                                <span>@admin.Id</span>
+                                            </div>
+                                        </td>
+                                        <td>@admin.Email</td>
+                                        <td>@admin.Role</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div>
+                            <span>Some error ocurred while fetching admins! Please try later.</span>
+                            @Html.Partial("_NoContent")
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
-</div>
+}

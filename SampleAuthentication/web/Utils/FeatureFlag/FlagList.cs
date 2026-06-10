@@ -25,7 +25,7 @@ namespace web.Utils.FeatureFlag
     {
         public IList<AdminFeatureFlag> adminFeatureFlag = new List<AdminFeatureFlag>()
         {
-            new AdminFeatureFlag() { Flag = AdminFlags.PRESENTATION, DevType = "MODAL", IsEnabled = false },
+            new AdminFeatureFlag() { Flag = AdminFlags.PRESENTATION, DevType = "MODAL", IsEnabled = true },
             new AdminFeatureFlag() { Flag = AdminFlags.CREATE, DevType = "MODAL", IsEnabled = false },
             new AdminFeatureFlag() { Flag = AdminFlags.EDIT, DevType = "MODAL", IsEnabled = false },
             new AdminFeatureFlag() { Flag = AdminFlags.DELETE, DevType = "MODAL", IsEnabled = false }

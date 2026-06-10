@@ -38,6 +38,14 @@
     padding: 20px;
 }
 
+.view-admins-detail-container{
+    display: flex;
+}
+
+.view-admins-detail{
+    text-align: start;
+}
+
 .view-admins-table-layout {
     width: 100%;
     display: flex;

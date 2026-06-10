@@ -200,6 +200,7 @@
     <Compile Include="Models\Form.cs" />
     <Compile Include="Models\Registration.cs" />
     <Compile Include="Models\ResponseModel\ResponseDetail.cs" />
+    <Compile Include="Models\SessionModel\Modal\AdminModal.cs" />
     <Compile Include="Models\SessionModel\PagedResult.cs" />
     <Compile Include="Models\SessionModel\UserSessionDetail.cs" />
     <Compile Include="Models\VerifyAccount.cs" />

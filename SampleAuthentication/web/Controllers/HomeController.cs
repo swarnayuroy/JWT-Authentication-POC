@@ -10,6 +10,7 @@ using System.Web.UI;
 using web.Models;
 using web.Models.ResponseModel;
 using web.Models.SessionModel;
+using web.Models.SessionModel.Modal;
 using web.Repository;
 using web.Utils;
 using web.Utils.CustomFilter;
@@ -204,7 +205,7 @@ namespace web.Controllers
                     ResponseDetail response = await _repository.GetAllUser(sessionToken, currentUser.Id, "Admin", 1);
                     if (response.Status && response is ResponseDataDetail<AdminResult> adminResultSet)
                     {
-                        return PartialView("_ViewAdminsModal", adminResultSet.Data);
+                        return PartialView("_ViewAdminsModal", new AdminModal { ModalData = adminResultSet.Data });
                     }
                 }
                 return PartialView("_UserDetailError");
