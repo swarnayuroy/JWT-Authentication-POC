@@ -20,7 +20,7 @@ namespace API_Service.Models.DTO
     public class FullUserDetail : UserDetail
     {
         private string _accountOld = string.Empty;
-        public DateTime LoggedInAt { get; set; }
+        public DateTime? LoggedInAt { get; set; }
         public string AccountOld {            
             get
             {

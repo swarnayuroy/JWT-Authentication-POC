@@ -310,7 +310,7 @@ namespace API_Service.AppData.DataService
                                      Email = user.Email,
                                      Role = role.Role == UserRoleType.Superadmin ? "Superadmin" : role.Role == UserRoleType.Admin ? "Admin" : "User",
                                      IsVerified = user.IsVerified,
-                                     LoggedInAt = account.LoggedInAt,
+                                     LoggedInAt = account.LoggedInAt == null ? DateTime.MinValue : account.LoggedInAt,
                                      AccountOld = Convert.ToString(account.CreatedAt)
                                  }).FirstOrDefault<FullUserDetail>();
                 

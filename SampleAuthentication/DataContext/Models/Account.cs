@@ -20,6 +20,6 @@ namespace DataContext.Models
         /*
          sets date an time of an user sign-in
         */
-        public DateTime LoggedInAt { get; set; }
+        public DateTime? LoggedInAt { get; set; }
     }
 }
