@@ -9,6 +9,7 @@ using DataContext.DataProvider;
 using DataContext.DataService;
 using DataContext.SampleData;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -55,6 +56,11 @@ builder.Services.AddSwaggerGen(options =>
         {jwtSecurityScheme, Array.Empty<string>()}
     });
 });
+
+// Register DbContext with connection string from appsettings.json
+builder.Services.AddDbContext<AuthenticationDbContext>(
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 // Add CORS policy to allow MVC web app to call this API
 builder.Services.AddCors(options =>
