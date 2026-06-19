@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using API_Service.Utils;
+using DataContext.DataProvider;
+using DataContext.DataService;
 using DataContext.Models;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace API_Service.AppData.DataService
@@ -119,6 +122,108 @@ namespace API_Service.AppData.DataService
                     CreatedAt = new DateTime(2025, 5, 10, 10, 15, 30)
                 }
             );
+        }
+    }
+
+    public class DataAccessLayer : IContextProvider, IContextService
+    {
+        private readonly AuthenticationDbContext _context;
+
+        public DataAccessLayer(AuthenticationDbContext context)
+        {
+            this._context = context;
+        }
+
+        public IQueryable<User> User => _context.Users;
+
+        public IQueryable<UserRole> UserRole => _context.UserRoles;
+
+        public IQueryable<Account> Account => _context.Accounts;
+
+        public Task SaveAccountAsync(Account accountDetail)
+        {
+            _context.Accounts.AddAsync(accountDetail);
+            return Task.CompletedTask;
+        }
+
+        public Task SaveUserAsync(User userDetail)
+        {
+             _context.Users.AddAsync(userDetail);
+            return Task.CompletedTask;
+        }
+
+        public Task SaveUserRoleAsync(UserRole userRole)
+        {
+            _context.UserRoles.AddAsync(userRole);
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateAccountAsync(Account accountDetail)
+        {
+            _context.Accounts.Update(accountDetail);
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateUserAsync(User userDetail)
+        {
+            _context.Users.Update(userDetail);
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateUserRoleAsync(UserRole userRole)
+        {
+            _context.UserRoles.Update(userRole);
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteUserAsync(User user)
+        {
+            _context.Users.Remove(user);
+            return Task.CompletedTask;
+        }        
+    }
+
+    public class ExecuteContextTask : IUnitOfWork
+    {
+        private readonly LoggerService<ExecuteContextTask> _logger;
+        private readonly AuthenticationDbContext _context;
+        public ExecuteContextTask(ILogger<ExecuteContextTask> logger, AuthenticationDbContext context)
+        {
+            this._logger = new LoggerService<ExecuteContextTask>(logger);
+            this._context = context;
+        }
+        public async Task<bool> ExecuteAndCommit(params Func<Task>[] operations)
+        {
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            string operationNames = string.Join(", ", operations.Select(op => op.Method.Name));
+            bool isExecutionSuccessful = false;
+            try
+            {
+                foreach (var operation in operations)
+                {
+                    await operation();
+                }
+
+                int result = await _context.SaveChangesAsync();
+
+                if (result > 0) {                    
+
+                    _logger.LogDetails(LogType.INFO, $"Successfully executed {operationNames}.");
+                }
+                else
+                {
+                    _logger.LogDetails(LogType.WARNING, $"No changes saved for {operationNames}.");
+                }
+
+                isExecutionSuccessful = true;
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDetails(LogType.ERROR, $"Error executing {operationNames}: {ex.Message}");
+                await transaction.RollbackAsync();
+            }
+            return isExecutionSuccessful;
         }
     }
 }

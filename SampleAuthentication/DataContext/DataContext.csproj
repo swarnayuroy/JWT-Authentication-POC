@@ -41,7 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataProvider\IContextProvider.cs" />
     <Compile Include="DataProvider\IDataProvider.cs" />
+    <Compile Include="DataService\IContextService.cs" />
     <Compile Include="DataService\IDataService.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\User.cs" />

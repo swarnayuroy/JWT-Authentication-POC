@@ -237,7 +237,7 @@ namespace TestProject.api_service_test
 
             _accountServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<Account>());
             _accountServiceMock.Setup(x => x.Save(It.IsAny<Account>())).ReturnsAsync(false);
-            _userServiceMock.Setup(x => x.Delete(It.IsAny<string>())).ReturnsAsync(true);
+            _userServiceMock.Setup(x => x.Delete(It.IsAny<User>())).ReturnsAsync(true);
 
             var userDetail = new UserDetail
             {
@@ -254,7 +254,7 @@ namespace TestProject.api_service_test
             Assert.That(result.Message, Is.EqualTo("Failed to create account."));
 
             //Verify that the user deletion was attempted for rollback
-            _userServiceMock.Verify(x => x.Delete(It.IsAny<string>()), Times.Once);
+            _userServiceMock.Verify(x => x.Delete(createdUser), Times.Once);
         }
 
         [Test]
@@ -289,12 +289,9 @@ namespace TestProject.api_service_test
         {
             //Arrange
             var user = new User { Id = Guid.NewGuid(), Name = "John Doe" };
-            var account = new Account { Id = Guid.NewGuid(), UserId = user.Id };
 
             _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User> { user });
-            _accountServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<Account> { account });
-            _userServiceMock.Setup(x => x.Delete(It.IsAny<string>())).ReturnsAsync(true);
-            _accountServiceMock.Setup(x => x.Delete(It.IsAny<string>())).ReturnsAsync(true);
+            _userServiceMock.Setup(x => x.Delete(It.IsAny<User>())).ReturnsAsync(true);
 
             //Act
             var result = await _repository.DeleteAccount(user.Id.ToString());
@@ -302,26 +299,33 @@ namespace TestProject.api_service_test
             //Assert
             Assert.That(result.Status, Is.True);
             Assert.That(result.Message, Is.EqualTo($"User, {user.Name} has been deleted successfully."));
-
-            //Verify both user and account were deleted
-            _userServiceMock.Verify(x => x.Delete(user.Id.ToString()), Times.Once);
-            _accountServiceMock.Verify(x => x.Delete(account.Id.ToString()), Times.Once);
         }
 
         [Test]
-        public async Task DeleteAccount_RollsBack_WhenDeletionFails()
+        public async Task DeleteAccount_ReturnsFalse_WhenFailed()
+        {
+            //Arrange
+            var user = new User { Id = Guid.NewGuid(), Name = "John Doe" };
+
+            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User> { user });
+            _userServiceMock.Setup(x => x.Delete(It.IsAny<User>())).ReturnsAsync(false);
+
+            //Act
+            var result = await _repository.DeleteAccount(user.Id.ToString());
+
+            //Assert
+            Assert.That(result.Status, Is.False);
+            Assert.That(result.Message, Is.EqualTo($"Failed to delete user {user.Name}!"));
+        }
+
+        [Test]
+        public async Task DeleteAccount_Encounters_Exception()
         {
             // Arrange
             var user = new User
             {
                 Id = Guid.NewGuid(),
                 Name = "John Doe"
-            };
-
-            var account = new Account
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id
             };
 
             var userGetCallCount = 0;
@@ -335,31 +339,12 @@ namespace TestProject.api_service_test
                 return new List<User>();
             });
 
-            var accountGetCallCount = 0;
-            _accountServiceMock.Setup(x => x.Get()).ReturnsAsync(() =>
-            {
-                accountGetCallCount++;
-
-                if (accountGetCallCount == 1)
-                    return new List<Account> { account };
-
-                return new List<Account>();
-            });
-
             _userServiceMock
-                .Setup(x => x.Delete(It.IsAny<string>()))
+                .Setup(x => x.Delete(It.IsAny<User>()))
                 .ThrowsAsync(new Exception("Database error during user deletion"));
-
-            _accountServiceMock
-                .Setup(x => x.Delete(It.IsAny<string>()))
-                .ReturnsAsync(true);
 
             _userServiceMock
                 .Setup(x => x.Save(It.IsAny<User>()))
-                .ReturnsAsync(true);
-
-            _accountServiceMock
-                .Setup(x => x.Save(It.IsAny<Account>()))
                 .ReturnsAsync(true);
 
             // Act
@@ -370,23 +355,7 @@ namespace TestProject.api_service_test
 
             Assert.That(
                 result.Message,
-                Is.EqualTo($"Deletion of user, {user.Name} failed!"));
-
-            _userServiceMock.Verify(
-                x => x.Delete(user.Id.ToString()),
-                Times.Once);
-
-            _accountServiceMock.Verify(
-                x => x.Delete(account.Id.ToString()),
-                Times.Once);
-
-            _userServiceMock.Verify(
-                x => x.Save(It.IsAny<User>()),
-                Times.Once);
-
-            _accountServiceMock.Verify(
-                x => x.Save(It.IsAny<Account>()),
-                Times.Once);
+                Is.EqualTo($"Some error occurred while deleting user {user.Name}!"));
         }
 
         #endregion

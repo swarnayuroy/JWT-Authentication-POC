@@ -73,11 +73,17 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddScoped<IDataProvider, AccountData>();
-builder.Services.AddScoped<IDataService, AccountData>();
+//builder.Services.AddScoped<IDataProvider, AccountData>();
+//builder.Services.AddScoped<IDataService, AccountData>();
+
+builder.Services.AddScoped<IContextProvider, DataAccessLayer>();
+builder.Services.AddScoped<IContextService, DataAccessLayer>();
+builder.Services.AddScoped<IUnitOfWork, ExecuteContextTask>();
+
 builder.Services.AddScoped<IService<User>, SampleDataService<User>>();
 builder.Services.AddScoped<IService<Account>, SampleDataService<Account>>();
 builder.Services.AddScoped<IUserDetailService, SampleDataService<FullUserDetail>>();
+
 builder.Services.AddScoped<IJwtManager, JwtManager>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

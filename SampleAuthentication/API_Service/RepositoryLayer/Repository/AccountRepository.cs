@@ -170,21 +170,21 @@ namespace API_Service.RepositoryLayer.Repository
                 };
             }
 
-            // Get all accounts
-            var accounts = await _accountService.Get();
+            //// Get all accounts
+            //var accounts = await _accountService.Get();
 
-            //Find account by userId
-            _logger.LogDetails(LogType.INFO, $"getting account by userId");
-            var account = accounts.FirstOrDefault(account=> account.UserId.ToString() == userId);
-            if (account == null) 
-            { 
-                _logger.LogDetails(LogType.WARNING, "Couldn't find account for the user ID");
-                return new ResponseDetail
-                {
-                    Status = false,
-                    Message = "Account details not found!"
-                };
-            }
+            ////Find account by userId
+            //_logger.LogDetails(LogType.INFO, $"getting account by userId");
+            //var account = accounts.FirstOrDefault(account=> account.UserId.ToString() == userId);
+            //if (account == null) 
+            //{ 
+            //    _logger.LogDetails(LogType.WARNING, "Couldn't find account for the user ID");
+            //    return new ResponseDetail
+            //    {
+            //        Status = false,
+            //        Message = "Account details not found!"
+            //    };
+            //}
 
             #endregion
 
@@ -194,16 +194,9 @@ namespace API_Service.RepositoryLayer.Repository
             try
             {
                 // Wait for both tasks to complete and collect results
-                var (isUserDeleted, isAccountDeleted) = await Task.WhenAll(
-                    _userService.Delete(user.Id.ToString()), 
-                    _accountService.Delete(account.Id.ToString())
-                ).ContinueWith(task =>
-                {
-                    var results = task.Result;
-                    return ((bool)results[0], (bool)results[1]);
-                });
+                var isUserDeleted = await _userService.Delete(user);
 
-                if (isUserDeleted && isAccountDeleted) {
+                if (isUserDeleted) {
                     _logger.LogDetails(LogType.INFO, $"User, {user.Name} has been deleted successfully.");
                     response = new ResponseDetail
                     {
@@ -213,17 +206,22 @@ namespace API_Service.RepositoryLayer.Repository
                 }
                 else
                 {
-                    throw new Exception($"Failed to delete user {user.Name}");
+                    _logger.LogDetails(LogType.INFO, $"Failed to delete user {user.Name}");
+                    response = new ResponseDetail
+                    {
+                        Status = false,
+                        Message = $"Failed to delete user {user.Name}!"
+                    };
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogDetails(LogType.ERROR, $"{ex.Message}");
-                await RollBackProcess(user, account, RollbackOperation.RETAIN);
+                //await RollBackProcess(user, account, RollbackOperation.RETAIN);
                 response = new ResponseDetail
                 {
                     Status = false,
-                    Message = $"Deletion of user, {user.Name} failed!"
+                    Message = $"Some error occurred while deleting user {user.Name}!"
                 };
             }
 
@@ -398,11 +396,11 @@ namespace API_Service.RepositoryLayer.Repository
                 case RollbackOperation.REMOVE:
                     if (isUserExists)
                     {
-                        await _userService.Delete(userDetail.Id.ToString());
+                        await _userService.Delete(userDetail);
                     }
                     if (isAccountExists)
                     {
-                        await _accountService.Delete(accountDetail.Id.ToString());
+                        await _accountService.Delete(accountDetail);
                     }
                     _logger.LogDetails(LogType.INFO, $"Rollback: User with id {userDetail.Id} has been removed.");
                     break;

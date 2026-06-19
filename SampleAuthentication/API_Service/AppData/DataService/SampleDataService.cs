@@ -78,12 +78,23 @@ namespace API_Service.AppData.DataService
         private LoggerService<SampleDataService<T>> _logger;
         private readonly IDataProvider _dataProvider;
         private readonly IDataService _dataService;
+        private readonly IContextProvider _dataContextProvider;
+        private readonly IContextService _dataContextService;
+        private readonly IUnitOfWork _taskExecution;
 
-        public SampleDataService(ILogger<SampleDataService<T>> logger, IDataProvider dataProvider, IDataService dataService)
+        public SampleDataService(
+            ILogger<SampleDataService<T>> logger, 
+            IDataProvider dataProvider, IDataService dataService,                       // Inmemory data provider and service for testing
+            IContextProvider dataContextProvider, IContextService dataContextService,   // Database context provider and service for production
+            IUnitOfWork taskExecution
+        )
         {
             this._logger = new LoggerService<SampleDataService<T>>(logger);
             this._dataProvider = dataProvider;
             this._dataService = dataService;
+            this._dataContextProvider = dataContextProvider;
+            this._dataContextService = dataContextService;
+            this._taskExecution = taskExecution;
         }
 
         public Task<IEnumerable<T>> Get()
@@ -91,8 +102,8 @@ namespace API_Service.AppData.DataService
             var dataContext = new Data();
             if (typeof(T) == typeof(Models.Entities.User))
             {
-                var users = (from user in _dataProvider.User
-                             join userRole in _dataProvider.UserRole
+                var users = (from user in _dataContextProvider.User
+                             join userRole in _dataContextProvider.UserRole
                              on user.Id equals userRole.UserId
                              select new Models.Entities.User
                              {
@@ -110,7 +121,7 @@ namespace API_Service.AppData.DataService
             }
             else if (typeof(T) == typeof(Models.Entities.Account))
             {
-                var accountDetails = _dataProvider.Account.Select(a => new Models.Entities.Account
+                var accountDetails = _dataContextProvider.Account.Select(a => new Models.Entities.Account
                 {
                     Id = a.Id,
                     UserId = a.UserId,
@@ -148,19 +159,25 @@ namespace API_Service.AppData.DataService
                         Email = userDetail.Email,                        
                         IsVerified = userDetail.IsVerified
                     };
+                    
                     var userRole = new UserRole
                     {
                         UserId = userDetail.Id,
                         Role = userDetail.Role.Equals("Superadmin") ? UserRoleType.Superadmin : userDetail.Role.Equals("Admin") ? UserRoleType.Admin : UserRoleType.User
                     };
 
-                    await Task.WhenAll(
-                        _dataService.SaveUserAsync(user),
-                        _dataService.SaveUserRoleAsync(userRole)
-                    );
-
-                    _logger.LogDetails(LogType.INFO, $"Account: {user.Id} saved successfully.");
-                    return true;
+                    if (await _taskExecution.ExecuteAndCommit(
+                        () => _dataContextService.SaveUserAsync(user),
+                        () => _dataContextService.SaveUserRoleAsync(userRole)
+                    ))
+                    {
+                        _logger.LogDetails(LogType.INFO, $"User: {user.Id} saved successfully.");
+                        return true;
+                    }
+                    else
+                    {
+                        throw new Exception($"Failed to save user: {user.Id}");
+                    }
                 }
                 else if (typeof(T) == typeof(Models.Entities.Account))
                 {
@@ -180,9 +197,18 @@ namespace API_Service.AppData.DataService
                         LoggedInAt = accountDetail.LoggedInAt
                     };
 
-                    await _dataService.SaveAccountAsync(account);
-                    _logger.LogDetails(LogType.INFO, $"Account: {account.Id} saved successfully.");
-                    return true;
+                    if (await _taskExecution.ExecuteAndCommit(
+                        () => _dataContextService.SaveAccountAsync(account)
+                    ))
+                    {
+                        _logger.LogDetails(LogType.INFO, $"Account: {account.Id} saved successfully.");
+                        return true;
+                    }
+                    else
+                    {
+                        throw new Exception($"Failed to save account: {account.Id}");
+                    }
+                    
                 }
 
                 _logger.LogDetails(LogType.WARNING, $"Type {typeof(T).Name} is not supported type");
@@ -204,13 +230,15 @@ namespace API_Service.AppData.DataService
                     var userDetail = entity as Models.Entities.User;
                     if (userDetail != null)
                     {
-                        return await _dataService.UpdateUserAsync(new DataContext.Models.User
-                        {
-                            Id = userDetail.Id,
-                            Name = userDetail.Name,
-                            Email = userDetail.Email,
-                            IsVerified = userDetail.IsVerified
-                        });
+                        return await _taskExecution.ExecuteAndCommit(() => _dataContextService.UpdateUserAsync(
+                            new DataContext.Models.User
+                            {
+                                Id = userDetail.Id,
+                                Name = userDetail.Name,
+                                Email = userDetail.Email,
+                                IsVerified = userDetail.IsVerified
+                            }
+                        ));
                     }
                 }
                 else if (typeof(T) == typeof(Models.Entities.Account))
@@ -218,14 +246,16 @@ namespace API_Service.AppData.DataService
                     var accountDetail = entity as Models.Entities.Account;
                     if (accountDetail != null)
                     {
-                        return await _dataService.UpdateAccountAsync(new DataContext.Models.Account
-                        {
-                            Id = accountDetail.Id,
-                            UserId = accountDetail.UserId,
-                            Password = accountDetail.Password,
-                            CreatedAt = accountDetail.CreatedAt,
-                            LoggedInAt = accountDetail.LoggedInAt
-                        });
+                        return await _taskExecution.ExecuteAndCommit(() => _dataContextService.UpdateAccountAsync(
+                            new DataContext.Models.Account
+                            {
+                                Id = accountDetail.Id,
+                                UserId = accountDetail.UserId,
+                                Password = accountDetail.Password,
+                                CreatedAt = accountDetail.CreatedAt,
+                                LoggedInAt = accountDetail.LoggedInAt
+                            }
+                        ));
                     }
                 }
                 _logger.LogDetails(LogType.WARNING, $"Type {typeof(T).Name} is not supported type");
@@ -238,23 +268,35 @@ namespace API_Service.AppData.DataService
             }            
         }
 
-        public Task<bool> Delete(string id)
+        public async Task<bool> Delete(T entity)
         {
             try
             {
-                if (!Guid.TryParse(id, out Guid guidId))
-                {
-                    _logger.LogDetails(LogType.WARNING, $"Failed to parse the id:{id}");
-                    return Task.FromResult(false);
-                }
-
                 if (typeof(T) == typeof(Models.Entities.User))
                 {
-                    return _dataService.DeleteUserAsync(guidId);
+                    var userDetail = entity as Models.Entities.User;
+                    if (userDetail != null)
+                    {
+                        return await _taskExecution.ExecuteAndCommit(() => 
+                                        _dataContextService.DeleteUserAsync(new DataContext.Models.User
+                                        {
+                                            Id = userDetail.Id,
+                                            Name = userDetail.Name,
+                                            Email = userDetail.Email,
+                                            IsVerified = userDetail.IsVerified
+                                        })
+                                     );
+                    }
                 }
-                else if (typeof(T) == typeof(Models.Entities.Account))
+                else if (typeof(T) == typeof(Models.Entities.Account))  // this operation isn't be valid while working with DbContext - as cascading behavior has been set.
                 {
-                    return _dataService.DeleteAccountAsync(guidId);
+                    var accountDetail = entity as Models.Entities.Account;
+                    if (accountDetail != null)
+                    {
+                        return await _taskExecution.ExecuteAndCommit(() => 
+                                        _dataService.DeleteAccountAsync(accountDetail.Id) // Assuming DeleteAccountAsync takes an ID for deletion
+                                     );
+                    }
                 }
 
                 _logger.LogDetails(LogType.WARNING, $"Type {typeof(T).Name} is not supported type");
@@ -263,7 +305,7 @@ namespace API_Service.AppData.DataService
             catch (Exception ex)
             {
                 _logger.LogDetails(LogType.ERROR, $"{ex.Message}");
-                return Task.FromResult(false);
+                return Convert.ToBoolean(await Task.FromResult(false));
             }
         }
 
@@ -272,8 +314,8 @@ namespace API_Service.AppData.DataService
             if (!string.IsNullOrEmpty(id))
             {
                 var dataContext = new Data();
-                var userDetail = (from user in _dataProvider.User
-                                  join role in _dataProvider.UserRole on user.Id equals role.UserId
+                var userDetail = (from user in _dataContextProvider.User
+                                  join role in _dataContextProvider.UserRole on user.Id equals role.UserId
                                   where user.Id.ToString() == id
                                   select new UserDetail
                                   {
@@ -299,9 +341,9 @@ namespace API_Service.AppData.DataService
             if (!string.IsNullOrEmpty(id))
             {
                 var dataContext = new Data();
-                var userDetail = (from user in _dataProvider.User
-                                 join role in _dataProvider.UserRole on user.Id equals role.UserId
-                                 join account in _dataProvider.Account on user.Id equals account.UserId
+                var userDetail = (from user in _dataContextProvider.User
+                                 join role in _dataContextProvider.UserRole on user.Id equals role.UserId
+                                 join account in _dataContextProvider.Account on user.Id equals account.UserId
                                  where user.Id.ToString() == id
                                  select new FullUserDetail
                                  {
