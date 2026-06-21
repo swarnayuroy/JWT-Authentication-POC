@@ -46,7 +46,7 @@ namespace API_Service.RepositoryLayer.Repository
                                          Email = user.Email,
                                          Role = user.Role,
                                          IsVerified = user.IsVerified
-                                     }).ToList();
+                                     }).ToList<UserDetail>();
                     _logger.LogDetails(LogType.INFO, $"Fetched page {page} ({paginatedUsers.Count()} of {totalUserCount} users)");
 
                     if (userType == "Admin")
@@ -88,7 +88,7 @@ namespace API_Service.RepositoryLayer.Repository
                 Status = false,
                 Message = "No users found"
             };
-        }
+        }        
         public async Task<ResponseDetail> GetUserBySearch(string userId, int page, int pageSize, string searchText)
         {
             var users = await _userService.Get();

@@ -86,7 +86,7 @@ namespace web.Controllers
                                         IsEnable = true,
                                         Type = sessionDataResponse.StatusCode != null ? (HttpStatusCode)sessionDataResponse.StatusCode : HttpStatusCode.BadRequest,
                                         StatusIcon = ToastNotification.WARNING_ICON,
-                                        Message = "Oops! failed to fetch users."
+                                        Message = !string.IsNullOrEmpty(sessionDataResponse.Message) ? sessionDataResponse.Message : "Oops! failed to fetch users."
                                     }
                                 });
                             }

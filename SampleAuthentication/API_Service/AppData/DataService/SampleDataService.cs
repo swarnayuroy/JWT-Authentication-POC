@@ -76,22 +76,22 @@ namespace API_Service.AppData.DataService
     public class SampleDataService<T> : IUserDetailService, IService<T> where T : class
     {
         private LoggerService<SampleDataService<T>> _logger;
-        private readonly IDataProvider _dataProvider;
-        private readonly IDataService _dataService;
+        //private readonly IDataProvider _dataProvider;
+        //private readonly IDataService _dataService;
         private readonly IContextProvider _dataContextProvider;
         private readonly IContextService _dataContextService;
         private readonly IUnitOfWork _taskExecution;
 
         public SampleDataService(
             ILogger<SampleDataService<T>> logger, 
-            IDataProvider dataProvider, IDataService dataService,                       // Inmemory data provider and service for testing
+            /*IDataProvider dataProvider, IDataService dataService,*/                       // Inmemory data provider and service for testing
             IContextProvider dataContextProvider, IContextService dataContextService,   // Database context provider and service for production
             IUnitOfWork taskExecution
         )
         {
             this._logger = new LoggerService<SampleDataService<T>>(logger);
-            this._dataProvider = dataProvider;
-            this._dataService = dataService;
+            //this._dataProvider = dataProvider;
+            //this._dataService = dataService;
             this._dataContextProvider = dataContextProvider;
             this._dataContextService = dataContextService;
             this._taskExecution = taskExecution;
@@ -288,16 +288,16 @@ namespace API_Service.AppData.DataService
                                      );
                     }
                 }
-                else if (typeof(T) == typeof(Models.Entities.Account))  // this operation isn't be valid while working with DbContext - as cascading behavior has been set.
-                {
-                    var accountDetail = entity as Models.Entities.Account;
-                    if (accountDetail != null)
-                    {
-                        return await _taskExecution.ExecuteAndCommit(() => 
-                                        _dataService.DeleteAccountAsync(accountDetail.Id) // Assuming DeleteAccountAsync takes an ID for deletion
-                                     );
-                    }
-                }
+                //else if (typeof(T) == typeof(Models.Entities.Account))  // this operation isn't valid while working with DbContext - as cascading behavior has been set.
+                //{
+                //    var accountDetail = entity as Models.Entities.Account;
+                //    if (accountDetail != null)
+                //    {
+                //        return await _taskExecution.ExecuteAndCommit(() => 
+                //                        _dataService.DeleteAccountAsync(accountDetail.Id) // Assuming DeleteAccountAsync takes an ID for deletion
+                //                     );
+                //    }
+                //}
 
                 _logger.LogDetails(LogType.WARNING, $"Type {typeof(T).Name} is not supported type");
                 throw new NotSupportedException($"Type {typeof(T).Name} is not supported type");

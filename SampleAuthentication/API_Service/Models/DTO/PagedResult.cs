@@ -1,4 +1,6 @@
-﻿namespace API_Service.Models.DTO
+﻿using System.Linq;
+
+namespace API_Service.Models.DTO
 {
     //Grabs paginated user data and metadata
     public class PagedResult<T> where T : class
@@ -14,15 +16,19 @@
     {
         public int AdminCount { get; set; }
         public int SuperadminCount { get; set; }
-        public IEnumerable<UserDetail> SuffixIdentifiedAdmin(string userId, List<UserDetail> admins)
+        public IEnumerable<UserDetail> SuffixIdentifiedAdmin(string userId, IList<UserDetail> admins)
         {
-            if (!string.IsNullOrEmpty(userId) && admins.Count > 0)
+            if (!string.IsNullOrEmpty(userId) && (admins != null && admins.Any()))
             {
-                admins[admins.IndexOf(admins.First(admin => admin.Id == userId))].Name = (from admin in admins
-                                                                                          where admin.Id == userId
-                                                                                          select admin.Name).FirstOrDefault() + " (You)";                
+                admins[admins.IndexOf(admins.First(admin => 
+                Guid.Parse(admin.Id) == Guid.Parse(userId)))].Name = (from admin in admins
+                                                                      where Guid.Parse(admin.Id) == Guid.Parse(userId)
+                                                                      select admin.Name).FirstOrDefault() + " (You)";
+
+                return admins;
             }
-            return admins;
+
+            return Enumerable.Empty<UserDetail>();
         }
     }
 }
