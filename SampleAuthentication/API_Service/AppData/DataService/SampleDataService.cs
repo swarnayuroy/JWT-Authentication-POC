@@ -4,6 +4,7 @@ using API_Service.Utils;
 using DataContext.DataProvider;
 using DataContext.DataService;
 using DataContext.Models;
+using Microsoft.Identity.Client;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -73,7 +74,7 @@ namespace API_Service.AppData.DataService
             }
         }
     }
-    public class SampleDataService<T> : IUserDetailService, IService<T> where T : class
+    public class SampleDataService<T> : IService<T> where T : class
     {
         private LoggerService<SampleDataService<T>> _logger;
         //private readonly IDataProvider _dataProvider;
@@ -308,7 +309,17 @@ namespace API_Service.AppData.DataService
                 return Convert.ToBoolean(await Task.FromResult(false));
             }
         }
+    }
 
+    public class UserDataService: IUserDetailService
+    {
+        private LoggerService<UserDataService> _logger;
+        private readonly IContextProvider _dataContextProvider;
+        public UserDataService(ILogger<UserDataService> logger, IContextProvider dataContextProvider)
+        {
+            _logger = new LoggerService<UserDataService>(logger);
+            _dataContextProvider = dataContextProvider;
+        }
         public Task<UserDetail> GetUser(string id)
         {
             if (!string.IsNullOrEmpty(id))
@@ -329,40 +340,213 @@ namespace API_Service.AppData.DataService
 
                 if (userDetail != null)
                 {
+                    _logger.LogDetails(LogType.INFO, $"User found with id {id}");
                     dataContext.UserDetail = userDetail;
                     return Task.FromResult(dataContext.UserDetail);
                 }
             }
+            
+            _logger.LogDetails(LogType.WARNING, $"Couldn't find user with id {id}");
             return Task.FromResult(new UserDetail());
         }
-        
+
         public Task<FullUserDetail> GetUserDetail(string id)
-        {            
+        {
             if (!string.IsNullOrEmpty(id))
             {
                 var dataContext = new Data();
                 var userDetail = (from user in _dataContextProvider.User
-                                 join role in _dataContextProvider.UserRole on user.Id equals role.UserId
-                                 join account in _dataContextProvider.Account on user.Id equals account.UserId
-                                 where user.Id.ToString() == id
-                                 select new FullUserDetail
-                                 {
-                                     Id = user.Id.ToString(),
-                                     Name = user.Name,
-                                     Email = user.Email,
-                                     Role = role.Role == UserRoleType.Superadmin ? "Superadmin" : role.Role == UserRoleType.Admin ? "Admin" : "User",
-                                     IsVerified = user.IsVerified,
-                                     LoggedInAt = account.LoggedInAt == null ? DateTime.MinValue : account.LoggedInAt,
-                                     AccountOld = Convert.ToString(account.CreatedAt)
-                                 }).FirstOrDefault<FullUserDetail>();
-                
+                                  join role in _dataContextProvider.UserRole on user.Id equals role.UserId
+                                  join account in _dataContextProvider.Account on user.Id equals account.UserId
+                                  where user.Id.ToString() == id
+                                  select new FullUserDetail
+                                  {
+                                      Id = user.Id.ToString(),
+                                      Name = user.Name,
+                                      Email = user.Email,
+                                      Role = role.Role == UserRoleType.Superadmin ? "Superadmin" : role.Role == UserRoleType.Admin ? "Admin" : "User",
+                                      IsVerified = user.IsVerified,
+                                      LoggedInAt = account.LoggedInAt == null ? DateTime.MinValue : account.LoggedInAt,
+                                      AccountOld = Convert.ToString(account.CreatedAt)
+                                  }).FirstOrDefault<FullUserDetail>();
+
                 if (userDetail != null)
                 {
+                    _logger.LogDetails(LogType.INFO, $"Details found for user id {id}");
+
                     dataContext.FullUserDetail = userDetail;
                     return Task.FromResult(dataContext.FullUserDetail);
                 }
             }
+            _logger.LogDetails(LogType.WARNING, $"Couldn't find details for user {id}");
             return Task.FromResult(new FullUserDetail());
+        }
+
+        public Task<UserDetail> GetUserByEmail(string email)
+        {
+            if (!string.IsNullOrEmpty(email))
+            {
+                var dataContext = new Data();
+                var userDetail = (from user in _dataContextProvider.User
+                                  join role in _dataContextProvider.UserRole on user.Id equals role.UserId
+                                  where user.Email == email
+                                  select new UserDetail
+                                  {
+                                      Id = user.Id.ToString(),
+                                      Name = user.Name,
+                                      Email = user.Email,
+                                      Role = role.Role == UserRoleType.Superadmin ? "Superadmin" : role.Role == UserRoleType.Admin ? "Admin" : "User",
+                                      IsVerified = user.IsVerified,
+                                      Password = string.Empty
+                                  }).FirstOrDefault<UserDetail>();
+
+                if (userDetail != null)
+                {
+                    _logger.LogDetails(LogType.INFO, $"User found with email {email}");
+                    dataContext.UserDetail = userDetail;
+                    return Task.FromResult(dataContext.UserDetail);
+                }
+            }
+            _logger.LogDetails(LogType.WARNING, $"Couldn't find user with email {email}");
+            return Task.FromResult(new UserDetail());
+        }
+
+        public Task<IEnumerable<UserDetail>> GetUsersByType(string userType)
+        {
+            if (!string.IsNullOrEmpty(userType))
+            {
+                switch (userType)
+                {
+                    case "Admin":
+                        var adminUsers = (from user in _dataContextProvider.User
+                                          join role in _dataContextProvider.UserRole on user.Id equals role.UserId
+                                          where role.Role == UserRoleType.Superadmin || role.Role == UserRoleType.Admin
+                                          select new UserDetail
+                                          {
+                                              Id = user.Id.ToString(),
+                                              Name = user.Name,
+                                              Email = user.Email,
+                                              Role = role.Role == UserRoleType.Superadmin ? "Superadmin" : "Admin",
+                                              IsVerified = user.IsVerified,
+                                              Password = string.Empty
+                                          }).ToList<UserDetail>();
+
+                        _logger.LogDetails(LogType.INFO, $"Fetched {adminUsers.Count()} admin users from data provider.");
+
+                        return Task.FromResult((IEnumerable<UserDetail>)adminUsers);
+
+                    case "User":
+                        var users = (from user in _dataContextProvider.User
+                                     join role in _dataContextProvider.UserRole on user.Id equals role.UserId
+                                     where role.Role == UserRoleType.User
+                                     select new UserDetail
+                                     {
+                                         Id = user.Id.ToString(),
+                                         Name = user.Name,
+                                         Email = user.Email,
+                                         Role = "User",
+                                         IsVerified = user.IsVerified,
+                                         Password = string.Empty
+                                     }).ToList<UserDetail>();
+
+                        _logger.LogDetails(LogType.INFO, $"Fetched {users.Count()} admin users from data provider.");
+
+                        return Task.FromResult((IEnumerable<UserDetail>)users);
+
+                    default:
+                        _logger.LogDetails(LogType.WARNING, $"No users found of type {userType}");
+                        break;
+                }
+            }
+            _logger.LogDetails(LogType.WARNING, $"Couldn't generate result for empty type");
+            return Task.FromResult(Enumerable.Empty<UserDetail>());
+        }
+
+        public Task<IEnumerable<UserDetail>> FindUsers(string searchTerm)
+        {
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                var userResults = (from user in _dataContextProvider.User
+                                   join userRole in _dataContextProvider.UserRole on user.Id equals userRole.UserId
+                                   where userRole.Role == UserRoleType.User &&
+                                   user.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                                   user.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                                   select new UserDetail
+                                   {
+                                       Id = user.Id.ToString(),
+                                       Name = user.Name,
+                                       Email = user.Email,
+                                       Role = "User",
+                                       IsVerified = user.IsVerified,
+                                       Password = string.Empty
+                                   }).ToList<UserDetail>();
+            }
+            _logger.LogDetails(LogType.WARNING, $"Couldn't generate result for empty search term");
+            return Task.FromResult(Enumerable.Empty<UserDetail>());
+        }
+    }
+
+    public class AccountDataService : IAccountService
+    {
+        private LoggerService<AccountDataService> _logger;
+        private readonly IContextProvider _dataContextProvider;
+        public AccountDataService(ILogger<AccountDataService> logger, IContextProvider dataContextProvider)
+        {
+            this._logger = new LoggerService<AccountDataService>(logger);
+            this._dataContextProvider = dataContextProvider;
+        }
+        public Task<Models.Entities.Account> CheckAndGetAccount(string userId, string password)
+        {
+            if (!string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(password))
+            {
+                if (Guid.TryParse(userId, out Guid id))
+                {
+                    var accountDetail = (from account in _dataContextProvider.Account 
+                                         where account.UserId == id && account.Password == password
+                                         select new Models.Entities.Account
+                                         {
+                                             Id = account.Id,
+                                             UserId = account.UserId,
+                                             CreatedAt = account.CreatedAt,
+                                             Password = account.Password
+                                         }).FirstOrDefault<Models.Entities.Account>();
+
+                    if (accountDetail != null)
+                    {
+                        _logger.LogDetails(LogType.INFO, $"Account found for UserId: {userId}");
+                        return Task.FromResult(accountDetail);
+                    }
+                }
+            }
+            _logger.LogDetails(LogType.WARNING, $"Couldn't find account for UserId: {userId} with the provided password.");
+            return Task.FromResult(new Models.Entities.Account());
+        }
+
+        public Task<Models.Entities.Account> GetAccountById(string id)
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                if (Guid.TryParse(id, out Guid accountId))
+                {
+                    var accountDetail = (from account in _dataContextProvider.Account
+                                         where account.Id == accountId
+                                         select new Models.Entities.Account
+                                         {
+                                            Id= account.Id,
+                                            UserId = account.UserId,
+                                            CreatedAt = account.CreatedAt,
+                                            Password = account.Password,
+                                         }).FirstOrDefault<Models.Entities.Account>();
+
+                    if (accountDetail != null)
+                    {
+                        _logger.LogDetails(LogType.INFO, $"Account found");
+                        return Task.FromResult(accountDetail);
+                    }
+                }                
+            }
+            _logger.LogDetails(LogType.WARNING, $"Couldn't find any account");
+            return Task.FromResult(new Models.Entities.Account());
         }
     }
 }

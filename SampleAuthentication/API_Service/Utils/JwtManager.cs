@@ -2,13 +2,13 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using API_Service.Models.Entities;
+using API_Service.Models.DTO;
 
 namespace API_Service.Utils
 {
     public interface IJwtManager
     {
-        string GenerateToken(User userDetail);
+        string GenerateToken(UserDetail userDetail);
     }
     public class JwtManager : IJwtManager
     {
@@ -17,7 +17,7 @@ namespace API_Service.Utils
         {
             this._configuration = configuration;
         }
-        public string GenerateToken(User userDetail)
+        public string GenerateToken(UserDetail userDetail)
         {
             var tokenDescriptor = new SecurityTokenDescriptor
             {

@@ -18,25 +18,16 @@ namespace API_Service.RepositoryLayer.Repository
             this._userService = userService;
             this._userDetailService = userDetailService;
         }
+        
         public async Task<ResponseDetail> GetAllUsersAsync(string userId, string userType, int page, int pageSize)
         {
-            var users = await _userService.Get();
+            var users = await _userDetailService.GetUsersByType(userType);
             if (users.Any())
-            {
-                IEnumerable<User> filteredUser = new List<User>();
-                if (userType == "Admin") 
-                {
-                    filteredUser = users.Where(user => user.Role == "Superadmin" || user.Role == "Admin");
-                }
-                else
-                {
-                    filteredUser = users.Where(user => user.Role == "User");
-                }               
-
-                int totalUserCount = filteredUser.Count();
+            {   
+                int totalUserCount = users.Count();
                 if (totalUserCount > 0)
                 {
-                    var paginatedUsers = filteredUser
+                    var paginatedUsers = users
                                      .Skip((page - 1) * pageSize)
                                      .Take(pageSize)
                                      .Select(user => new UserDetail
@@ -61,8 +52,8 @@ namespace API_Service.RepositoryLayer.Repository
                                 ItemCount = totalUserCount,
                                 CurrentPage = page,
                                 PageSize = pageSize,
-                                AdminCount = filteredUser.Count(u => u.Role == "Admin"),
-                                SuperadminCount = filteredUser.Count(u => u.Role == "Superadmin")
+                                AdminCount = users.Count(u => u.Role == "Admin"),
+                                SuperadminCount = users.Count(u => u.Role == "Superadmin")
                             }
                         };
                     }
@@ -89,22 +80,17 @@ namespace API_Service.RepositoryLayer.Repository
                 Message = "No users found"
             };
         }        
+        
         public async Task<ResponseDetail> GetUserBySearch(string userId, int page, int pageSize, string searchText)
         {
-            var users = await _userService.Get();
+            _logger.LogDetails(LogType.INFO, $"Searching users with term '{searchText}'");
+            var users = await _userDetailService.FindUsers(searchText);
             if (users.Any())
             {
-                _logger.LogDetails(LogType.INFO, $"Searching users with term '{searchText}'");
-                var filteredUsers = users
-                                    .Where(user => user.Role == "User")
-                                    .Where(user => string.IsNullOrEmpty(searchText) ||
-                                                   user.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-                                                   user.Email.Contains(searchText, StringComparison.OrdinalIgnoreCase));
-
-                int totalUserCount = filteredUsers.Count();
+                int totalUserCount = users.Count();
                 if (totalUserCount > 0)
                 {
-                    var paginatedUsers = filteredUsers
+                    var paginatedUsers = users
                                      .Skip((page - 1) * pageSize)
                                      .Take(pageSize)
                                      .Select(user => new UserDetail
@@ -136,6 +122,7 @@ namespace API_Service.RepositoryLayer.Repository
                 Message = $"No users found matching with search text '{searchText}'"
             };
         }
+        
         public async Task<ResponseDetail> GetUserAsync(string id)
         {
             var user = await _userDetailService.GetUser(id);
@@ -155,6 +142,7 @@ namespace API_Service.RepositoryLayer.Repository
                 Message = "User not found"
             };
         }
+        
         public async Task<ResponseDetail> GetUserDetailAsync(string id)
         {
             var userDetail = await _userDetailService.GetUserDetail(id);

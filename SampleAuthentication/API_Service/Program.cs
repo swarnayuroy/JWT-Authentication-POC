@@ -82,7 +82,8 @@ builder.Services.AddScoped<IUnitOfWork, ExecuteContextTask>();
 
 builder.Services.AddScoped<IService<User>, SampleDataService<User>>();
 builder.Services.AddScoped<IService<Account>, SampleDataService<Account>>();
-builder.Services.AddScoped<IUserDetailService, SampleDataService<FullUserDetail>>();
+builder.Services.AddScoped<IUserDetailService, UserDataService>();
+builder.Services.AddScoped<IAccountService, AccountDataService>();
 
 builder.Services.AddScoped<IJwtManager, JwtManager>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();

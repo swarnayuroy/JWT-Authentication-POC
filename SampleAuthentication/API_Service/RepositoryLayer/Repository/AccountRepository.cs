@@ -12,28 +12,32 @@ namespace API_Service.RepositoryLayer.Repository
         private LoggerService<AccountRepository> _logger;
         private readonly IService<User> _userService;
         private readonly IService<Account> _accountService;
+        private readonly IUserDetailService _userDetailService;
+        private readonly IAccountService _accountDataService;
         private readonly IJwtManager _jwtManager;
 
         public AccountRepository(
             ILogger<AccountRepository> logger, 
             IService<User> userService, 
             IService<Account> accountService,
+            IUserDetailService userDetailService,
+            IAccountService accountDataService,
             IJwtManager jwtManager
         )
         {
             this._logger = new LoggerService<AccountRepository>(logger);
             this._userService = userService;
             this._accountService = accountService;
+            this._userDetailService = userDetailService;
+            this._accountDataService = accountDataService;
             this._jwtManager = jwtManager;
         }
         
         public async Task<ResponseDetail> CheckCredential(UserCredential userCredential)
         {
-            // Get all users
-            var users = await _userService.Get();
             // Find user by email
             _logger.LogDetails(LogType.INFO, $"getting user by email");
-            var user = users.FirstOrDefault(u => u.Email.Equals(userCredential.Email, StringComparison.OrdinalIgnoreCase));
+            var user = await _userDetailService.GetUserByEmail(userCredential.Email);
             if (user == null)
             {
                 _logger.LogDetails(LogType.WARNING, "incorrect email");
@@ -44,16 +48,14 @@ namespace API_Service.RepositoryLayer.Repository
                 };
             }
 
-            // Get all accounts
-            var accounts = await _accountService.Get();
+            // Find account by verifying the user id and password
+            _logger.LogDetails(LogType.INFO, $"Validating password for the user...");
+            var account = await _accountDataService.CheckAndGetAccount(user.Id.ToString(), userCredential.Password);
             
-            // Find account by userId and verify password
-            _logger.LogDetails(LogType.INFO, $"validating password for the user");
-            var account = accounts.FirstOrDefault(a => a.UserId == user.Id && a.Password == userCredential.Password);
             if (account == null)
-            {
+            {                
                 _logger.LogDetails(LogType.WARNING, "incorrect password");
-                return new ResponseDetail { Status = false, Message = "Incorrect password" };                
+                return new ResponseDetail { Status = false, Message = "Incorrect password" };             
             }
             account.LoggedInAt = DateTime.Now;
             if (!await _accountService.Update(account))
@@ -84,9 +86,9 @@ namespace API_Service.RepositoryLayer.Repository
         public async Task<ResponseDetail> RegisterUser(UserDetail userRegistrationDetail)
         {
             // Get existing users to check for duplicate email
-            var existingUsers = await _userService.Get();
+            var existingUsers = await _userDetailService.GetUserByEmail(userRegistrationDetail.Email);
             _logger.LogDetails(LogType.INFO, $"Checking if email exists");
-            if (existingUsers.Any(u => u.Email.Equals(userRegistrationDetail.Email, StringComparison.OrdinalIgnoreCase)))
+            if (existingUsers != null)
             {
                 _logger.LogDetails(LogType.WARNING, $"The email is in use");
                 return new ResponseDetail
@@ -117,7 +119,7 @@ namespace API_Service.RepositoryLayer.Repository
                     Message = "Failed to create user"
                 };
             }
-            _logger.LogDetails(LogType.INFO, $"New user saved with id {newUser.Id} saved");
+            _logger.LogDetails(LogType.INFO, $"New user, {newUser.Name} saved with id {newUser.Id}");
 
             // Create account for the user
             var newAccount = new Account
@@ -144,7 +146,7 @@ namespace API_Service.RepositoryLayer.Repository
                 };
             }
             
-            _logger.LogDetails(LogType.INFO, $"Account information saved for respective user, {newUser.Id}");            
+            _logger.LogDetails(LogType.INFO, $"Account information saved for respective user, {newUser.Name}");
             return new ResponseDetail
             {
                 Status = true,
@@ -154,12 +156,10 @@ namespace API_Service.RepositoryLayer.Repository
 
         public async Task<ResponseDetail> DeleteAccount(string userId) {
             #region Find user and account details
-            // Get all users
-            var users = await _userService.Get();
 
             // Find user by Id
             _logger.LogDetails(LogType.INFO, $"getting user by id");
-            var user = users.FirstOrDefault(u => u.Id.ToString() == userId);
+            var user = await _userDetailService.GetUser(userId);
             if (user == null)
             {
                 _logger.LogDetails(LogType.WARNING, "Couldn't find user with the provided ID");
@@ -194,7 +194,14 @@ namespace API_Service.RepositoryLayer.Repository
             try
             {
                 // Wait for both tasks to complete and collect results
-                var isUserDeleted = await _userService.Delete(user);
+                var isUserDeleted = await _userService.Delete(new User
+                {
+                    Id = Guid.Parse(userId),
+                    Name = user.Name,
+                    Email = user.Email,
+                    Role = user.Role,
+                    IsVerified = user.IsVerified
+                });
 
                 if (isUserDeleted) {
                     _logger.LogDetails(LogType.INFO, $"User, {user.Name} has been deleted successfully.");
@@ -232,11 +239,8 @@ namespace API_Service.RepositoryLayer.Repository
 
         public async Task<ResponseDetail> EmailExists(string email)
         {
-            // Get all users
-            var users = await _userService.Get();
-            // Find user by email
             _logger.LogDetails(LogType.INFO, $"getting user by email");
-            var user = users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            var user = await _userDetailService.GetUserByEmail(email);
             if (user == null)
             {
                 _logger.LogDetails(LogType.WARNING, "incorrect email");
@@ -248,7 +252,7 @@ namespace API_Service.RepositoryLayer.Repository
             }
 
             _logger.LogDetails(LogType.INFO, $"Email exists, generating OTP...");
-            string newOtp = await Task.Run(() => ProcessOtpService.GenerateOtp(user.Id, user.Email));
+            string newOtp = await Task.Run(() => ProcessOtpService.GenerateOtp(Guid.Parse(user.Id), user.Email));
 
             if (!string.IsNullOrEmpty(newOtp))
             {
@@ -275,15 +279,20 @@ namespace API_Service.RepositoryLayer.Repository
             if (isVerified && detail.IsLoggedIn)
             {
                 _logger.LogDetails(LogType.INFO, $"OTP verification for email {detail.Email} is successful");
-                // Get all users
-                var users = await _userService.Get();
+
                 // Find user by email
                 _logger.LogDetails(LogType.INFO, $"getting user by email");
-                var user = users.FirstOrDefault(u => u.Email.Equals(detail.Email, StringComparison.OrdinalIgnoreCase));
+                var user = await _userDetailService.GetUserByEmail(detail.Email);
                 if (user != null)
-                {                    
-                    user.IsVerified = true;
-                    bool isUpdated = await _userService.Update(user);
+                {
+                    bool isUpdated = await _userService.Update(new User
+                    {
+                        Id = Guid.Parse(user.Id),
+                        Name = user.Name,
+                        Email = user.Email,
+                        Role = user.Role,
+                        IsVerified = true
+                    });
                     await Task.Run(() => ProcessOtpService.ClearOtp(detail.Email));
 
                     if (isUpdated) 
@@ -321,23 +330,19 @@ namespace API_Service.RepositoryLayer.Repository
 
         public async Task<ResponseDetail> SetPassword(UserCredential userCredential)
         {
-            var users = await _userService.Get();
             // Find user by email
-            _logger.LogDetails(LogType.INFO, $"getting user by email");
-            var user = users.FirstOrDefault(u => u.Email.Equals(userCredential.Email, StringComparison.OrdinalIgnoreCase));
+            _logger.LogDetails(LogType.INFO, $"Getting user by email...");
+            var user = await _userDetailService.GetUserByEmail(userCredential.Email);
 
             if (user != null)
             {
-                bool isSuccess = await Task.Run(() => ProcessOtpService.GetSuccessStatus(user.Id, user.Email));
+                bool isSuccess = await Task.Run(() => ProcessOtpService.GetSuccessStatus(Guid.Parse(user.Id), user.Email));
 
                 if (isSuccess)
                 {
-                    // Get all accounts
-                    var accounts = await _accountService.Get();
-
                     // Find account by userId and verify password
-                    _logger.LogDetails(LogType.INFO, $"fetching account detail...");
-                    var account = accounts.FirstOrDefault(a => a.UserId == user.Id);
+                    _logger.LogDetails(LogType.INFO, $"Fetching account detail by user id and password...");
+                    var account = await _accountDataService.CheckAndGetAccount(user.Id.ToString(), userCredential.Password);
 
                     if (account != null)
                     {
@@ -373,8 +378,8 @@ namespace API_Service.RepositoryLayer.Repository
         public async Task RollBackProcess(User userDetail, Account accountDetail, RollbackOperation operation)
         {
             var (isUserExists, isAccountExists) = await Task.WhenAll(
-                _userService.Get().ContinueWith(task => task.Result.Any(u => u.Id == userDetail.Id)),
-                _accountService.Get().ContinueWith(task => task.Result.Any(a => a.Id == accountDetail.Id))
+                _userDetailService.GetUser(userDetail.Id.ToString()).ContinueWith(task => task.Result != null),
+                _accountDataService.GetAccountById(accountDetail.Id.ToString()).ContinueWith(task => task.Result != null)
             ).ContinueWith(task =>
             {
                 var results = task.Result;
