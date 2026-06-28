@@ -18,7 +18,6 @@ namespace TestProject.api_service_test
     public class TestUserRepository
     {
         private Mock<ILogger<UserRepository>> _loggerMock;
-        private Mock<IService<User>> _userServiceMock;
         private Mock<IUserDetailService> _userDetailServiceMock;
 
         private UserRepository _repository;
@@ -26,13 +25,11 @@ namespace TestProject.api_service_test
         [SetUp]
         public void Setup()
         {
-            _userDetailServiceMock = new Mock<IUserDetailService>();
-            _userServiceMock = new Mock<IService<User>>();
             _loggerMock = new Mock<ILogger<UserRepository>>();
+            _userDetailServiceMock = new Mock<IUserDetailService>();            
 
             _repository = new UserRepository(
                 _loggerMock.Object,
-                _userServiceMock.Object,
                 _userDetailServiceMock.Object
             );
         }

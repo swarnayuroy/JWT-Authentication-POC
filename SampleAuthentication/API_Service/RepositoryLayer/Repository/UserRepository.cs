@@ -10,12 +10,10 @@ namespace API_Service.RepositoryLayer.Repository
     public class UserRepository : IUserRepository
     {
         private LoggerService<UserRepository> _logger;
-        private readonly IService<User> _userService;
         private readonly IUserDetailService _userDetailService;
-        public UserRepository(ILogger<UserRepository> logger, IService<User> userService, IUserDetailService userDetailService)
+        public UserRepository(ILogger<UserRepository> logger, IUserDetailService userDetailService)
         {
             this._logger = new LoggerService<UserRepository>(logger);
-            this._userService = userService;
             this._userDetailService = userDetailService;
         }
         
