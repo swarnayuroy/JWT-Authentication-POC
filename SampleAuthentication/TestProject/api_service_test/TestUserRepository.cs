@@ -42,7 +42,7 @@ namespace TestProject.api_service_test
         public async Task GetAllUsersAsync_ReturnsFalse_WhenNoUsersFound()
         {
             // Arrange
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>());
+            _userDetailServiceMock.Setup(x => x.GetUsersByType("Admin")).ReturnsAsync(new List<UserDetail>());
 
             // Act
             var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), userType: "User", page: 1, pageSize: 5);
@@ -56,13 +56,13 @@ namespace TestProject.api_service_test
         public async Task GetAllUsersAsync_ReturnsSingleUser_WhenOneUserExists()
         {
             // Arrange
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>
+            _userDetailServiceMock.Setup(x => x.GetUsersByType("User")).ReturnsAsync(new List<UserDetail>
             {
-                new User
+                new UserDetail
                 {
-                    Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
-                    Name = "John Doe",
-                    Email = "doe.john@gmail.com",
+                    Id = "1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e",
+                    Name = "Max Miller",
+                    Email = "miller.max@gmail.com",
                     Role = "User",
                     IsVerified = true
                 }
@@ -81,26 +81,26 @@ namespace TestProject.api_service_test
             Assert.That(dataResult.Data.CurrentPage, Is.EqualTo(1));
 
             Assert.That(userDetail.Password, Is.EqualTo(string.Empty)); // Ensure password hidden
-            Assert.That(userDetail.Email, Is.EqualTo("doe.john@gmail.com"));
+            Assert.That(userDetail.Email, Is.EqualTo("miller.max@gmail.com"));
         }
 
         [Test]
         public async Task GetAllUsersAsync_ReturnsMultipleUsers_WhenMoreThanOneExists()
         {
             // Arrange
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>
+            _userDetailServiceMock.Setup(x => x.GetUsersByType("Admin")).ReturnsAsync(new List<UserDetail>
             {
-                new User
+                new UserDetail
                 {
-                    Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
+                    Id = "1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e",
                     Name = "John Doe",
                     Email = "doe.john@gmail.com",
                     Role = "Superadmin",
                     IsVerified = false
                 },
-                new User
+                new UserDetail
                 {
-                    Id = Guid.Parse("4b79aeeb-96cd-49bf-abf0-8b5f6f693467"),
+                    Id = "1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e",
                     Name = "Jane Doe",
                     Email = "doe.jane@gmail.com",
                     Role = "Admin",
@@ -126,19 +126,20 @@ namespace TestProject.api_service_test
         public async Task GetUserBySearch_WhenSearchTextMatchesName()
         {
             // Arrange
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>
+            string searchTerm = "Doe";
+            _userDetailServiceMock.Setup(x => x.FindUsers(searchTerm)).ReturnsAsync(new List<UserDetail>
             {
-                new User
+                new UserDetail
                 {
-                    Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
+                    Id = "1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e",
                     Name = "John Doe",
                     Email = "doe.john@gmail.com",
                     Role = "User",
                     IsVerified = true
                 },
-                new User
+                new UserDetail
                 {
-                    Id = Guid.Parse("4b79aeeb-96cd-49bf-abf0-8b5f6f693467"),
+                    Id = "4b79aeeb-96cd-49bf-abf0-8b5f6f693467",
                     Name = "Jane Doe",
                     Email = "doe.jane@gmail.com",
                     Role = "User",
@@ -147,80 +148,64 @@ namespace TestProject.api_service_test
             });
 
             //Act
-            var result = await _repository.GetUserBySearch(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5, searchText: "doe");
+            var result = await _repository.GetUserBySearch(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5, searchText: searchTerm);
             var dataResult = result as ResponseDataDetail<PagedResult<UserDetail>>;
 
             //Assert
             Assert.That(result.Status, Is.True);
             Assert.That(dataResult!.Data.ItemCount, Is.EqualTo(2));
-            Assert.That(dataResult!.Data.Items.All(User => User.Name.Contains("Doe", StringComparison.OrdinalIgnoreCase)), Is.True);
+            Assert.That(dataResult!.Data.Items.All(User => User.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)), Is.True);
         }
 
         [Test]
         public async Task GetUserBySearch_WhenSearchTextMatchesEmail()
         {
             // Arrange
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>
+            string searchTerm = "@gmail.com";
+            _userDetailServiceMock.Setup(x => x.FindUsers(searchTerm)).ReturnsAsync(new List<UserDetail>
             {
-                new User
+                new UserDetail
                 {
-                    Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
+                    Id = "1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e",
                     Name = "John Doe",
                     Email = "doe.john@gmail.com",
-                    Role= "User",
+                    Role = "User",
                     IsVerified = true
                 },
-                new User
+                new UserDetail
                 {
-                    Id = Guid.Parse("4b79aeeb-96cd-49bf-abf0-8b5f6f693467"),
+                    Id = "4b79aeeb-96cd-49bf-abf0-8b5f6f693467",
                     Name = "Jane Doe",
-                    Email = "doe.jane@outlook.com",
+                    Email = "doe.jane@gmail.com",
                     Role = "User",
                     IsVerified = true
                 }
             });
 
             //Act
-            var result = await _repository.GetUserBySearch(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5, searchText: "@outlook.com");
+            var result = await _repository.GetUserBySearch(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5, searchText: searchTerm);
             var dataResult = result as ResponseDataDetail<PagedResult<UserDetail>>;
 
             //Assert
             Assert.That(result.Status, Is.True);
-            Assert.That(dataResult!.Data.ItemCount, Is.EqualTo(1));
-            Assert.That(dataResult!.Data.Items.First().Email, Is.EqualTo("doe.jane@outlook.com"));
+            Assert.That(dataResult!.Data.ItemCount, Is.EqualTo(2));
+            Assert.That(dataResult!.Data.Items.All(User => User.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)), Is.True);
         }
 
         [Test]
         public async Task GetUserBySearch_WhenSearchTextHasNoMatch()
         {
             // Arrange
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>
-            {
-                new User
-                {
-                    Id = Guid.Parse("1e61f4a4-0e98-4fd9-bfc4-0c1c0da4a66e"),
-                    Name = "John Doe",
-                    Email = "doe.john@gmail.com",
-                    Role = "User",
-                    IsVerified = true
-                },
-                new User
-                {
-                    Id = Guid.Parse("4b79aeeb-96cd-49bf-abf0-8b5f6f693467"),
-                    Name = "Jane Doe",
-                    Email = "doe.jane@outlook.com",
-                    Role = "User",
-                    IsVerified = true
-                }
-            });
+            string searchTerm = "XYZ";
+            _userDetailServiceMock.Setup(x => x.FindUsers(searchTerm)).ReturnsAsync(new List<UserDetail> {});
 
             //Act
-            var result = await _repository.GetUserBySearch(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5, searchText: "XYZ");
+            var result = await _repository.GetUserBySearch(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5, searchText: searchTerm);
             var dataResult = result as ResponseDataDetail<PagedResult<UserDetail>>;
 
             //Assert
             Assert.That(result.Status, Is.False);
-            Assert.That(result.Message, Is.EqualTo("No users found matching with search text 'XYZ'"));
+            Assert.That(result.Message, Is.EqualTo($"No users found matching with search text '{searchTerm}'"));
         }
         #endregion
 
