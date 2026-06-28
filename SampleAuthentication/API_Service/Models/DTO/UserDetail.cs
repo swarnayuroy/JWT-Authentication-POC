@@ -34,7 +34,15 @@ namespace API_Service.Models.DTO
                     // Less than 24 hours - return in hours
                     if (accountAge.TotalHours < 24)
                     {
-                        value = $"{(int)accountAge.TotalHours} hour{((int)accountAge.TotalHours != 1 ? "s" : "")}";
+                        if (accountAge.TotalHours < 1)
+                        {
+                            value = "few minutes ago";
+                        }
+                        else
+                        {
+                            value = $"{(int)accountAge.TotalHours} hour{((int)accountAge.TotalHours != 1 ? "s" : "")}";
+                        }
+                        
                     }
                     // Less than 30 days - return in days
                     else if (accountAge.TotalDays < 30)
