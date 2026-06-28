@@ -4,6 +4,7 @@ using API_Service.Utils;
 using DataContext.DataProvider;
 using DataContext.DataService;
 using DataContext.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using System.Linq;
 using System.Security.Principal;
@@ -320,12 +321,12 @@ namespace API_Service.AppData.DataService
             _logger = new LoggerService<UserDataService>(logger);
             _dataContextProvider = dataContextProvider;
         }
-        public Task<UserDetail> GetUser(string id)
+        public async Task<UserDetail> GetUser(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
                 var dataContext = new Data();
-                var userDetail = (from user in _dataContextProvider.User
+                var userDetail = await (from user in _dataContextProvider.User
                                   join role in _dataContextProvider.UserRole on user.Id equals role.UserId
                                   where user.Id.ToString() == id
                                   select new UserDetail
@@ -336,26 +337,26 @@ namespace API_Service.AppData.DataService
                                       Role = role.Role == UserRoleType.Superadmin ? "Superadmin" : role.Role == UserRoleType.Admin ? "Admin" : "User",
                                       IsVerified = user.IsVerified,
                                       Password = string.Empty
-                                  }).FirstOrDefault<UserDetail>();
+                                  }).FirstOrDefaultAsync();
 
                 if (userDetail != null)
                 {
                     _logger.LogDetails(LogType.INFO, $"User found with id {id}");
                     dataContext.UserDetail = userDetail;
-                    return Task.FromResult(dataContext.UserDetail);
+                    return dataContext.UserDetail;
                 }
             }
             
             _logger.LogDetails(LogType.WARNING, $"Couldn't find user with id {id}");
-            return Task.FromResult(new UserDetail());
+            return new UserDetail();
         }
 
-        public Task<FullUserDetail> GetUserDetail(string id)
+        public async Task<FullUserDetail> GetUserDetail(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
                 var dataContext = new Data();
-                var userDetail = (from user in _dataContextProvider.User
+                var userDetail = await (from user in _dataContextProvider.User
                                   join role in _dataContextProvider.UserRole on user.Id equals role.UserId
                                   join account in _dataContextProvider.Account on user.Id equals account.UserId
                                   where user.Id.ToString() == id
@@ -368,26 +369,26 @@ namespace API_Service.AppData.DataService
                                       IsVerified = user.IsVerified,
                                       LoggedInAt = account.LoggedInAt == null ? DateTime.MinValue : account.LoggedInAt,
                                       AccountOld = Convert.ToString(account.CreatedAt)
-                                  }).FirstOrDefault<FullUserDetail>();
+                                  }).FirstOrDefaultAsync();
 
                 if (userDetail != null)
                 {
                     _logger.LogDetails(LogType.INFO, $"Details found for user id {id}");
 
                     dataContext.FullUserDetail = userDetail;
-                    return Task.FromResult(dataContext.FullUserDetail);
+                    return dataContext.FullUserDetail;
                 }
             }
             _logger.LogDetails(LogType.WARNING, $"Couldn't find details for user {id}");
-            return Task.FromResult(new FullUserDetail());
+            return new FullUserDetail();
         }
 
-        public Task<UserDetail> GetUserByEmail(string email)
+        public async Task<UserDetail> GetUserByEmail(string email)
         {
             if (!string.IsNullOrEmpty(email))
             {
                 var dataContext = new Data();
-                var userDetail = (from user in _dataContextProvider.User
+                var userDetail = await (from user in _dataContextProvider.User
                                   join role in _dataContextProvider.UserRole on user.Id equals role.UserId
                                   where user.Email == email
                                   select new UserDetail
@@ -398,20 +399,20 @@ namespace API_Service.AppData.DataService
                                       Role = role.Role == UserRoleType.Superadmin ? "Superadmin" : role.Role == UserRoleType.Admin ? "Admin" : "User",
                                       IsVerified = user.IsVerified,
                                       Password = string.Empty
-                                  }).FirstOrDefault<UserDetail>();
+                                  }).FirstOrDefaultAsync();
 
                 if (userDetail != null)
                 {
                     _logger.LogDetails(LogType.INFO, $"User found with email {email}");
                     dataContext.UserDetail = userDetail;
-                    return Task.FromResult(dataContext.UserDetail);
+                    return dataContext.UserDetail;
                 }
             }
             _logger.LogDetails(LogType.WARNING, $"Couldn't find user with email {email}");
-            return Task.FromResult(new UserDetail());
+            return new UserDetail();
         }
 
-        public Task<IEnumerable<UserDetail>> GetUsersByType(string userType)
+        public async Task<IEnumerable<UserDetail>> GetUsersByType(string userType)
         {
             if (!string.IsNullOrEmpty(userType))
             {
@@ -419,7 +420,7 @@ namespace API_Service.AppData.DataService
                 switch (userType)
                 {
                     case "Admin":
-                        var adminUsers = (from user in _dataContextProvider.User
+                        var adminUsers = await (from user in _dataContextProvider.User
                                           join role in _dataContextProvider.UserRole on user.Id equals role.UserId
                                           where role.Role == UserRoleType.Superadmin || role.Role == UserRoleType.Admin
                                           select new UserDetail
@@ -430,9 +431,9 @@ namespace API_Service.AppData.DataService
                                               Role = role.Role == UserRoleType.Superadmin ? "Superadmin" : "Admin",
                                               IsVerified = user.IsVerified,
                                               Password = string.Empty
-                                          }).ToList<UserDetail>();
+                                          }).ToListAsync();
 
-                        if (adminUsers.Any())
+                        if (adminUsers.Count() > 0)
                         {
                             if (adminUsers.Count() == 1)
                             {
@@ -443,13 +444,13 @@ namespace API_Service.AppData.DataService
                                 _logger.LogDetails(LogType.INFO, $"Fetched {adminUsers.Count()} admins.");
                             }
                             dataContext.Users = adminUsers;
-                            return Task.FromResult(dataContext.Users);
+                            return dataContext.Users;
                         }
                         _logger.LogDetails(LogType.WARNING, $"No admin users found!");
-                        return Task.FromResult(Enumerable.Empty<UserDetail>());
+                        return Enumerable.Empty<UserDetail>();
 
                     case "User":
-                        var users = (from user in _dataContextProvider.User
+                        var users = await (from user in _dataContextProvider.User
                                      join role in _dataContextProvider.UserRole on user.Id equals role.UserId
                                      where role.Role == UserRoleType.User
                                      select new UserDetail
@@ -460,11 +461,11 @@ namespace API_Service.AppData.DataService
                                          Role = "User",
                                          IsVerified = user.IsVerified,
                                          Password = string.Empty
-                                     }).ToList<UserDetail>();
+                                     }).ToListAsync();
 
-                        if (users.Any())
+                        if (users.Count() > 0)
                         {
-                            if (users.Count()==1)
+                            if (users.Count() == 1)
                             {
                                 _logger.LogDetails(LogType.INFO, $"Fetched 1 user only.");
                             }
@@ -472,10 +473,11 @@ namespace API_Service.AppData.DataService
                             {
                                 _logger.LogDetails(LogType.INFO, $"Fetched {users.Count()} users.");
                             }
-                            return Task.FromResult((IEnumerable<UserDetail>)users);
+                            dataContext.Users = users;
+                            return dataContext.Users;
                         }
                         _logger.LogDetails(LogType.WARNING, $"No users found!");
-                        return Task.FromResult(Enumerable.Empty<UserDetail>());
+                        return Enumerable.Empty<UserDetail>();
 
                     default:
                         _logger.LogDetails(LogType.WARNING, $"No users found of type {userType}");
@@ -483,19 +485,21 @@ namespace API_Service.AppData.DataService
                 }
             }
             _logger.LogDetails(LogType.WARNING, $"Couldn't generate result for empty type");
-            return Task.FromResult(Enumerable.Empty<UserDetail>());
+            return Enumerable.Empty<UserDetail>();
         }
 
-        public Task<IEnumerable<UserDetail>> FindUsers(string searchTerm)
+        public async Task<IEnumerable<UserDetail>> FindUsers(string searchTerm)
         {
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 var dataContext = new Data();
-                var userResults = (from user in _dataContextProvider.User
+                var userResults = await (from user in _dataContextProvider.User
                                    join userRole in _dataContextProvider.UserRole on user.Id equals userRole.UserId
                                    where userRole.Role == UserRoleType.User &&
-                                   user.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                                   user.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                                   (
+                                    EF.Functions.Like(user.Name, $"%{searchTerm}%") ||
+                                    EF.Functions.Like(user.Email, $"%{searchTerm}%")
+                                   )
                                    select new UserDetail
                                    {
                                        Id = user.Id.ToString(),
@@ -504,9 +508,9 @@ namespace API_Service.AppData.DataService
                                        Role = "User",
                                        IsVerified = user.IsVerified,
                                        Password = string.Empty
-                                   }).ToList<UserDetail>();
+                                   }).ToListAsync();
 
-                if (userResults.Any())
+                if (userResults.Count() > 0)
                 {
                     if (userResults.Count() == 1)
                     {
@@ -517,13 +521,13 @@ namespace API_Service.AppData.DataService
                         _logger.LogDetails(LogType.INFO, $"Fetched {userResults.Count()} users for the search term: {searchTerm}.");
                     }
                     dataContext.Users = userResults;
-                    return Task.FromResult(dataContext.Users);
+                    return dataContext.Users;
                 }
                 _logger.LogDetails(LogType.WARNING, $"No users found for search term: {searchTerm}");
-                return Task.FromResult(Enumerable.Empty<UserDetail>());
+                return Enumerable.Empty<UserDetail>();
             }
             _logger.LogDetails(LogType.WARNING, $"Couldn't generate result for empty search term");
-            return Task.FromResult(Enumerable.Empty<UserDetail>());
+            return Enumerable.Empty<UserDetail>();
         }
     }
 
@@ -536,14 +540,14 @@ namespace API_Service.AppData.DataService
             this._logger = new LoggerService<AccountDataService>(logger);
             this._dataContextProvider = dataContextProvider;
         }
-        public Task<Models.Entities.Account> CheckAndGetAccount(string userId, string password)
+        public async Task<Models.Entities.Account> CheckAndGetAccount(string userId, string password)
         {
             if (!string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(password))
             {
                 var dataContext = new Data();
                 if (Guid.TryParse(userId, out Guid id))
                 {
-                    var accountDetail = (from account in _dataContextProvider.Account 
+                    var accountDetail = await (from account in _dataContextProvider.Account 
                                          where account.UserId == id && account.Password == password
                                          select new Models.Entities.Account
                                          {
@@ -551,28 +555,28 @@ namespace API_Service.AppData.DataService
                                              UserId = account.UserId,
                                              CreatedAt = account.CreatedAt,
                                              Password = account.Password
-                                         }).FirstOrDefault<Models.Entities.Account>();
+                                         }).FirstOrDefaultAsync();
 
                     if (accountDetail != null)
                     {
                         _logger.LogDetails(LogType.INFO, $"Account found for UserId: {userId}");
                         dataContext.AccountDetail = accountDetail;
-                        return Task.FromResult(dataContext.AccountDetail);
+                        return dataContext.AccountDetail;
                     }
                 }
             }
             _logger.LogDetails(LogType.WARNING, $"Couldn't find account for UserId: {userId} with the provided password.");
-            return Task.FromResult(new Models.Entities.Account());
+            return new Models.Entities.Account();
         }
 
-        public Task<Models.Entities.Account> GetAccountById(string id)
+        public async Task<Models.Entities.Account> GetAccountById(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
                 if (Guid.TryParse(id, out Guid accountId))
                 {
                     var dataContext = new Data();
-                    var accountDetail = (from account in _dataContextProvider.Account
+                    var accountDetail = await (from account in _dataContextProvider.Account
                                          where account.Id == accountId
                                          select new Models.Entities.Account
                                          {
@@ -580,18 +584,18 @@ namespace API_Service.AppData.DataService
                                             UserId = account.UserId,
                                             CreatedAt = account.CreatedAt,
                                             Password = account.Password,
-                                         }).FirstOrDefault<Models.Entities.Account>();
+                                         }).FirstOrDefaultAsync();
 
                     if (accountDetail != null)
                     {
                         _logger.LogDetails(LogType.INFO, $"Account found");
                         dataContext.AccountDetail = accountDetail;
-                        return Task.FromResult(dataContext.AccountDetail);
+                        return dataContext.AccountDetail;
                     }
                 }                
             }
             _logger.LogDetails(LogType.WARNING, $"Couldn't find any account");
-            return Task.FromResult(new Models.Entities.Account());
+            return new Models.Entities.Account();
         }
     }
 }
