@@ -85,10 +85,10 @@ namespace API_Service.RepositoryLayer.Repository
 
         public async Task<ResponseDetail> RegisterUser(UserDetail userRegistrationDetail)
         {
-            // Get existing users to check for duplicate email
-            var existingUsers = await _userDetailService.GetUserByEmail(userRegistrationDetail.Email);
             _logger.LogDetails(LogType.INFO, $"Checking if email exists");
-            if (existingUsers != null)
+            // Get existing users to check for duplicate email
+            UserDetail existingUsers = await _userDetailService.GetUserByEmail(userRegistrationDetail.Email);            
+            if (!string.IsNullOrEmpty(existingUsers.Email))
             {
                 _logger.LogDetails(LogType.WARNING, $"The email is in use");
                 return new ResponseDetail
@@ -108,7 +108,7 @@ namespace API_Service.RepositoryLayer.Repository
                 IsVerified = false
             };
             // Save user
-            var userSaved = await _userService.Save(newUser);
+            bool userSaved = await _userService.Save(newUser);
 
             if (!userSaved)
             {
@@ -131,7 +131,7 @@ namespace API_Service.RepositoryLayer.Repository
             };
 
             // Save account
-            var accountSaved = await _accountService.Save(newAccount);
+            bool accountSaved = await _accountService.Save(newAccount);
 
             // Rollback: If account save fails, delete the user that was just saved
             if (!accountSaved)
