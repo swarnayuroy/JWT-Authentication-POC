@@ -20,7 +20,9 @@ namespace TestProject.api_service_test
     {
         private Mock<ILogger<AccountRepository>> _loggerMock;
         private Mock<IService<User>> _userServiceMock;
-        private Mock<IService<Account>> _accountServiceMock;        
+        private Mock<IService<Account>> _accountServiceMock;
+        private Mock<IUserDetailService> _userDetailServiceMock;
+        private Mock<IAccountService> _accountDataServiceMock;
         private Mock<IJwtManager> _jwtManagerMock = new Mock<IJwtManager>();
 
         private AccountRepository _repository;
@@ -29,12 +31,16 @@ namespace TestProject.api_service_test
         public void Setup() {
             _userServiceMock = new Mock<IService<User>>();
             _accountServiceMock = new Mock<IService<Account>>();
+            _userDetailServiceMock = new Mock<IUserDetailService>();
+            _accountDataServiceMock = new Mock<IAccountService>();
             _loggerMock = new Mock<ILogger<AccountRepository>>();
             _repository = new AccountRepository
             (
                 _loggerMock.Object, 
                 _userServiceMock.Object, 
-                _accountServiceMock.Object, 
+                _accountServiceMock.Object,
+                _userDetailServiceMock.Object,
+                _accountDataServiceMock.Object,
                 _jwtManagerMock.Object
             );
         }
@@ -44,12 +50,9 @@ namespace TestProject.api_service_test
         public async Task Check_ReturnsFalse_WhenEmailNotFound()
         {
             //Arrange
-            _userServiceMock.Setup(x => x.Get())
-            .ReturnsAsync(new List<User>());
-
             var credential = new UserCredential
             {
-                Email = "doe.john@gmail.com",
+                Email = string.Empty,
                 Password = "TestJohn@1994"
             };
 
@@ -65,25 +68,19 @@ namespace TestProject.api_service_test
         public async Task Check_ReturnsFalse_WhenPasswordIncorrect()
         {
             //Arrange
-            var userId = Guid.NewGuid();
-
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>
-            {
-                new User 
-                { 
-                    Id = userId, 
-                    Email = "doe.john@gmail.com" 
-                }
-            });
-
-            _accountServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<Account>());
-
             var credential = new UserCredential
             {
                 Email = "doe.john@gmail.com",
                 Password = "TestJohn@1994"
             };
 
+            _userDetailServiceMock.Setup(x => x.GetUserByEmail(credential.Email)).ReturnsAsync(new UserDetail 
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "John Doe",
+                Email = credential.Email
+            });
+            
             //Act
             var result = await _repository.CheckCredential(credential);
 
@@ -97,29 +94,27 @@ namespace TestProject.api_service_test
         {
             //Arrange
             var userId = Guid.NewGuid();
-
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>
-                {
-                    new User { Id = userId, Email = "doe.john@gmail.com" }
-                }
-            );
-
-            _accountServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<Account>
-            {
-                new Account
-                {
-                    UserId = userId,
-                    Password = "TestJohn@1994"
-                }
-            });
-
-            _accountServiceMock.Setup(x => x.Update(It.IsAny<Account>())).ReturnsAsync(false);
-
             var credential = new UserCredential
             {
                 Email = "doe.john@gmail.com",
                 Password = "TestJohn@1994"
             };
+
+            _userDetailServiceMock.Setup(x => x.GetUserByEmail(credential.Email)).ReturnsAsync(new UserDetail
+            {
+                Id = userId.ToString(),
+                Name = "John Doe",
+                Email = credential.Email
+            });
+
+            _accountDataServiceMock.Setup(x => x.CheckAndGetAccount(userId.ToString(), credential.Password)).ReturnsAsync(new Account
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Password = credential.Password
+            });
+
+            _accountServiceMock.Setup(x => x.Update(It.IsAny<Account>())).ReturnsAsync(false);
 
             //Act
             var result = await _repository.CheckCredential(credential);
@@ -134,29 +129,30 @@ namespace TestProject.api_service_test
         {
             //Arrange
             var userId = Guid.NewGuid();
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>
-            {
-                new User { Id = userId, Email = "doe.john@gmail.com", Name = "TestJohn@1994" }
-            });
-
-            _accountServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<Account>
-            {
-                new Account
-                {
-                    UserId = userId,
-                    Password = "TestJohn@1994"
-                }
-            });
-
-            _accountServiceMock.Setup(x => x.Update(It.IsAny<Account>())).ReturnsAsync(true);
-
-            _jwtManagerMock.Setup(x => x.GenerateToken(It.IsAny<User>())).Returns("xxxxx.yyyyy.zzzzz");
-
             var credential = new UserCredential
             {
                 Email = "doe.john@gmail.com",
                 Password = "TestJohn@1994"
             };
+
+            _userDetailServiceMock.Setup(x => x.GetUserByEmail(credential.Email)).ReturnsAsync(new UserDetail
+            {
+                Id = userId.ToString(),
+                Name = "John Doe",
+                Email = credential.Email
+            });
+
+            _accountDataServiceMock.Setup(x => x.CheckAndGetAccount(userId.ToString(), credential.Password)).ReturnsAsync(new Account
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Password = credential.Password
+            });
+
+            _accountServiceMock.Setup(x => x.Update(It.IsAny<Account>())).ReturnsAsync(true);
+
+            _jwtManagerMock.Setup(x => x.GenerateToken(It.IsAny<UserDetail>())).Returns("xxxxx.yyyyy.zzzzz");
+            
 
             //Act
             var result = await _repository.CheckCredential(credential);
@@ -175,20 +171,24 @@ namespace TestProject.api_service_test
         public async Task Register_ReturnsFalse_WhenEmailAlreadyExists()
         {
             //Arrange
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>
+            var userRegistrationDetail = new UserDetail
             {
-                new User { Email = "doe.john@gmail.com" }
-            });
-
-            var userDetail = new UserDetail
-            {
-                Name = "John Doe",
-                Email = "doe.john@gmail.com",
-                Password = "TestJohn@1994"
+                Name = "Max Miller",
+                Email = "miller.max@gmail.com",
+                Password = "TestMiller@1995"
             };
 
+            _userDetailServiceMock.Setup(x => x.GetUserByEmail(userRegistrationDetail.Email)).ReturnsAsync(new UserDetail 
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = userRegistrationDetail.Name,
+                Email = userRegistrationDetail.Email,
+                Role = "User",
+                IsVerified = true
+            });
+
             //Act
-            var result = await _repository.RegisterUser(userDetail);
+            var result = await _repository.RegisterUser(userRegistrationDetail);
 
             //Assert
             Assert.That(result.Status, Is.False);
@@ -199,19 +199,18 @@ namespace TestProject.api_service_test
         public async Task Register_ReturnsFalse_WhenUserSaveFails()
         {
             //Arrange
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>());
-
-            _userServiceMock.Setup(x => x.Save(It.IsAny<User>())).ReturnsAsync(false);
-
-            var userDetail = new UserDetail
+            var userRegistrationDetail = new UserDetail
             {
                 Name = "John Doe",
                 Email = "doe.john@gmail.com",
                 Password = "TestJohn@1994"
             };
+            _userDetailServiceMock.Setup(x => x.GetUserByEmail(userRegistrationDetail.Email)).ReturnsAsync(new UserDetail());
+
+            _userServiceMock.Setup(x => x.Save(It.IsAny<User>())).ReturnsAsync(false);      
 
             //Act
-            var result = await _repository.RegisterUser(userDetail);
+            var result = await _repository.RegisterUser(userRegistrationDetail);
 
             //Assert
             Assert.That(result.Status, Is.False);
@@ -222,32 +221,35 @@ namespace TestProject.api_service_test
         public async Task Register_RollsBack_WhenAccountSaveFails()
         {
             //Arrange
-            User createdUser = new User();
-
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(() =>
-            {
-                if (createdUser != null)
-                    return new List<User> { createdUser };
-                return new List<User>();
-            });
-
-            _userServiceMock.Setup(x => x.Save(It.IsAny<User>()))
-                .Callback<User>(user => createdUser = user)
-                .ReturnsAsync(true);
-
-            _accountServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<Account>());
-            _accountServiceMock.Setup(x => x.Save(It.IsAny<Account>())).ReturnsAsync(false);
-            _userServiceMock.Setup(x => x.Delete(It.IsAny<User>())).ReturnsAsync(true);
-
-            var userDetail = new UserDetail
+            var userRegistrationDetail = new UserDetail
             {
                 Name = "John Doe",
                 Email = "doe.john@gmail.com",
                 Password = "TestJohn@1994"
             };
+            
+            User createdUser = new User { Id = Guid.NewGuid() };
+
+            _userDetailServiceMock.Setup(x => x.GetUserByEmail(userRegistrationDetail.Email)).ReturnsAsync(new UserDetail());
+            _userDetailServiceMock.Setup(x => x.GetUser(createdUser.Id.ToString())).ReturnsAsync(new UserDetail { 
+                Id = createdUser.Id.ToString() 
+            });
+
+            _userServiceMock.Setup(x => x.Save(It.IsAny<User>()))
+                .Callback<User>(user => createdUser = user)
+                .ReturnsAsync(true);
+            
+            Account newAccount = new Account{
+                Id = Guid.NewGuid(),
+                UserId = createdUser.Id
+            };
+            _accountServiceMock.Setup(x => x.Save(It.IsAny<Account>())).ReturnsAsync(false);
+            _accountDataServiceMock.Setup(x => x.GetAccountById(newAccount.Id.ToString())).ReturnsAsync(newAccount);
+            
+            _userServiceMock.Setup(x => x.Delete(It.IsAny<User>())).ReturnsAsync(true);       
 
             //Act
-            var result = await _repository.RegisterUser(userDetail);
+            var result = await _repository.RegisterUser(userRegistrationDetail);
 
             //Assert
             Assert.That(result.Status, Is.False);
@@ -261,20 +263,31 @@ namespace TestProject.api_service_test
         public async Task Register_ReturnsTrue_WhenSuccessful()
         {
             //Arrange
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User>());
-            _userServiceMock.Setup(x => x.Save(It.IsAny<User>())).ReturnsAsync(true);
-
-            _accountServiceMock.Setup(x => x.Save(It.IsAny<Account>())).ReturnsAsync(true);
-
-            var userDetail = new UserDetail
+            var userRegistrationDetail = new UserDetail
             {
                 Name = "John Doe",
                 Email = "doe.john@gmail.com",
                 Password = "TestJohn@1994"
             };
 
+            User createdUser = new User();
+
+            _userDetailServiceMock.Setup(x => x.GetUserByEmail(userRegistrationDetail.Email)).ReturnsAsync(new UserDetail());
+            _userServiceMock.Setup(x => x.Save(It.IsAny<User>())).ReturnsAsync(true);
+            _userServiceMock.Setup(x => x.Save(It.IsAny<User>()))
+                .Callback<User>(user => createdUser = user)
+                .ReturnsAsync(true);
+
+            Account createdAccount = new Account();
+
+            _accountServiceMock.Setup(x => x.Save(It.IsAny<Account>())).ReturnsAsync(true);
+            _accountServiceMock.Setup(x => x.Save(It.IsAny<Account>()))
+                .Callback<Account>(account => createdAccount = account)
+                .ReturnsAsync(true);
+            
+
             //Act
-            var result = await _repository.RegisterUser(userDetail);
+            var result = await _repository.RegisterUser(userRegistrationDetail);
 
             //Assert
             Assert.That(result.Status, Is.True);
@@ -288,9 +301,15 @@ namespace TestProject.api_service_test
         public async Task DeleteAccount_ReturnsTrue_WhenSuccessful()
         {
             //Arrange
-            var user = new User { Id = Guid.NewGuid(), Name = "John Doe" };
+            var user = new User { Id = Guid.NewGuid(), Name = "John Doe", Email = "doe.john@gmail.com", Role = "User", IsVerified = true };
 
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User> { user });
+            _userDetailServiceMock.Setup(x => x.GetUser(user.Id.ToString())).ReturnsAsync(new UserDetail { 
+                Id = user.Id.ToString(),
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                IsVerified = user.IsVerified
+            });
             _userServiceMock.Setup(x => x.Delete(It.IsAny<User>())).ReturnsAsync(true);
 
             //Act
@@ -305,9 +324,16 @@ namespace TestProject.api_service_test
         public async Task DeleteAccount_ReturnsFalse_WhenFailed()
         {
             //Arrange
-            var user = new User { Id = Guid.NewGuid(), Name = "John Doe" };
+            var user = new User { Id = Guid.NewGuid(), Name = "John Doe", Email = "doe.john@gmail.com", Role = "User", IsVerified = true };
 
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(new List<User> { user });
+            _userDetailServiceMock.Setup(x => x.GetUser(user.Id.ToString())).ReturnsAsync(new UserDetail
+            {
+                Id = user.Id.ToString(),
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                IsVerified = user.IsVerified
+            });
             _userServiceMock.Setup(x => x.Delete(It.IsAny<User>())).ReturnsAsync(false);
 
             //Act
@@ -322,30 +348,20 @@ namespace TestProject.api_service_test
         public async Task DeleteAccount_Encounters_Exception()
         {
             // Arrange
-            var user = new User
+            var user = new User { Id = Guid.NewGuid(), Name = "John Doe", Email = "doe.john@gmail.com", Role = "User", IsVerified = true };
+
+            _userDetailServiceMock.Setup(x => x.GetUser(user.Id.ToString())).ReturnsAsync(new UserDetail
             {
-                Id = Guid.NewGuid(),
-                Name = "John Doe"
-            };
-
-            var userGetCallCount = 0;
-            _userServiceMock.Setup(x => x.Get()).ReturnsAsync(() =>
-            {
-                userGetCallCount++;
-
-                if (userGetCallCount == 1)
-                    return new List<User> { user };
-
-                return new List<User>();
+                Id = user.Id.ToString(),
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                IsVerified = user.IsVerified
             });
 
             _userServiceMock
                 .Setup(x => x.Delete(It.IsAny<User>()))
                 .ThrowsAsync(new Exception("Database error during user deletion"));
-
-            _userServiceMock
-                .Setup(x => x.Save(It.IsAny<User>()))
-                .ReturnsAsync(true);
 
             // Act
             var result = await _repository.DeleteAccount(user.Id.ToString());
