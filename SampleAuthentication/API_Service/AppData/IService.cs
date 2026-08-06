@@ -15,8 +15,8 @@ namespace API_Service.AppData
         Task<UserDetail> GetUser(string id);
         Task<UserDetail> GetUserByEmail(string email);
         Task<FullUserDetail> GetUserDetail(string id);
-        Task<IEnumerable<UserDetail>> GetUsersByType(string userType);
-        Task<IEnumerable<UserDetail>> FindUsers(string searchTerm);
+        Task<IEnumerable<UserDetail>> GetUsersByType(string userType, int page = 1, int pageSize = 10);
+        Task<IEnumerable<UserDetail>> FindUsers(string searchTerm, int page = 1, int pageSize = 10);
     }
     public interface IAccountService
     {

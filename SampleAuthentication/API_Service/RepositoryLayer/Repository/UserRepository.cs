@@ -19,23 +19,13 @@ namespace API_Service.RepositoryLayer.Repository
         
         public async Task<ResponseDetail> GetAllUsersAsync(string userId, string userType, int page, int pageSize)
         {
-            var users = await _userDetailService.GetUsersByType(userType);
+            var users = await _userDetailService.GetUsersByType(userType, page, pageSize);
             if (users.Any())
             {   
                 int totalUserCount = users.Count();
                 if (totalUserCount > 0)
                 {
-                    var paginatedUsers = users
-                                     .Skip((page - 1) * pageSize)
-                                     .Take(pageSize)
-                                     .Select(user => new UserDetail
-                                     {
-                                         Id = user.Id.ToString(),
-                                         Name = user.Name,
-                                         Email = user.Email,
-                                         Role = user.Role,
-                                         IsVerified = user.IsVerified
-                                     }).ToList<UserDetail>();
+                    var paginatedUsers = users.ToList<UserDetail>();
                     _logger.LogDetails(LogType.INFO, $"Fetched page {page} ({paginatedUsers.Count()} of {totalUserCount} users)");
 
                     if (userType == "Admin")
@@ -82,24 +72,15 @@ namespace API_Service.RepositoryLayer.Repository
         public async Task<ResponseDetail> GetUserBySearch(string userId, int page, int pageSize, string searchText)
         {
             _logger.LogDetails(LogType.INFO, $"Searching users with term '{searchText}'");
-            var users = await _userDetailService.FindUsers(searchText);
+            var users = await _userDetailService.FindUsers(searchText, page, pageSize);
             if (users.Any())
             {
                 int totalUserCount = users.Count();
                 if (totalUserCount > 0)
                 {
-                    var paginatedUsers = users
-                                     .Skip((page - 1) * pageSize)
-                                     .Take(pageSize)
-                                     .Select(user => new UserDetail
-                                     {
-                                         Id = user.Id.ToString(),
-                                         Name = user.Name,
-                                         Email = user.Email,
-                                         Role = user.Role,
-                                         IsVerified = user.IsVerified
-                                     });
+                    var paginatedUsers = users.ToList<UserDetail>();
                     _logger.LogDetails(LogType.INFO, $"Fetched page {page} ({paginatedUsers.Count()} of {totalUserCount} users) for search term '{searchText}'");
+                    
                     return new ResponseDataDetail<PagedResult<UserDetail>>
                     {
                         Status = true,

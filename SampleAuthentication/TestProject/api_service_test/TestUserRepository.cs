@@ -39,7 +39,7 @@ namespace TestProject.api_service_test
         public async Task GetAllUsersAsync_ReturnsFalse_WhenNoUsersFound()
         {
             // Arrange
-            _userDetailServiceMock.Setup(x => x.GetUsersByType("Admin")).ReturnsAsync(new List<UserDetail>());
+            _userDetailServiceMock.Setup(x => x.GetUsersByType("Admin", 1, 5)).ReturnsAsync(new List<UserDetail>());
 
             // Act
             var result = await _repository.GetAllUsersAsync(userId: Guid.NewGuid().ToString(), userType: "User", page: 1, pageSize: 5);
@@ -53,7 +53,7 @@ namespace TestProject.api_service_test
         public async Task GetAllUsersAsync_ReturnsSingleUser_WhenOneUserExists()
         {
             // Arrange
-            _userDetailServiceMock.Setup(x => x.GetUsersByType("User")).ReturnsAsync(new List<UserDetail>
+            _userDetailServiceMock.Setup(x => x.GetUsersByType("User", 1, 5)).ReturnsAsync(new List<UserDetail>
             {
                 new UserDetail
                 {
@@ -85,7 +85,7 @@ namespace TestProject.api_service_test
         public async Task GetAllUsersAsync_ReturnsMultipleUsers_WhenMoreThanOneExists()
         {
             // Arrange
-            _userDetailServiceMock.Setup(x => x.GetUsersByType("Admin")).ReturnsAsync(new List<UserDetail>
+            _userDetailServiceMock.Setup(x => x.GetUsersByType("Admin", 1, 5)).ReturnsAsync(new List<UserDetail>
             {
                 new UserDetail
                 {
@@ -124,7 +124,7 @@ namespace TestProject.api_service_test
         {
             // Arrange
             string searchTerm = "Doe";
-            _userDetailServiceMock.Setup(x => x.FindUsers(searchTerm)).ReturnsAsync(new List<UserDetail>
+            _userDetailServiceMock.Setup(x => x.FindUsers(searchTerm, 1, 5)).ReturnsAsync(new List<UserDetail>
             {
                 new UserDetail
                 {
@@ -159,7 +159,7 @@ namespace TestProject.api_service_test
         {
             // Arrange
             string searchTerm = "@gmail.com";
-            _userDetailServiceMock.Setup(x => x.FindUsers(searchTerm)).ReturnsAsync(new List<UserDetail>
+            _userDetailServiceMock.Setup(x => x.FindUsers(searchTerm, 1, 5)).ReturnsAsync(new List<UserDetail>
             {
                 new UserDetail
                 {
@@ -194,7 +194,7 @@ namespace TestProject.api_service_test
         {
             // Arrange
             string searchTerm = "XYZ";
-            _userDetailServiceMock.Setup(x => x.FindUsers(searchTerm)).ReturnsAsync(new List<UserDetail> {});
+            _userDetailServiceMock.Setup(x => x.FindUsers(searchTerm, 1, 5)).ReturnsAsync(new List<UserDetail> {});
 
             //Act
             var result = await _repository.GetUserBySearch(userId: Guid.NewGuid().ToString(), page: 1, pageSize: 5, searchText: searchTerm);

@@ -412,7 +412,7 @@ namespace API_Service.AppData.DataService
             return new UserDetail();
         }
 
-        public async Task<IEnumerable<UserDetail>> GetUsersByType(string userType)
+        public async Task<IEnumerable<UserDetail>> GetUsersByType(string userType, int page = 1, int pageSize = 5)
         {
             if (!string.IsNullOrEmpty(userType))
             {
@@ -431,7 +431,10 @@ namespace API_Service.AppData.DataService
                                               Role = role.Role == UserRoleType.Superadmin ? "Superadmin" : "Admin",
                                               IsVerified = user.IsVerified,
                                               Password = string.Empty
-                                          }).ToListAsync();
+                                          })
+                                          .Skip((page - 1) * pageSize)
+                                          .Take(pageSize)
+                                          .ToListAsync();
 
                         if (adminUsers.Count() > 0)
                         {
@@ -461,7 +464,10 @@ namespace API_Service.AppData.DataService
                                          Role = "User",
                                          IsVerified = user.IsVerified,
                                          Password = string.Empty
-                                     }).ToListAsync();
+                                     })
+                                     .Skip((page - 1) * pageSize)
+                                     .Take(pageSize)
+                                     .ToListAsync();
 
                         if (users.Count() > 0)
                         {
@@ -488,7 +494,7 @@ namespace API_Service.AppData.DataService
             return Enumerable.Empty<UserDetail>();
         }
 
-        public async Task<IEnumerable<UserDetail>> FindUsers(string searchTerm)
+        public async Task<IEnumerable<UserDetail>> FindUsers(string searchTerm, int page = 1, int pageSize = 5)
         {
             if (!string.IsNullOrEmpty(searchTerm))
             {
@@ -508,7 +514,10 @@ namespace API_Service.AppData.DataService
                                        Role = "User",
                                        IsVerified = user.IsVerified,
                                        Password = string.Empty
-                                   }).ToListAsync();
+                                   })
+                                   .Skip((page - 1) * pageSize)
+                                   .Take(pageSize)
+                                   .ToListAsync();
 
                 if (userResults.Count() > 0)
                 {
