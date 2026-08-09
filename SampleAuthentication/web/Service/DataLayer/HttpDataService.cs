@@ -107,8 +107,10 @@ namespace web.Service.DataLayer
         public HttpDataService() {
             this._logger = new Logger<HttpDataService>();
             this._policy = new HttpServicePolicy().BuildPolicy();
-            this._client = new HttpClient { Timeout = TimeSpan.FromSeconds(12) };
-            this._client.BaseAddress = new Uri(ConfigurationManager.AppSettings["serviceUri"]);
+            this._client = new HttpClient { 
+                Timeout = TimeSpan.FromSeconds(12),
+                BaseAddress = new Uri(ConfigurationManager.AppSettings["serviceUri"])
+            };
             this._client.DefaultRequestHeaders.Accept.Add
             (
                 new MediaTypeWithQualityHeaderValue("application/json")

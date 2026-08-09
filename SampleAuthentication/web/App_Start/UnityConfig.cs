@@ -44,8 +44,11 @@ namespace web
             //container.LoadConfiguration();
 
             // Register Data Provider and Data Service
-            // Using HierarchicalLifetimeManager for per-request lifetime (recommended for web apps)
-            container.RegisterType<IHttpService, HttpDataService>(new HierarchicalLifetimeManager());
+
+            // Using ContainerControlledLifetimeManager for per-request lifetime
+            container.RegisterType<IHttpService, HttpDataService>(new ContainerControlledLifetimeManager());
+
+            // Using HierarchicalLifetimeManager for per-request lifetime
             container.RegisterType<IWebRepository, WebRepository>(new HierarchicalLifetimeManager());
         }
     }
