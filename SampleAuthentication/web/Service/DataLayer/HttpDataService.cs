@@ -29,7 +29,7 @@ namespace web.Service.DataLayer
         }
         public AsyncPolicyWrap<HttpResponseMessage> BuildPolicy()
         {
-            #region 1. TIMEOUT POLICY: 8 seconds per request
+            #region 1. TIMEOUT POLICY: 10 seconds per request
             
             // Triggers first to enforce per-request timeout control
             var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(
@@ -94,8 +94,8 @@ namespace web.Service.DataLayer
             #endregion
             
             //WRAP ALL POLICIES: Order matters (outer to inner)
-            // Execution order: Fallback → Timeout → Retry → Circuit Breaker
-            return Policy.WrapAsync(fallbackPolicy, timeoutPolicy, retryPolicy, circuitBreakerPolicy);
+            // Execution order: Fallback → Retry → Timeout → Circuit Breaker
+            return Policy.WrapAsync(fallbackPolicy, retryPolicy, timeoutPolicy, circuitBreakerPolicy);
         }
     }
     
@@ -137,7 +137,7 @@ namespace web.Service.DataLayer
                 _logger.LogDetails(LogType.ERROR, "Circuit breaker is open. Service unavailable.");
                 return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
                 {
-                    ReasonPhrase = "Service temporarily unavailable (circuit breaker open)"
+                    ReasonPhrase = "Service temporarily unavailable"
                 };
             }
             catch (OperationCanceledException)
@@ -336,7 +336,7 @@ namespace web.Service.DataLayer
                 _logger.LogDetails(LogType.ERROR, "Circuit breaker is open. Service unavailable.");
                 return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
                 {
-                    ReasonPhrase = "Service temporarily unavailable (circuit breaker open)"
+                    ReasonPhrase = "Service temporarily unavailable"
                 };
             }
             catch (OperationCanceledException)
