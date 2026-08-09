@@ -9,6 +9,10 @@
       "url": "https://api.githubcopilot.com/mcp/"
     },
 
+    "JWT-Authentication-POC Docs": {
+      "url": "https://gitmcp.io/swarnayuroy/JWT-Authentication-POC"
+    },
+
     "context7": {
       "type": "http",
       "url": "https://mcp.context7.com/mcp",
