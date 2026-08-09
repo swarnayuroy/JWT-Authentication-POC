@@ -45,7 +45,8 @@ namespace web
 
             // Register Data Provider and Data Service
 
-            // Using ContainerControlledLifetimeManager for per-request lifetime
+            // Long-lived application/container lifetime.
+            // Appropriate for HttpDataService because it owns HttpClient and long-lived Polly policies.
             container.RegisterType<IHttpService, HttpDataService>(new ContainerControlledLifetimeManager());
 
             // Using HierarchicalLifetimeManager for per-request lifetime
