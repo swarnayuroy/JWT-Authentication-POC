@@ -123,6 +123,10 @@ namespace web.Service.DataLayer
         private readonly AsyncPolicyWrap<HttpResponseMessage> _policy;
         private readonly HttpClient _client;
 
+        private readonly SemaphoreSlim _bulkhead;
+        private const int bulkheadLimit = 10;
+        private const int bulkheadQueueLimit = 20;
+        private int _queuedRequests;
 
         public HttpDataService()
         {
@@ -135,7 +139,66 @@ namespace web.Service.DataLayer
             _client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue(
                     "application/json"));
+
+            _bulkhead = new SemaphoreSlim(bulkheadLimit, bulkheadLimit);
         }
+
+        #region Bulkhead Control and Execution
+
+        private async Task<bool> EnterBulkheadAsync(CancellationToken cancellationToken)
+        {
+            if (!_bulkhead.Wait(0))
+            {
+                // No immediate slot.
+                // Check whether we can join the queue.
+                var queued = Interlocked.Increment(ref _queuedRequests);
+
+                if (queued > bulkheadQueueLimit)
+                {
+                    Interlocked.Decrement(ref _queuedRequests);
+                    return false;
+                }
+                try
+                {
+                    await _bulkhead.WaitAsync(cancellationToken);
+                    return true;
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref _queuedRequests);
+                }                
+            }
+            return true;
+        }
+
+        private void ExitBulkhead()
+        {
+            _bulkhead.Release();
+        }
+
+        private async Task<HttpResponseMessage> ExecuteWithBulkheadAsync(Func<CancellationToken, Task<HttpResponseMessage>> action, CancellationToken cancellationToken)
+        {
+            if (await EnterBulkheadAsync(cancellationToken))
+            {
+                try
+                {
+                    return await action(cancellationToken);
+                }
+                finally
+                {
+                    ExitBulkhead();
+                }
+            }
+
+            _logger.LogDetails(LogType.WARNING, "Bulkhead limit reached. Request rejected.");
+
+            return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
+            {
+                ReasonPhrase = "Service is busy. Bulkhead limit reached."
+            };
+        }
+        
+        #endregion
 
         #region HTTP Helpers
 
@@ -157,10 +220,12 @@ namespace web.Service.DataLayer
             Func<HttpRequestMessage> requestFactory,
             CancellationToken cancellationToken)
         {
-            return await _policy.ExecuteAsync(async cancelToken => {
-                using (var request = requestFactory()){
-                    return await _client.SendAsync(request, cancelToken);
-                }
+            return await ExecuteWithBulkheadAsync( async cancelToken => {
+                return await _policy.ExecuteAsync(async policyToken => {
+                    using (var request = requestFactory()) {
+                        return await _client.SendAsync(request, policyToken);
+                    }
+                }, cancelToken);
             }, cancellationToken);
         }
 
@@ -170,12 +235,14 @@ namespace web.Service.DataLayer
             T data,
             CancellationToken cancellationToken)
         {
-            return await _policy.ExecuteAsync(async cancelToken => {
-                using (var request = new HttpRequestMessage(method, CreateUri(relativeUrl)))
-                {
-                    request.Content = CreateJsonContent(data);
-                    return await _client.SendAsync(request, cancelToken);
-                }
+            return await ExecuteWithBulkheadAsync(async cancelToken => {
+                return await _policy.ExecuteAsync(async policyToken => {
+                    using (var request = new HttpRequestMessage(method, CreateUri(relativeUrl)))
+                    {
+                        request.Content = CreateJsonContent(data);
+                        return await _client.SendAsync(request, policyToken);
+                    }
+                }, cancelToken);
             }, cancellationToken);
         }
 
