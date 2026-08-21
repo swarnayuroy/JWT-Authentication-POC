@@ -31,7 +31,7 @@ namespace web.Service.DataLayer
             #region 1. TIMEOUT POLICY
 
             var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(
-                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(12),
                 TimeoutStrategy.Optimistic);
 
             #endregion

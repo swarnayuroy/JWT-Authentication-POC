@@ -38,7 +38,7 @@ namespace API_Service.RepositoryLayer.Repository
             // Find user by email
             _logger.LogDetails(LogType.INFO, $"getting user by email");
             var user = await _userDetailService.GetUserByEmail(userCredential.Email);
-            if (user == null)
+            if (user == null || string.IsNullOrEmpty(user.Id))
             {
                 _logger.LogDetails(LogType.WARNING, "incorrect email");
                 return new ResponseDetail
@@ -52,11 +52,12 @@ namespace API_Service.RepositoryLayer.Repository
             _logger.LogDetails(LogType.INFO, $"Validating password for the user...");
             var account = await _accountDataService.CheckAndGetAccount(user.Id.ToString(), userCredential.Password);
             
-            if (account == null)
+            if (account == null || account.Id == Guid.Empty)
             {                
                 _logger.LogDetails(LogType.WARNING, "incorrect password");
                 return new ResponseDetail { Status = false, Message = "Incorrect password" };             
             }
+
             account.LoggedInAt = DateTime.Now;
             if (!await _accountService.Update(account))
             {

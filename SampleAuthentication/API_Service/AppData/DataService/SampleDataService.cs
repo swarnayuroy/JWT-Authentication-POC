@@ -388,8 +388,9 @@ namespace API_Service.AppData.DataService
             if (!string.IsNullOrEmpty(email))
             {
                 var dataContext = new Data();
-                var userDetail = await (from user in _dataContextProvider.User
-                                  join role in _dataContextProvider.UserRole on user.Id equals role.UserId
+                var userDetail = await (from user in _dataContextProvider.User.AsNoTracking()
+                                        join role in _dataContextProvider.UserRole.AsNoTracking() 
+                                        on user.Id equals role.UserId
                                   where user.Email == email
                                   select new UserDetail
                                   {
@@ -551,27 +552,25 @@ namespace API_Service.AppData.DataService
         }
         public async Task<Models.Entities.Account> CheckAndGetAccount(string userId, string password)
         {
-            if (!string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(password))
+            if (!string.IsNullOrWhiteSpace(userId) && !string.IsNullOrWhiteSpace(password) && Guid.TryParse(userId, out Guid id))
             {
                 var dataContext = new Data();
-                if (Guid.TryParse(userId, out Guid id))
-                {
-                    var accountDetail = await (from account in _dataContextProvider.Account 
-                                         where account.UserId == id && account.Password == password
-                                         select new Models.Entities.Account
-                                         {
-                                             Id = account.Id,
-                                             UserId = account.UserId,
-                                             CreatedAt = account.CreatedAt,
-                                             Password = account.Password
-                                         }).FirstOrDefaultAsync();
+                var accountDetail = await (from account in _dataContextProvider.Account.AsNoTracking()
+                                           where account.UserId == id && account.Password == password
+                                           select new Models.Entities.Account
+                                           {
+                                               Id = account.Id,
+                                               UserId = account.UserId,
+                                               CreatedAt = account.CreatedAt,
+                                               Password = account.Password,
+                                               LoggedInAt = account.LoggedInAt
+                                           }).FirstOrDefaultAsync();
 
-                    if (accountDetail != null)
-                    {
-                        _logger.LogDetails(LogType.INFO, $"Account found for UserId: {userId}");
-                        dataContext.AccountDetail = accountDetail;
-                        return dataContext.AccountDetail;
-                    }
+                if (accountDetail != null)
+                {
+                    _logger.LogDetails(LogType.INFO, $"Account found for UserId: {userId}");
+                    dataContext.AccountDetail = accountDetail;
+                    return dataContext.AccountDetail;
                 }
             }
             _logger.LogDetails(LogType.WARNING, $"Couldn't find account for UserId: {userId} with the provided password.");
