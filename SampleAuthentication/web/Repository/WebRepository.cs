@@ -19,6 +19,7 @@ namespace web.Repository
     {
         private Logger<WebRepository> _logger;
         private readonly IHttpService _httpService;
+        private readonly FilterResponse<WebRepository> _filterResponse;
 
         private HttpResponseMessage _response;
 
@@ -26,6 +27,7 @@ namespace web.Repository
         {
             this._logger = new Logger<WebRepository>();
             this._httpService = httpService;
+            this._filterResponse = new FilterResponse<WebRepository>();
         }
 
         public async Task<ResponseDetail> CheckCredential(Credential userCredential)
@@ -34,9 +36,9 @@ namespace web.Repository
 
             try
             {
-                _response = await _httpService.CheckCredential(userCredential);
+                var response = await _httpService.CheckCredential(userCredential);
 
-                return await new FilterResponse<WebRepository>().ProcessData<string>(_response);
+                return await _filterResponse.ProcessData<string>(response);
             }
             catch (Exception ex)
             {
@@ -55,9 +57,9 @@ namespace web.Repository
 
             try
             {
-                _response = await _httpService.RegisterUser(userRegistrationDetail);
+                var response = await _httpService.RegisterUser(userRegistrationDetail);
 
-                return await new FilterResponse<WebRepository>().Process(_response);
+                return await _filterResponse.Process(response);
             }
             catch (Exception ex)
             {
@@ -76,8 +78,8 @@ namespace web.Repository
             #region HTTP Service Call
             try
             {
-                _response = await _httpService.CheckEmail(email);
-                return await new FilterResponse<WebRepository>().Process(_response);
+                var response = await _httpService.CheckEmail(email);
+                return await _filterResponse.Process(response);
             }
             catch (Exception ex)
             {
@@ -95,8 +97,8 @@ namespace web.Repository
             #region HTTP Service Call
             try
             {
-                _response = await _httpService.VerifyAccount(detail);
-                return await new FilterResponse<WebRepository>().Process(_response);
+                var response = await _httpService.VerifyAccount(detail);
+                return await _filterResponse.Process(response);
             }
             catch (Exception ex)
             {
@@ -115,7 +117,7 @@ namespace web.Repository
             try
             {
                 _response = await _httpService.SetNewPassword(credential);
-                return await new FilterResponse<WebRepository>().Process(_response);
+                return await _filterResponse.Process(_response);
             }
             catch (Exception ex)
             {
@@ -134,9 +136,9 @@ namespace web.Repository
 
             try
             {
-                _response = await _httpService.GetUser(token, userId);
+                var response = await _httpService.GetUser(token, userId);
 
-                return await new FilterResponse<WebRepository>().ProcessData<UserDetail>(_response);
+                return await _filterResponse.ProcessData<UserDetail>(response);
             }
             catch (Exception ex)
             {
@@ -155,9 +157,9 @@ namespace web.Repository
 
             try
             {
-                _response = await _httpService.GetUserDetail(token, userId);
+                var response = await _httpService.GetUserDetail(token, userId);
 
-                return await new FilterResponse<WebRepository>().ProcessData<FullUserDetail>(_response);
+                return await _filterResponse.ProcessData<FullUserDetail>(response);
             }
             catch (Exception ex)
             {
@@ -175,10 +177,10 @@ namespace web.Repository
             #region HTTP Service Call
             try
             {
-                _response = await _httpService.GetAllUsers(token, userId, userType, page, pageSize);
+                var response = await _httpService.GetAllUsers(token, userId, userType, page, pageSize);
                 return userType == "Admin" ?
-                    await new FilterResponse<WebRepository>().ProcessData<AdminResult>(_response) :
-                    await new FilterResponse<WebRepository>().ProcessData<PagedResult<UserDetail>>(_response);
+                    await _filterResponse.ProcessData<AdminResult>(response) :
+                    await _filterResponse.ProcessData<PagedResult<UserDetail>>(response);
             }
             catch (Exception ex)
             {
@@ -196,8 +198,8 @@ namespace web.Repository
             #region HTTP Service Call
             try
             {
-                _response = await _httpService.GetUsersBySearch(token, userId, page, pageSize, searchText);
-                return await new FilterResponse<WebRepository>().ProcessData<PagedResult<UserDetail>>(_response);
+                var response = await _httpService.GetUsersBySearch(token, userId, page, pageSize, searchText);
+                return await _filterResponse.ProcessData<PagedResult<UserDetail>>(response);
             }
             catch (Exception ex)
             {
@@ -215,9 +217,9 @@ namespace web.Repository
 
             try
             {
-                _response = await _httpService.DeleteAccount(token, userId);
+                var response = await _httpService.DeleteAccount(token, userId);
 
-                return await new FilterResponse<WebRepository>().Process(_response);
+                return await _filterResponse.Process(response);
             }
             catch (Exception ex)
             {
