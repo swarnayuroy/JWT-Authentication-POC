@@ -326,8 +326,9 @@ namespace API_Service.AppData.DataService
             if (!string.IsNullOrEmpty(id))
             {
                 var dataContext = new Data();
-                var userDetail = await (from user in _dataContextProvider.User
-                                  join role in _dataContextProvider.UserRole on user.Id equals role.UserId
+                var userDetail = await (from user in _dataContextProvider.User.AsNoTracking()
+                                  join role in _dataContextProvider.UserRole.AsNoTracking() 
+                                  on user.Id equals role.UserId
                                   where user.Id.ToString() == id
                                   select new UserDetail
                                   {
@@ -356,9 +357,9 @@ namespace API_Service.AppData.DataService
             if (!string.IsNullOrEmpty(id))
             {
                 var dataContext = new Data();
-                var userDetail = await (from user in _dataContextProvider.User
-                                  join role in _dataContextProvider.UserRole on user.Id equals role.UserId
-                                  join account in _dataContextProvider.Account on user.Id equals account.UserId
+                var userDetail = await (from user in _dataContextProvider.User.AsNoTracking()
+                                  join role in _dataContextProvider.UserRole.AsNoTracking() on user.Id equals role.UserId
+                                  join account in _dataContextProvider.Account.AsNoTracking() on user.Id equals account.UserId
                                   where user.Id.ToString() == id
                                   select new FullUserDetail
                                   {
@@ -421,8 +422,9 @@ namespace API_Service.AppData.DataService
                 switch (userType)
                 {
                     case "Admin":
-                        var adminUsers = await (from user in _dataContextProvider.User
-                                          join role in _dataContextProvider.UserRole on user.Id equals role.UserId
+                        var adminUsers = await (from user in _dataContextProvider.User.AsNoTracking()
+                                                join role in _dataContextProvider.UserRole.AsNoTracking() 
+                                                on user.Id equals role.UserId
                                           where role.Role == UserRoleType.Superadmin || role.Role == UserRoleType.Admin
                                           select new UserDetail
                                           {
@@ -433,6 +435,8 @@ namespace API_Service.AppData.DataService
                                               IsVerified = user.IsVerified,
                                               Password = string.Empty
                                           })
+                                          .OrderBy(user => user.Name)
+                                          .ThenBy(user => user.Id)
                                           .Skip((page - 1) * pageSize)
                                           .Take(pageSize)
                                           .ToListAsync();
@@ -454,8 +458,9 @@ namespace API_Service.AppData.DataService
                         return Enumerable.Empty<UserDetail>();
 
                     case "User":
-                        var users = await (from user in _dataContextProvider.User
-                                     join role in _dataContextProvider.UserRole on user.Id equals role.UserId
+                        var users = await (from user in _dataContextProvider.User.AsNoTracking()
+                                           join role in _dataContextProvider.UserRole.AsNoTracking() 
+                                           on user.Id equals role.UserId
                                      where role.Role == UserRoleType.User
                                      select new UserDetail
                                      {
@@ -466,6 +471,8 @@ namespace API_Service.AppData.DataService
                                          IsVerified = user.IsVerified,
                                          Password = string.Empty
                                      })
+                                     .OrderBy(user => user.Name)
+                                     .ThenBy(user => user.Id)
                                      .Skip((page - 1) * pageSize)
                                      .Take(pageSize)
                                      .ToListAsync();
@@ -500,8 +507,8 @@ namespace API_Service.AppData.DataService
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 var dataContext = new Data();
-                var userResults = await (from user in _dataContextProvider.User
-                                   join userRole in _dataContextProvider.UserRole on user.Id equals userRole.UserId
+                var userResults = await (from user in _dataContextProvider.User.AsNoTracking()
+                                   join userRole in _dataContextProvider.UserRole.AsNoTracking() on user.Id equals userRole.UserId
                                    where userRole.Role == UserRoleType.User &&
                                    (
                                     EF.Functions.Like(user.Name, $"%{searchTerm}%") ||
@@ -584,7 +591,7 @@ namespace API_Service.AppData.DataService
                 if (Guid.TryParse(id, out Guid accountId))
                 {
                     var dataContext = new Data();
-                    var accountDetail = await (from account in _dataContextProvider.Account
+                    var accountDetail = await (from account in _dataContextProvider.Account.AsNoTracking()
                                          where account.Id == accountId
                                          select new Models.Entities.Account
                                          {
