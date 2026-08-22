@@ -5,6 +5,7 @@ using API_Service.Models.Entities;
 using API_Service.RepositoryLayer.Interface;
 using API_Service.RepositoryLayer.Repository;
 using API_Service.Utils;
+using API_Service.Utils.Middleware;
 using DataContext.DataProvider;
 using DataContext.DataService;
 using DataContext.SampleData;
@@ -115,6 +116,8 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseApiMiddleware();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
