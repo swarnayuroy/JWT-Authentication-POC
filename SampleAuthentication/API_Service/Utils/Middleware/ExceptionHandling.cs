@@ -36,6 +36,7 @@ namespace API_Service.Utils.Middleware
             context.Response.Clear();
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             context.Response.ContentType = "application/problem+json";
+            context.Response.Headers[SetCorrelationId.HeaderName] = context.TraceIdentifier;
 
             var problemDetails = new ProblemDetails
             {
