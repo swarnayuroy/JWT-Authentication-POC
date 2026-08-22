@@ -5,6 +5,7 @@
         public static IApplicationBuilder UseApiMiddleware(this IApplicationBuilder app) 
         {
             return app
+                .UseMiddleware<SetCorrelationId>()
                 .UseMiddleware<RequestLogging>()
                 .UseMiddleware<ExceptionHandling>();
         }
