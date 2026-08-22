@@ -33,18 +33,9 @@ namespace API_Service.Controllers
         [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Check([FromBody] UserCredential userCredential)
         {
-            try
-            {
-                var response = await _accountService.CheckCredential(userCredential);
+            var response = await _accountService.CheckCredential(userCredential);
 
-                return response.Status ? Ok(response as ResponseDataDetail<string>) : Unauthorized(response.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDetails(LogType.ERROR, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, 
-                    "An error occurred while processing your request.");
-            }
+            return response.Status ? Ok(response as ResponseDataDetail<string>) : Unauthorized(response.Message);
         }
 
         [AllowAnonymous]
@@ -55,19 +46,10 @@ namespace API_Service.Controllers
         [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register([FromBody] UserDetail userRegistrationDetail)
         {
-            try
-            {
-                var response = await _accountService.RegisterUser(userRegistrationDetail);
-                return response.Status
-                    ? StatusCode(StatusCodes.Status201Created, response.Message)
-                    : Conflict(response.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDetails(LogType.ERROR, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, 
-                    "An error occurred while processing your request.");
-            }
+            var response = await _accountService.RegisterUser(userRegistrationDetail);
+            return response.Status
+                ? StatusCode(StatusCodes.Status201Created, response.Message)
+                : Conflict(response.Message);
         }
 
         #region Delete Account
@@ -80,17 +62,8 @@ namespace API_Service.Controllers
         [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteAccount(string userId)
         {
-            try
-            {
-                var response = await _accountService.DeleteAccount(userId);
-                return response.Status ? Ok(response) : BadRequest(response.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDetails(LogType.ERROR, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "An error occurred while processing your request.");
-            }
+            var response = await _accountService.DeleteAccount(userId);
+            return response.Status ? Ok(response) : BadRequest(response.Message);
         }
 
         #endregion
@@ -105,17 +78,8 @@ namespace API_Service.Controllers
         [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> EmailExists([FromBody] CheckEmail userEmail)
         {
-            try
-            {
-                var response = await _accountService.EmailExists(userEmail.Email);
-                return response.Status ? StatusCode(StatusCodes.Status200OK, response.Message) : NotFound(response.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDetails(LogType.ERROR, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, 
-                    "An error occurred while processing your request.");
-            }
+            var response = await _accountService.EmailExists(userEmail.Email);
+            return response.Status ? StatusCode(StatusCodes.Status200OK, response.Message) : NotFound(response.Message);
         }
 
         [AllowAnonymous]
@@ -126,17 +90,8 @@ namespace API_Service.Controllers
         [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Verify([FromBody] VerifyAccount detail)
         {
-            try
-            {
-                var response = await _accountService.Verify(detail);
-                return response.Status ? StatusCode(StatusCodes.Status200OK, response.Message) : BadRequest(response.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDetails(LogType.ERROR, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "An error occurred while processing your request.");
-            }
+            var response = await _accountService.Verify(detail);
+            return response.Status ? StatusCode(StatusCodes.Status200OK, response.Message) : BadRequest(response.Message);
         }
 
         [AllowAnonymous]
@@ -147,17 +102,8 @@ namespace API_Service.Controllers
         [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> SetPassword([FromBody] UserCredential userCredential)
         {
-            try
-            {
-                var response = await _accountService.SetPassword(userCredential);
-                return response.Status ? StatusCode(StatusCodes.Status200OK, response.Message) : BadRequest(response.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDetails(LogType.ERROR, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "An error occurred while processing your request.");
-            }
+            var response = await _accountService.SetPassword(userCredential);
+            return response.Status ? StatusCode(StatusCodes.Status200OK, response.Message) : BadRequest(response.Message);
         }
 
         #endregion

@@ -32,24 +32,15 @@ namespace API_Service.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Get([FromQuery] string userId, [FromQuery] string userType, [FromQuery] int page = 1, [FromQuery] int pageSize = 5, [FromQuery] string searchText = "")
         {
-            try
-            {
-                var response = string.IsNullOrEmpty(searchText) ? await _userRepository.GetAllUsersAsync(userId, userType, page, pageSize) : 
+            var response = string.IsNullOrEmpty(searchText) ? await _userRepository.GetAllUsersAsync(userId, userType, page, pageSize) :
                             await _userRepository.GetUserBySearch(userId, page, pageSize, searchText);
-                if (response.Status)
-                {
-                    return Ok(userType == "Admin" ? response as ResponseDataDetail<AdminResult> : response as ResponseDataDetail<PagedResult<UserDetail>>);
-                }
-                else
-                {
-                    return NoContent();
-                }
-            }
-            catch (Exception ex)
+            if (response.Status)
             {
-                _logger.LogDetails(LogType.ERROR, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "An error occurred while processing your request.");
+                return Ok(userType == "Admin" ? response as ResponseDataDetail<AdminResult> : response as ResponseDataDetail<PagedResult<UserDetail>>);
+            }
+            else
+            {
+                return NoContent();
             }
         }
 
@@ -65,24 +56,14 @@ namespace API_Service.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(string id)
         {
-            try
+            var response = await _userRepository.GetUserAsync(id);
+            if (response.Status)
             {
-                // Placeholder for actual user retrieval logic by ID
-                var response = await _userRepository.GetUserAsync(id);
-                if (response.Status)
-                {
-                    return Ok(response as ResponseDataDetail<UserDetail>);
-                }
-                else
-                {
-                    return NotFound(response.Message);
-                }
+                return Ok(response as ResponseDataDetail<UserDetail>);
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogDetails(LogType.ERROR, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "An error occurred while processing your request.");
+                return NotFound(response.Message);
             }
         }
 
@@ -95,23 +76,14 @@ namespace API_Service.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetDetails(string id)
         {
-            try
+            var response = await _userRepository.GetUserDetailAsync(id);
+            if (response.Status)
             {
-                var response = await _userRepository.GetUserDetailAsync(id);
-                if (response.Status)
-                {
-                    return Ok(response as ResponseDataDetail<FullUserDetail>);
-                }
-                else
-                {
-                    return NotFound(response.Message);
-                }
+                return Ok(response as ResponseDataDetail<FullUserDetail>);
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogDetails(LogType.ERROR, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "An error occurred while processing your request.");
+                return NotFound(response.Message);
             }
         }
     }
