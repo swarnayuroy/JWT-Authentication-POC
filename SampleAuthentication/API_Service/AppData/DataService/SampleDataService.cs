@@ -523,6 +523,8 @@ namespace API_Service.AppData.DataService
                                        IsVerified = user.IsVerified,
                                        Password = string.Empty
                                    })
+                                   .OrderBy(user => user.Name)
+                                   .ThenBy(user => user.Id)
                                    .Skip((page - 1) * pageSize)
                                    .Take(pageSize)
                                    .ToListAsync();

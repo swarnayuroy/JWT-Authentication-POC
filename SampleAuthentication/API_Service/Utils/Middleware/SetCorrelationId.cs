@@ -23,7 +23,7 @@
             }
             finally
             {
-                _logger.LogDetails(LogType.INFO, $"{correlationId}: {context.Request.Method} {context.Request.Path} {context.Response.StatusCode}");
+                _logger.LogDetails(LogType.INFO, $"{correlationId}: {context.Request.Method} {context.Request.Path} - Status code:{context.Response.StatusCode}");
             }            
         }
 
