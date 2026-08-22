@@ -4,7 +4,9 @@
     {
         public static IApplicationBuilder UseApiMiddleware(this IApplicationBuilder app) 
         {
-            return app.UseMiddleware<RequestLogging>();
+            return app
+                .UseMiddleware<RequestLogging>()
+                .UseMiddleware<ExceptionHandling>();
         }
     }
 }
