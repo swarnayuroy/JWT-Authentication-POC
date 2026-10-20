@@ -1,0 +1,8 @@
+{
+	"mcpServers": {
+		"angular-client": {
+			"url": "https://gitmcp.io/swarnayuroy/JWT-Authentication-POC/tree/main/SampleAuthentication/angular-web",
+			"type": "http"
+		}
+	}
+}
