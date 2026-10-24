@@ -1,26 +1,22 @@
-
 <div class="auth-page">
     <div class="form-container">
-        <form class="form_signIn" (ngSubmit)="onLogin()">
+        <form #loginForm="ngForm" class="form_signIn" (ngSubmit)="onLogin(loginForm)">
             <h2 class="form_signIn_header">Sign In</h2>
 
             <div class="form_signIn_email">
                 <label for="email" class="form_signIn_label">Email</label>
 
                 <div class="form_signIn_input">
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        autocomplete="off"
-                        [(ngModel)]="email"
-                        required
-                    />
+                    <input id="email" name="email" type="email" autocomplete="off" [(ngModel)]="email"
+                        #emailField="ngModel" required pattern="^[a-z][\w.]+@[a-z]+\.[a-z]{3}$" />
                 </div>
 
-                <p class="field-validation-error"
-                   *ngIf="submitted && !email.trim()">
-                    Email is required.
+                <p class="field-validation-error" *ngIf="submitted && emailField.errors?.['required']">
+                    Please enter your email
+                </p>
+
+                <p class="field-validation-error" *ngIf="submitted && emailField.errors?.['pattern']">
+                    Please enter a valid email
                 </p>
             </div>
 
@@ -30,29 +26,17 @@
                 </label>
 
                 <div class="form_signIn_input">
-                    <input
-                        id="password"
-                        name="password"
-                        [type]="showPassword ? 'text' : 'password'"
-                        [(ngModel)]="password"
-                        required
-                    />
+                    <input id="password" name="password" [type]="showPassword() ? 'text' : 'password'"
+                        [(ngModel)]="password" #passwordField="ngModel" required />
 
-                    <i
-                        class="fa-solid"
-                        [class.fa-eye]="!showPassword"
-                        [class.fa-eye-slash]="showPassword"
-                        (click)="togglePassword()"
-                        role="button"
-                        tabindex="0"
-                        [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-                        (keydown.enter)="togglePassword()"
-                    ></i>
+                    <i class="fa-solid" [class.fa-eye]="!showPassword()" [class.fa-eye-slash]="showPassword()"
+                        (click)="togglePassword()" role="button" tabindex="0"
+                        [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+                        (keydown.enter)="togglePassword()"></i>
                 </div>
 
-                <p class="field-validation-error"
-                   *ngIf="submitted && !password">
-                    Password is required.
+                <p class="field-validation-error" *ngIf="submitted && passwordField.errors?.['required']">
+                    Please enter your password
                 </p>
             </div>
 
@@ -62,8 +46,7 @@
 
             <div class="form_signIn_other_actions">
                 <p>
-                    <a href="#" class="forgot_passowrd"
-                       (click)="$event.preventDefault()">
+                    <a href="#" class="forgot_passowrd" (click)="$event.preventDefault()">
                         Forgot Password
                     </a>
                 </p>

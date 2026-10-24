@@ -1,7 +1,6 @@
-
 <div class="auth-page">
     <div class="form-container">
-        <form class="form_registration" (ngSubmit)="onSignUp()">
+        <form #signUpForm="ngForm" class="form_registration" (ngSubmit)="onSignUp(signUpForm)">
             <h2 class="form_registration_header">Sign Up</h2>
 
             <div class="form_registration_name">
@@ -10,19 +9,24 @@
                 </label>
 
                 <div class="form_registration_input">
-                    <input
-                        id="name"
-                        name="name"
-                        type="text"
-                        autocomplete="off"
-                        [(ngModel)]="name"
-                        required
-                    />
+                    <input id="name" name="name" type="text" autocomplete="off" [(ngModel)]="name" #nameField="ngModel"
+                        required minlength="4" maxlength="30" pattern="^[A-Z][a-z]+((\s[A-Z][a-z]*)*)?$" />
                 </div>
 
-                <p class="field-validation-error"
-                   *ngIf="submitted && !name.trim()">
-                    Name is required.
+                <p class="field-validation-error" *ngIf="submitted && nameField.errors?.['required']">
+                    Please enter your name
+                </p>
+
+                <p class="field-validation-error" *ngIf="submitted && nameField.errors?.['minlength']">
+                    Name must contain at least 4 characters
+                </p>
+
+                <p class="field-validation-error" *ngIf="submitted && nameField.errors?.['maxlength']">
+                    Name must not exceed 30 characters
+                </p>
+
+                <p class="field-validation-error" *ngIf="submitted && nameField.errors?.['pattern']">
+                    Please enter a correct name.
                 </p>
             </div>
 
@@ -32,19 +36,16 @@
                 </label>
 
                 <div class="form_registration_input">
-                    <input
-                        id="signupEmail"
-                        name="email"
-                        type="email"
-                        autocomplete="off"
-                        [(ngModel)]="email"
-                        required
-                    />
+                    <input id="email" name="email" type="email" autocomplete="off" [(ngModel)]="email"
+                        #emailField="ngModel" required pattern="^[a-z][\w.]+@[a-z]+\.[a-z]{3}$" />
                 </div>
 
-                <p class="field-validation-error"
-                   *ngIf="submitted && !email.trim()">
-                    Email is required.
+                <p class="field-validation-error" *ngIf="submitted && emailField.errors?.['required']">
+                    Please enter your email
+                </p>
+
+                <p class="field-validation-error" *ngIf="submitted && emailField.errors?.['pattern']">
+                    Please enter a valid email
                 </p>
             </div>
 
@@ -54,29 +55,31 @@
                 </label>
 
                 <div class="form_registration_input">
-                    <input
-                        id="signupPassword"
-                        name="password"
-                        [type]="showPassword ? 'text' : 'password'"
-                        [(ngModel)]="password"
-                        required
-                    />
+                    <input id="signupPassword" name="password" [type]="showPassword() ? 'text' : 'password'"
+                        autocomplete="off" [(ngModel)]="password" #passwordField="ngModel" required minlength="8"
+                        maxlength="15" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).*$" />
 
-                    <i
-                        class="fa-solid"
-                        [class.fa-eye]="!showPassword"
-                        [class.fa-eye-slash]="showPassword"
-                        (click)="togglePassword()"
-                        role="button"
-                        tabindex="0"
-                        [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-                        (keydown.enter)="togglePassword()"
-                    ></i>
+                    <i class="fa-solid" [class.fa-eye]="!showPassword()" [class.fa-eye-slash]="showPassword()"
+                        (click)="togglePassword()" role="button" tabindex="0"
+                        [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+                        (keydown.enter)="togglePassword()"></i>
                 </div>
 
-                <p class="field-validation-error"
-                   *ngIf="submitted && !password">
-                    Password is required.
+                <p class="field-validation-error" *ngIf="submitted && passwordField.errors?.['required']">
+                    Please enter a password
+                </p>
+
+                <p class="field-validation-error" *ngIf="submitted && passwordField.errors?.['minlength']">
+                    Password must contain at least 8 characters
+                </p>
+
+                <p class="field-validation-error" *ngIf="submitted && passwordField.errors?.['maxlength']">
+                    Password must not exceed 15 characters
+                </p>
+
+                <p class="field-validation-error" *ngIf="submitted && passwordField.errors?.['pattern']">
+                    Password must contain an uppercase letter, a lowercase letter,
+                    a digit and a special character.
                 </p>
             </div>
 

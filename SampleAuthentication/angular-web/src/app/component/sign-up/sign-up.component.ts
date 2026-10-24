@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-sign-up',
@@ -13,17 +14,18 @@ export class SignUpComponent {
   name: string = "";
   email: string = "";
   password: string = "";
-  showPassword: boolean = false;
+
   submitted: boolean = false;
+  showPassword= signal(false);
 
   togglePassword(): void {
-    this.showPassword = !this.showPassword;
+    this.showPassword.update(value => !value);
   }
 
-  onSignUp(): void {
+  onSignUp(form: NgForm): void {
     this.submitted = true;
 
-    if (!this.name.trim() || !this.email.trim() || !this.password) {
+    if (form.invalid) {
       return;
     }
 
