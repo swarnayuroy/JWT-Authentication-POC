@@ -1,1 +1,79 @@
-<p>login works!</p>
+
+<div class="auth-page">
+    <div class="form-container">
+        <form class="form_signIn" (ngSubmit)="onLogin()">
+            <h2 class="form_signIn_header">Sign In</h2>
+
+            <div class="form_signIn_email">
+                <label for="email" class="form_signIn_label">Email</label>
+
+                <div class="form_signIn_input">
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        autocomplete="off"
+                        [(ngModel)]="email"
+                        required
+                    />
+                </div>
+
+                <p class="field-validation-error"
+                   *ngIf="submitted && !email.trim()">
+                    Email is required.
+                </p>
+            </div>
+
+            <div class="form_signIn_password">
+                <label for="password" class="form_signIn_label">
+                    Password
+                </label>
+
+                <div class="form_signIn_input">
+                    <input
+                        id="password"
+                        name="password"
+                        [type]="showPassword ? 'text' : 'password'"
+                        [(ngModel)]="password"
+                        required
+                    />
+
+                    <i
+                        class="fa-solid"
+                        [class.fa-eye]="!showPassword"
+                        [class.fa-eye-slash]="showPassword"
+                        (click)="togglePassword()"
+                        role="button"
+                        tabindex="0"
+                        [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                        (keydown.enter)="togglePassword()"
+                    ></i>
+                </div>
+
+                <p class="field-validation-error"
+                   *ngIf="submitted && !password">
+                    Password is required.
+                </p>
+            </div>
+
+            <div class="form_signIn_btn">
+                <button type="submit" class="button">Login</button>
+            </div>
+
+            <div class="form_signIn_other_actions">
+                <p>
+                    <a href="#" class="forgot_passowrd"
+                       (click)="$event.preventDefault()">
+                        Forgot Password
+                    </a>
+                </p>
+
+                <p>
+                    <a routerLink="/sign-up" class="register_here">
+                        Don't have an account? Sign Up
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>

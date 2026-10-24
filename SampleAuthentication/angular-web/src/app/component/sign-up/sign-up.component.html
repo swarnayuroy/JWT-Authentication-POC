@@ -1,1 +1,96 @@
-<p>sign-up works!</p>
+
+<div class="auth-page">
+    <div class="form-container">
+        <form class="form_registration" (ngSubmit)="onSignUp()">
+            <h2 class="form_registration_header">Sign Up</h2>
+
+            <div class="form_registration_name">
+                <label for="name" class="form_registration_label">
+                    Name
+                </label>
+
+                <div class="form_registration_input">
+                    <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        autocomplete="off"
+                        [(ngModel)]="name"
+                        required
+                    />
+                </div>
+
+                <p class="field-validation-error"
+                   *ngIf="submitted && !name.trim()">
+                    Name is required.
+                </p>
+            </div>
+
+            <div class="form_registration_email">
+                <label for="signupEmail" class="form_registration_label">
+                    Email
+                </label>
+
+                <div class="form_registration_input">
+                    <input
+                        id="signupEmail"
+                        name="email"
+                        type="email"
+                        autocomplete="off"
+                        [(ngModel)]="email"
+                        required
+                    />
+                </div>
+
+                <p class="field-validation-error"
+                   *ngIf="submitted && !email.trim()">
+                    Email is required.
+                </p>
+            </div>
+
+            <div class="form_registration_password">
+                <label for="signupPassword" class="form_registration_label">
+                    Password
+                </label>
+
+                <div class="form_registration_input">
+                    <input
+                        id="signupPassword"
+                        name="password"
+                        [type]="showPassword ? 'text' : 'password'"
+                        [(ngModel)]="password"
+                        required
+                    />
+
+                    <i
+                        class="fa-solid"
+                        [class.fa-eye]="!showPassword"
+                        [class.fa-eye-slash]="showPassword"
+                        (click)="togglePassword()"
+                        role="button"
+                        tabindex="0"
+                        [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                        (keydown.enter)="togglePassword()"
+                    ></i>
+                </div>
+
+                <p class="field-validation-error"
+                   *ngIf="submitted && !password">
+                    Password is required.
+                </p>
+            </div>
+
+            <div class="form_registration_btn">
+                <button type="submit" class="button">Submit</button>
+            </div>
+
+            <div class="form_registration_other_actions">
+                <p>
+                    <a routerLink="/login" class="login_here">
+                        Have an account? LogIn
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
