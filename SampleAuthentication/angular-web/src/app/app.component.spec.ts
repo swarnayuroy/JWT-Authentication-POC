@@ -12,10 +12,10 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'angular-web'`, () => {
+  it(`should have as header title 'Angular'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('angular-web');
+    expect(app.headerTitle).toEqual('Angular');
   });
 
   it('should render the component', () => {
