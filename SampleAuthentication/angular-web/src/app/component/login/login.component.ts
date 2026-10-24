@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { signal } from '@angular/core';
+import { UserCredential } from '../../model/user-credential';
 
 @Component({
   selector: 'app-login',
@@ -11,8 +12,6 @@ import { signal } from '@angular/core';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  email: string = "";
-  password: string = "";
   
   submitted: boolean = false;
   showPassword = signal(false);
@@ -27,7 +26,11 @@ export class LoginComponent {
     if (form.invalid) {
       return;
     }
-
+    const userCredential: UserCredential = {
+      email: form.value.email,
+      password: form.value.password
+    };
     // API authentication will be implemented separately.
+    console.log(userCredential);
   }
 }

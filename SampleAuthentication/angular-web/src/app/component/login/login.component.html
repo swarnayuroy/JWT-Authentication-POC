@@ -7,7 +7,7 @@
                 <label for="email" class="form_signIn_label">Email</label>
 
                 <div class="form_signIn_input">
-                    <input id="email" name="email" type="email" autocomplete="off" [(ngModel)]="email"
+                    <input id="email" name="email" type="email" autocomplete="off" ngModel
                         #emailField="ngModel" required pattern="^[a-z][\w.]+@[a-z]+\.[a-z]{3}$" />
                 </div>
 
@@ -27,7 +27,7 @@
 
                 <div class="form_signIn_input">
                     <input id="password" name="password" [type]="showPassword() ? 'text' : 'password'"
-                        [(ngModel)]="password" #passwordField="ngModel" required />
+                        ngModel #passwordField="ngModel" required />
 
                     <i class="fa-solid" [class.fa-eye]="!showPassword()" [class.fa-eye-slash]="showPassword()"
                         (click)="togglePassword()" role="button" tabindex="0"

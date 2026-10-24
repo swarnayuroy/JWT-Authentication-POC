@@ -9,7 +9,7 @@
                 </label>
 
                 <div class="form_registration_input">
-                    <input id="name" name="name" type="text" autocomplete="off" [(ngModel)]="name" #nameField="ngModel"
+                    <input id="name" name="name" type="text" autocomplete="off" ngModel #nameField="ngModel"
                         required minlength="4" maxlength="30" pattern="^[A-Z][a-z]+((\s[A-Z][a-z]*)*)?$" />
                 </div>
 
@@ -36,7 +36,7 @@
                 </label>
 
                 <div class="form_registration_input">
-                    <input id="email" name="email" type="email" autocomplete="off" [(ngModel)]="email"
+                    <input id="email" name="email" type="email" autocomplete="off" ngModel
                         #emailField="ngModel" required pattern="^[a-z][\w.]+@[a-z]+\.[a-z]{3}$" />
                 </div>
 
@@ -56,7 +56,7 @@
 
                 <div class="form_registration_input">
                     <input id="signupPassword" name="password" [type]="showPassword() ? 'text' : 'password'"
-                        autocomplete="off" [(ngModel)]="password" #passwordField="ngModel" required minlength="8"
+                        autocomplete="off" ngModel #passwordField="ngModel" required minlength="8"
                         maxlength="15" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).*$" />
 
                     <i class="fa-solid" [class.fa-eye]="!showPassword()" [class.fa-eye-slash]="showPassword()"
