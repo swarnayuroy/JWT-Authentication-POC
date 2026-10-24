@@ -1,0 +1,28 @@
+
+.board-header-layout {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.board-header-content {
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.board-header-logo {
+    gap: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.board-logo {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
