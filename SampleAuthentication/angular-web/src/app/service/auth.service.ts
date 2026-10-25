@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
 import { ApiResponse, ApiDataResponse } from '../model/api-response';
 import { UserCredential } from '../model/user-credential';
@@ -15,15 +15,15 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
-  login(credential: UserCredential): Observable<ApiDataResponse<string>> {
+  login(credential: UserCredential): Observable<HttpResponse<ApiDataResponse<string>>> {
     return this.http.post<ApiDataResponse<string>>(
-      `${this.apiUrl}/check`, credential
+      `${this.apiUrl}/check`, credential, { observe: 'response' }
     )
   }
 
-  register(registration: UserRegistration): Observable<ApiResponse> {
+  register(registration: UserRegistration): Observable<HttpResponse<ApiResponse>> {
     return this.http.post<ApiResponse>(
-      `${this.apiUrl}/register`, registration
+      `${this.apiUrl}/register`, registration, { observe: 'response' }
     )
   }
 }

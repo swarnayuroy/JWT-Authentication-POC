@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HttpStatusCode } from '@angular/common/http';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -12,6 +12,7 @@ import { ToastNotificationService } from '../../service/shared/toast-notificatio
 import { UserCredential } from '../../model/user-credential';
 import { ApiDataResponse } from 'src/app/model/api-response';
 import { ErrorDetailResponse } from 'src/app/model/api-response';
+import { SystemMessage } from 'src/app/utils/system-message';
 
 @Component({
   selector: 'app-login',
@@ -52,8 +53,8 @@ export class LoginComponent {
         finalize(() => this.loaderService.hide())
       )
       .subscribe({
-        next: (response: ApiDataResponse<string>) => {
-          if (response.status && response.data) {
+        next: (response) => {
+          if (response.status == HttpStatusCode.Ok && response.body?.status && response.body?.data) {
             this.toastService.showSuccess(
               'Login successful.'
             );
@@ -63,15 +64,16 @@ export class LoginComponent {
             console.log('Login successful');
           } else {
             const errorDetail = new ErrorDetailResponse();
-            errorDetail.statusCode = HttpStatusCode.Unauthorized;
-            errorDetail.message = response.message;
+            errorDetail.statusCode = response.status;
+            errorDetail.message = response.body?.message || SystemMessage.LOGIN_FAILED;
 
             this.toastService.showWarning(errorDetail);
           }
         },
-        error: (error: any) => {
+        error: (error: HttpErrorResponse) => {
           const errorDetail = new ErrorDetailResponse();
-          errorDetail.message = typeof error.error === 'string' ? error.error : 'Unable to log in. Please try again.';
+          errorDetail.statusCode = error.status as HttpStatusCode;
+          errorDetail.message = typeof error.error === 'string' ? error.error : SystemMessage.GENERAL_ERROR;
 
           this.toastService.showWarning(errorDetail);
         }

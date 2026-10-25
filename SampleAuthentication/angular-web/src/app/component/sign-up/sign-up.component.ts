@@ -4,6 +4,10 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { signal } from '@angular/core';
 import { finalize } from 'rxjs';
+import {
+  HttpErrorResponse,
+  HttpStatusCode
+} from '@angular/common/http';
 
 import { AuthService } from '../../service/auth.service';
 import { UserRegistration } from '../../model/user-registration';
@@ -11,6 +15,7 @@ import { LoaderService } from '../../service/shared/loader.service';
 import { ToastNotificationService } from '../../service/shared/toast-notification.service';
 import { ApiResponse } from 'src/app/model/api-response';
 import { ErrorDetailResponse } from 'src/app/model/api-response';
+import { SystemMessage } from 'src/app/utils/system-message';
 
 @Component({
   selector: 'app-sign-up',
@@ -53,26 +58,27 @@ export class SignUpComponent {
         finalize(() => this.loaderService.hide())
       )
       .subscribe({
-        next: (response: ApiResponse) => {
-          if (response.status) {
+        next: (response) => {
+          if (response.status == HttpStatusCode.Ok && response.body?.status) {
             // Show the success message returned by the API.
-            this.toastService.showSuccess(response.message);
+            this.toastService.showSuccess(response.body.message);
 
             // Navigate to login after successful registration.
             this.router.navigate(['/login']);
           } else {
             const errorDetail = new ErrorDetailResponse();
-            errorDetail.message = response.message;
+            errorDetail.statusCode = response.status;
+            errorDetail.message = response.body?.message || SystemMessage.REGISTRATION_FAILED;
 
             // Stay on the sign-up page if registration fails.
             this.toastService.showWarning(errorDetail);
           }
         },
-        error: error => {
+        error: (error: HttpErrorResponse) => {
           // Handle HTTP errors, including server-side failures.
           const errorDetail = new ErrorDetailResponse();
-          errorDetail.message = error.error?.message || (typeof error.error === 'string' ? error.error : null) ||
-            'Registration failed. Please try again.';
+          errorDetail.statusCode = error.status as HttpStatusCode;
+          errorDetail.message = error.error?.message || (typeof error.error === 'string' ? error.error : null) || SystemMessage.GENERAL_ERROR;
 
           this.toastService.showWarning(errorDetail);
         }
