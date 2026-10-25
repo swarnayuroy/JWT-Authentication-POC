@@ -8,7 +8,7 @@
 
                 <div class="form_signIn_input">
                     <input id="email" name="email" type="email" autocomplete="off" ngModel
-                        #emailField="ngModel" required pattern="^[a-z][\w.]+@[a-z]+\.[a-z]{3}$" />
+                        #emailField="ngModel" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$" />
                 </div>
 
                 <p class="field-validation-error" *ngIf="submitted && emailField.errors?.['required']">
