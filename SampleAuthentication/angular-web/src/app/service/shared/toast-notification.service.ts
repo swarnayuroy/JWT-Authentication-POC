@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpStatusCode } from '@angular/common/http';
 import { ToastNotification } from '../../model/toast-notification';
+import { ErrorDetailResponse } from 'src/app/model/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -40,12 +41,12 @@ export class ToastNotificationService {
     this.show(toast);
   }
 
-  showWarning(message: string): void {
+  showWarning(errorDetail: ErrorDetailResponse): void {
     const toast = new ToastNotification();
 
-    toast.type = HttpStatusCode.BadRequest;
+    toast.type = errorDetail.statusCode;
     toast.statusIcon = ToastNotification.WARNING_ICON;
-    toast.message = message;
+    toast.message = errorDetail.message;
 
     this.show(toast);
   }

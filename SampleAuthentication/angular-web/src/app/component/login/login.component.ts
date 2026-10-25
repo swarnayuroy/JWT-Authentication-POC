@@ -1,11 +1,17 @@
 import { CommonModule } from '@angular/common';
+import { HttpStatusCode } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { signal } from '@angular/core';
-import { UserCredential } from '../../model/user-credential';
+import { finalize } from 'rxjs';
+
+import { AuthService } from '../../service/auth.service';
 import { LoaderService } from '../../service/shared/loader.service';
 import { ToastNotificationService } from '../../service/shared/toast-notification.service';
+import { UserCredential } from '../../model/user-credential';
+import { ApiDataResponse } from 'src/app/model/api-response';
+import { ErrorDetailResponse } from 'src/app/model/api-response';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +22,8 @@ import { ToastNotificationService } from '../../service/shared/toast-notificatio
 export class LoginComponent {
   private readonly loaderService = inject(LoaderService);
   private readonly toastService = inject(ToastNotificationService);
+
+  private readonly authService = inject(AuthService);
 
   submitted: boolean = false;
   showPassword = signal(false);
@@ -30,20 +38,43 @@ export class LoginComponent {
     if (form.invalid) {
       return;
     }
+
     const userCredential: UserCredential = {
       email: form.value.email,
       password: form.value.password
     };
 
     this.loaderService.show();
-    // API authentication will be implemented separately.
-    setTimeout(() => {
-    this.loaderService.hide();
-    this.toastService.showWarning(
-      'Invalid email or password.'
-    );
 
-    console.log(userCredential);
-  }, 1500);
+    // API authentication will be implemented separately.
+    this.authService.login(userCredential)
+      .pipe(
+        finalize(() => this.loaderService.hide())
+      )
+      .subscribe({
+        next: (response: ApiDataResponse<string>) => {
+          if (response.status && response.data) {
+            this.toastService.showSuccess(
+              'Login successful.'
+            );
+
+            // JWT handling and dashboard navigation
+            // will be implemented in the next step.
+            console.log('Login successful');
+          } else {
+            const errorDetail = new ErrorDetailResponse();
+            errorDetail.statusCode = HttpStatusCode.Unauthorized;
+            errorDetail.message = response.message;
+
+            this.toastService.showWarning(errorDetail);
+          }
+        },
+        error: (error: any) => {
+          const errorDetail = new ErrorDetailResponse();
+          errorDetail.message = typeof error.error === 'string' ? error.error : 'Unable to log in. Please try again.';
+
+          this.toastService.showWarning(errorDetail);
+        }
+      });
   }
 }
