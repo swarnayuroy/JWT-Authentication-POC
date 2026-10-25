@@ -1,0 +1,44 @@
+.page_toast_notification {
+  position: fixed;
+  top: 50px;
+  right: 10px;
+  z-index: 1100;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  width: max-content;
+  max-width: calc(100vw - 40px);
+  min-height: 60px;
+  padding: 8px;
+
+  border: 2px solid black;
+  border-radius: 10px;
+  background: white;
+}
+
+.page_toast_notification_content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page_toast_notification_message {
+  width: 210px;
+  overflow-wrap: anywhere;
+}
+
+.page_toast_notification_text {
+  margin: 0;
+}
+
+.page_toast_notification_close_btn {
+  flex-shrink: 0;
+  align-self: flex-start;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}

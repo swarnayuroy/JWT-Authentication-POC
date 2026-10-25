@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { signal } from '@angular/core';
-import { UserRegistration} from '../../model/user-registration';
+import { UserRegistration } from '../../model/user-registration';
+import { LoaderService } from '../../service/shared/loader.service';
+import { ToastNotificationService } from '../../service/shared/toast-notification.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -12,8 +14,11 @@ import { UserRegistration} from '../../model/user-registration';
   styleUrl: './sign-up.component.css'
 })
 export class SignUpComponent {
+  private readonly loaderService = inject(LoaderService);
+  private readonly toastService = inject(ToastNotificationService);
+
   submitted: boolean = false;
-  showPassword= signal(false);
+  showPassword = signal(false);
 
   togglePassword(): void {
     this.showPassword.update(value => !value);
@@ -30,8 +35,17 @@ export class SignUpComponent {
       name: form.value.name,
       email: form.value.email,
       password: form.value.password
-    };    
+    };
+
+    this.loaderService.show();
     // Registration API will be implemented separately.
-    console.log(userRegistration);
+    setTimeout(() => {
+      this.loaderService.hide();
+      this.toastService.showSuccess(
+        'Registration successful.'
+      );
+
+      console.log(userRegistration);
+    }, 1500);
   }
 }

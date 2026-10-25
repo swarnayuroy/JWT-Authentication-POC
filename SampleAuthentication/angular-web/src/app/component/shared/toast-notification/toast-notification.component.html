@@ -1,1 +1,18 @@
-<p>toast-notification works!</p>
+@if (toastService.notification(); as toast) {
+    @if (toast.isEnable) {
+        <div class="page_toast_notification" role="status">
+            <div class="page_toast_notification_content">
+                <i [class]="toast.statusIcon" style="font-size: 22px;" aria-hidden="true"></i>
+
+                <div class="page_toast_notification_message">
+                    <p class="page_toast_notification_text">{{ toast.message }}</p>
+                </div>
+            </div>
+
+            <button class="page_toast_notification_close_btn" type="button" 
+                aria-label="Close notification" (click)="toastService.hide()">
+                <i [class]="toast.closeToastIcon" style="font-size: 15px;" aria-hidden="true"></i>
+            </button>
+        </div>
+    }
+}

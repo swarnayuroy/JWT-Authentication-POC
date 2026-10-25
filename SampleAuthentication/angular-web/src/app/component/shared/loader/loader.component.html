@@ -1,1 +1,7 @@
-<p>loader works!</p>
+@if (loaderService.isLoading()) {
+  <div class="page_loader">
+    <div class="loader_content">
+      <img src="assets/loader1.gif" alt="Loading..." />
+    </div>
+  </div>
+}
