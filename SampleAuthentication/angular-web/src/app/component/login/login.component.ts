@@ -54,7 +54,7 @@ export class LoginComponent {
       )
       .subscribe({
         next: (response) => {
-          if (response.status == HttpStatusCode.Ok && response.body?.status && response.body?.data) {
+          if (response.body?.status && response.body?.data) {
             this.toastService.showSuccess(
               'Login successful.'
             );

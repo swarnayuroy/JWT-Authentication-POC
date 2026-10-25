@@ -59,7 +59,7 @@ export class SignUpComponent {
       )
       .subscribe({
         next: (response) => {
-          if (response.status == HttpStatusCode.Ok && response.body?.status) {
+          if (response.body?.status) {
             // Show the success message returned by the API.
             this.toastService.showSuccess(response.body.message);
 
