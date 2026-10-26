@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpStatusCode } from '@angular/common/http';
 import { ToastNotification } from '../../model/toast-notification';
-import { ErrorDetailResponse } from 'src/app/model/api-response';
+import { SuccessDetailResponse, ErrorDetailResponse } from 'src/app/model/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -31,23 +31,25 @@ export class ToastNotificationService {
     }, toast.timeOut);
   }
 
-  showSuccess(message: string): void {
-    const toast = new ToastNotification();
+  showSuccess(successDetail: SuccessDetailResponse): void {
+    console.log(successDetail);
 
-    toast.type = HttpStatusCode.Ok;
+    const toast = new ToastNotification();
+    toast.type = successDetail.statusCode;
     toast.statusIcon = ToastNotification.SUCCESS_ICON;
-    toast.message = message;
+    toast.message = successDetail.message;
 
     this.show(toast);
   }
 
   showWarning(errorDetail: ErrorDetailResponse): void {
-    const toast = new ToastNotification();
+    console.log(errorDetail);
 
+    const toast = new ToastNotification();
     toast.type = errorDetail.statusCode;
     toast.statusIcon = ToastNotification.WARNING_ICON;
     toast.message = errorDetail.message;
-
+    
     this.show(toast);
   }
 

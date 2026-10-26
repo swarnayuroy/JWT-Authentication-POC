@@ -10,8 +10,7 @@ import { AuthService } from '../../service/auth.service';
 import { LoaderService } from '../../service/shared/loader.service';
 import { ToastNotificationService } from '../../service/shared/toast-notification.service';
 import { UserCredential } from '../../model/user-credential';
-import { ApiDataResponse } from 'src/app/model/api-response';
-import { ErrorDetailResponse } from 'src/app/model/api-response';
+import { SuccessDetailResponse, ErrorDetailResponse } from 'src/app/model/api-response';
 import { SystemMessage } from 'src/app/utils/system-message';
 
 @Component({
@@ -55,13 +54,16 @@ export class LoginComponent {
       .subscribe({
         next: (response) => {
           if (response.body?.status && response.body?.data) {
-            this.toastService.showSuccess(
-              'Login successful.'
-            );
+            const successDetail = new SuccessDetailResponse();
+            successDetail.statusCode = response.status;
+            successDetail.message = response.body?.message || SystemMessage.LOGIN_SUCCESS;
+            successDetail.data = response.body?.data;
+
+            this.toastService.showSuccess(successDetail);
 
             // JWT handling and dashboard navigation
             // will be implemented in the next step.
-            console.log('Login successful');
+            console.log(successDetail.data);
           } else {
             const errorDetail = new ErrorDetailResponse();
             errorDetail.statusCode = response.status;

@@ -13,8 +13,7 @@ import { AuthService } from '../../service/auth.service';
 import { UserRegistration } from '../../model/user-registration';
 import { LoaderService } from '../../service/shared/loader.service';
 import { ToastNotificationService } from '../../service/shared/toast-notification.service';
-import { ApiResponse } from 'src/app/model/api-response';
-import { ErrorDetailResponse } from 'src/app/model/api-response';
+import { SuccessDetailResponse, ErrorDetailResponse } from 'src/app/model/api-response';
 import { SystemMessage } from 'src/app/utils/system-message';
 
 @Component({
@@ -61,7 +60,10 @@ export class SignUpComponent {
         next: (response) => {
           if (response.body?.status) {
             // Show the success message returned by the API.
-            this.toastService.showSuccess(response.body.message);
+            const successDetail = new SuccessDetailResponse();
+            successDetail.statusCode = response.status;
+            successDetail.message = response.body?.message || SystemMessage.REGISTRATION_SUCCESS;
+            this.toastService.showSuccess(successDetail);
 
             // Navigate to login after successful registration.
             this.router.navigate(['/login']);

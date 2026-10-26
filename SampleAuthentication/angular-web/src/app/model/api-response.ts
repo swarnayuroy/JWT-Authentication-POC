@@ -8,6 +8,12 @@ export interface ApiDataResponse<T> extends ApiResponse {
     data: T;
 }
 
+export class SuccessDetailResponse {
+    statusCode: HttpStatusCode = HttpStatusCode.Ok | HttpStatusCode.Created;
+    message: string = "";
+    data: ReturnType<typeof Object> | string | null = null;
+}
+
 export class ErrorDetailResponse{    
     statusCode: HttpStatusCode = HttpStatusCode.BadRequest;
     message: string = "";
