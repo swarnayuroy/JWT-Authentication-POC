@@ -66,10 +66,19 @@ builder.Services.AddDbContext<AuthenticationDbContext>(
 // Add CORS policy to allow MVC web app to call this API
 builder.Services.AddCors(options =>
 {
+    //MVC application
     options.AddPolicy("AllowWebApp", policy =>
     {
         policy.WithOrigins("https://localhost:44328") // web
               .WithMethods("GET", "POST", "PUT", "DELETE")
+              .WithHeaders("Content-Type", "Authorization");
+    });
+
+    // Angular application
+    options.AddPolicy("AllowAngularApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .WithMethods("GET", "POST", "PUT")
               .WithHeaders("Content-Type", "Authorization");
     });
 });
