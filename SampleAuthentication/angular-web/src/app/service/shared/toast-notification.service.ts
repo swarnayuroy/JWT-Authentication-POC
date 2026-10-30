@@ -1,7 +1,10 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpStatusCode } from '@angular/common/http';
+
 import { ToastNotification } from '../../model/toast-notification';
 import { SuccessDetailResponse, ErrorDetailResponse } from 'src/app/model/api-response';
+import { LogLevel } from '../../utils/logger-level';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +14,7 @@ export class ToastNotificationService {
   private timeoutId?: ReturnType<typeof setTimeout>;
   notification = signal<ToastNotification | null>(null);
   
-  constructor() { }
+  constructor(private logger: LoggerService) { }
 
   private clearTimeout(): void {
     if (this.timeoutId) {
@@ -32,7 +35,7 @@ export class ToastNotificationService {
   }
 
   showSuccess(successDetail: SuccessDetailResponse): void {
-    console.log(successDetail);
+    this.logger.logDetails(LogLevel.INFO, successDetail.message);
 
     const toast = new ToastNotification();
     toast.type = successDetail.statusCode;
@@ -43,7 +46,7 @@ export class ToastNotificationService {
   }
 
   showWarning(errorDetail: ErrorDetailResponse): void {
-    console.log(errorDetail);
+    errorDetail.statusCode === HttpStatusCode.InternalServerError ? this.logger.logDetails(LogLevel.ERROR, errorDetail.message) : this.logger.logDetails(LogLevel.WARN, errorDetail.message);
 
     const toast = new ToastNotification();
     toast.type = errorDetail.statusCode;
