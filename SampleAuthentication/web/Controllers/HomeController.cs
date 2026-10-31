@@ -411,7 +411,14 @@ namespace web.Controllers
 
                     cookie.Expires = DateTime.Now.AddMinutes(-1);
                     cookie.Value = String.Empty;
-                    Response.Cookies.Add(cookie);
+                    Response.Cookies.Add(new HttpCookie("sessionToken", string.Empty)
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Lax,
+                        Path = "/",
+                        Expires = DateTime.UtcNow.AddDays(-1)
+                    });
                     Request.Cookies.Remove("sessionToken");
                     Request.Cookies.Remove("currentUser");
                 }

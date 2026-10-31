@@ -66,7 +66,9 @@ namespace web.Controllers
                     var cookie = new HttpCookie("sessionToken", responseWithToken.Data)
                     {
                         HttpOnly = true,
-                        Secure = true
+                        Secure = true,
+                        SameSite = SameSiteMode.Lax,
+                        Path = "/"
                     };
                     Response.Cookies.Add(cookie);
                     return RedirectToAction("Dashboard", "Home");
