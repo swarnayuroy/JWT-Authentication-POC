@@ -18,14 +18,14 @@ export class AuthService {
   constructor(private http: HttpClient, private logger: LoggerService) { }
 
   login(credential: UserCredential): Observable<HttpResponse<ApiDataResponse<string>>> {
-    this.logger.logDetails(LogLevel.INFO, 'Checking user credential.');
+    this.logger.logDetails(LogLevel.INFO, 'Checking user credential...');
     return this.http.post<ApiDataResponse<string>>(
       `${this.apiUrl}/check`, credential, { observe: 'response' }
     )
   }
 
   register(registration: UserRegistration): Observable<HttpResponse<ApiResponse>> {
-    this.logger.logDetails(LogLevel.INFO, 'Registering new user.');
+    this.logger.logDetails(LogLevel.INFO, 'Registering new user...');
     return this.http.post<ApiResponse>(
       `${this.apiUrl}/register`, registration, { observe: 'response' }
     )

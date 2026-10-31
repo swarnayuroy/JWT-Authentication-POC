@@ -46,7 +46,8 @@ export class ToastNotificationService {
   }
 
   showWarning(errorDetail: ErrorDetailResponse): void {
-    errorDetail.statusCode === HttpStatusCode.InternalServerError ? this.logger.logDetails(LogLevel.ERROR, errorDetail.message) : this.logger.logDetails(LogLevel.WARN, errorDetail.message);
+    errorDetail.statusCode === HttpStatusCode.InternalServerError || errorDetail.statusCode === HttpStatusCode.ServiceUnavailable ? 
+      this.logger.logDetails(LogLevel.ERROR, errorDetail.message) : this.logger.logDetails(LogLevel.WARN, errorDetail.message);
 
     const toast = new ToastNotification();
     toast.type = errorDetail.statusCode;

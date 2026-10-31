@@ -7,8 +7,6 @@ import { LogLevel } from '../../utils/logger-level';
 
 export class LoggerService {
 
-  constructor() { }
-  
   logDetails(type: LogLevel, message: string): void {
 
     if (isDevMode()) {
