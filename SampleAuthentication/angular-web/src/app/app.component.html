@@ -1,10 +1,16 @@
 <div class="board-header-layout">
-    <div class="board-header-content">
-        <div class="board-header-logo">
-            <img src="assets/ng_image.png" class="board-logo" alt="Angular logo" />
-            <b>{{ headerTitle }}</b>
-        </div>
+  <div class="board-header-content">
+    <div class="board-header-logo">
+      <img src="assets/ng_image.png" class="board-logo" alt="Angular logo" />
+      <b>{{ headerTitle }}</b>
     </div>
+
+    <div class="board-header-right-content" *ngIf="isDashboard">
+      <button type="button" (click)="onLogout()">
+        <i class="fa-solid fa-power-off"></i> Logout
+      </button>
+    </div>
+  </div>
 </div>
 
 <app-loader></app-loader>
