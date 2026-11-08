@@ -12,5 +12,7 @@ namespace web.Models
 
         [Required(ErrorMessage = "Please enter your password")]
         public string Password { get; set; }
+
+        public string Client { get; set; } = "mvc";
     }
 }

@@ -6,6 +6,7 @@ namespace API_Service.Models.DTO
     {
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public string Client { get; set; } = string.Empty;
     }
     public class UserDetail
     {
