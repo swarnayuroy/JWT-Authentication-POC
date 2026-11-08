@@ -34,8 +34,33 @@ namespace API_Service.Controllers
         public async Task<IActionResult> Check([FromBody] UserCredential userCredential)
         {
             var response = await _accountService.CheckCredential(userCredential);
-
-            return response.Status ? Ok(response as ResponseDataDetail<LoginResult>) : Unauthorized(response.Message);
+            
+            if (response.Status)
+            {
+                if (userCredential.Client.Equals("angular", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (response is ResponseDataDetail<LoginResult> responseToken && !string.IsNullOrWhiteSpace(responseToken.Data.Token))
+                    {
+                        Response.Cookies.Append (
+                            "auth_token",
+                            responseToken.Data.Token,
+                            new CookieOptions {
+                                HttpOnly = true,
+                                Secure = true,
+                                SameSite = SameSiteMode.None,
+                                Expires = DateTimeOffset.UtcNow.AddMinutes(15)
+                            }
+                        );
+                        return Ok(new ResponseDetail
+                        {
+                            Status = true,
+                            Message = "Authentication successful."
+                        });
+                    }
+                }
+                return Ok(response as ResponseDataDetail<LoginResult>);
+            }
+            return Unauthorized(response.Message);
         }
 
         [AllowAnonymous]
@@ -51,7 +76,7 @@ namespace API_Service.Controllers
             {
                 if (response is ResponseDataDetail<string> responseToken && !string.IsNullOrWhiteSpace(responseToken.Data))
                 {
-                    Response.Cookies.Append(
+                    Response.Cookies.Append (
                         "auth_token", 
                         responseToken.Data, 
                         new CookieOptions {
