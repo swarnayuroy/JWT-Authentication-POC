@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { RouterLink, Router } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { signal } from '@angular/core';
 import { finalize } from 'rxjs';
 
@@ -27,6 +27,7 @@ export class LoginComponent {
   private readonly loaderService = inject(LoaderService);
   private readonly toastService = inject(ToastNotificationService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   private readonly authState = inject(AuthStateService);
   private readonly authService = inject(AuthService);
@@ -34,21 +35,50 @@ export class LoginComponent {
   submitted: boolean = false;
   showPassword = signal(false);
 
+  ngOnInit(): void {
+    const handoff = this.route.snapshot.queryParamMap.get('handOff');
+
+    if (handoff) {
+      this.completeHandoff(handoff);
+    }
+  }
+
   togglePassword(): void {
     this.showPassword.update((value) => !value);
   }
 
-  private decodeJwtPayload(token: string): any {
-    const payload = token.split('.')[1];
+  private completeHandoff(handoff: string): void {
+    this.loaderService.show();
 
-    if (!payload) {
-      throw new Error('Invalid JWT token.');
-    }
+    this.authService
+      .completeHandoff(handoff)
+      .pipe(finalize(() => this.loaderService.hide()))
+      .subscribe({
+        next: (response) => {
+          if (response.body?.status) {
+            this.authState.setAuthenticated();
+            this.router.navigate(['/dashboard']);
+          } else {
+            const errorDetail = new ErrorDetailResponse();
+            errorDetail.statusCode = response.status;
+            errorDetail.message =
+              response.body?.message || SystemMessage.LOGIN_FAILED;
 
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+            this.toastService.showWarning(errorDetail);
+          }
+        },
 
-    const decoded = atob(base64);
-    return JSON.parse(decoded);
+        error: (error: HttpErrorResponse) => {
+          const errorDetail = new ErrorDetailResponse();
+          errorDetail.statusCode = error.status as HttpStatusCode;
+          errorDetail.message =
+            typeof error.error === 'string'
+              ? error.error
+              : SystemMessage.GENERAL_ERROR;
+
+          this.toastService.showWarning(errorDetail);
+        },
+      });
   }
 
   onLogin(form: NgForm): void {
@@ -61,6 +91,7 @@ export class LoginComponent {
     const userCredential: UserCredential = {
       email: form.value.email,
       password: form.value.password,
+      client: 'angular',
     };
 
     this.loaderService.show();
@@ -71,30 +102,17 @@ export class LoginComponent {
       .pipe(finalize(() => this.loaderService.hide()))
       .subscribe({
         next: (response) => {
-          if (response.body?.status && response.body?.data) {
-            const token: string = response.body.data.toString();
-            const role: string =
-              this.decodeJwtPayload(token).role?.toLowerCase();
-
-            if (role !== 'user') {
-              const errorDetail = new ErrorDetailResponse();
-              errorDetail.statusCode = HttpStatusCode.Unauthorized;
-              errorDetail.message = 'Unauthorized user.';
-              this.toastService.showWarning(errorDetail);
-              return;
-            }
-            // Store authentication details.
-            this.authState.setAuthentication(token, role);
+          if (response.body?.status) {
+            this.authState.setAuthenticated();
 
             const successDetail = new SuccessDetailResponse();
             successDetail.statusCode = response.status;
             successDetail.message =
               response.body?.message || SystemMessage.LOGIN_SUCCESS;
-            successDetail.data = response.body?.data;
 
             this.toastService.showSuccess(successDetail);
 
-            // JWT handling and dashboard navigation
+            // dashboard navigation
             this.router.navigate(['/dashboard']);
           } else {
             const errorDetail = new ErrorDetailResponse();
