@@ -6,6 +6,7 @@ namespace API_Service.RepositoryLayer.Interface
     public interface IAccountRepository
     {
         Task<ResponseDetail> CheckCredential(UserCredential userCredential);
+        Task<ResponseDetail> CompleteHandoff(HandoffRequest handoffRequest);
         Task<ResponseDetail> RegisterUser(UserDetail userRegistrationDetail);
         Task<ResponseDetail> DeleteAccount(string userId);
         Task<ResponseDetail> EmailExists(string email);

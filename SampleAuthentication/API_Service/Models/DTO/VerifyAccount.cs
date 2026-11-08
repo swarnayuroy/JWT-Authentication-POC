@@ -12,4 +12,8 @@
         public string Otp { get; set; } = string.Empty;
         public bool IsLoggedIn { get; set; } = false;
     }
+    public class HandoffRequest
+    {
+        public string Handoff { get; set; } = string.Empty;
+    }
 }

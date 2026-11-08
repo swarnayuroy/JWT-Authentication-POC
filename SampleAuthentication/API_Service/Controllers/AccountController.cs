@@ -40,6 +40,39 @@ namespace API_Service.Controllers
 
         [AllowAnonymous]
         [HttpPost]
+        [Route("complete-handoff")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> CompleteHandoff([FromBody] HandoffRequest request)
+        {
+            var response = await _accountService.CompleteHandoff(request);
+            
+            if (response.Status)
+            {
+                if (response is ResponseDataDetail<string> responseToken && !string.IsNullOrWhiteSpace(responseToken.Data))
+                {
+                    Response.Cookies.Append(
+                        "auth_token", 
+                        responseToken.Data, 
+                        new CookieOptions {
+                            HttpOnly = true,
+                            Secure = true,
+                            SameSite = SameSiteMode.None,
+                            Expires = DateTimeOffset.UtcNow.AddMinutes(15)
+                        }
+                    );
+                    return Ok(new ResponseDetail
+                    {
+                        Status = true,
+                        Message = "Authentication successful."
+                    });
+                }
+            }
+            return Unauthorized(response.Message);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
         [Route("register")]
         [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(object), StatusCodes.Status409Conflict)]

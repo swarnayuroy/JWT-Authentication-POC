@@ -1,9 +1,9 @@
 ﻿using API_Service.AppData;
-using API_Service.Utils;
 using API_Service.Models.DTO;
 using API_Service.Models.Entities;
 using API_Service.Models.ResponseModel;
 using API_Service.RepositoryLayer.Interface;
+using API_Service.Utils;
 
 namespace API_Service.RepositoryLayer.Repository
 {
@@ -48,6 +48,19 @@ namespace API_Service.RepositoryLayer.Repository
                 {
                     Status = false,
                     Message = "Incorrect email"
+                };
+            }
+
+            // process revoked for admin user from 'angular' client
+            if (userCredential.Client.Equals("angular", StringComparison.OrdinalIgnoreCase) && 
+                (user.Role.Equals("admin", StringComparison.OrdinalIgnoreCase) || 
+                user.Role.Equals("superadmin", StringComparison.OrdinalIgnoreCase)))
+            {
+                _logger.LogDetails(LogType.WARNING, "Revoking the process for admin.");
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "Process revoked."
                 };
             }
 
@@ -105,6 +118,45 @@ namespace API_Service.RepositoryLayer.Repository
             { 
                 Status = false,
                 Message = "Failed to generate token!"
+            };
+        }
+
+        public async Task<ResponseDetail> CompleteHandoff(HandoffRequest handoffRequest)
+        {
+            if (string.IsNullOrEmpty(handoffRequest.Handoff))
+            {
+                _logger.LogDetails(LogType.WARNING, "Invalid handoff!");
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "Invalid handoff."
+                };
+            }
+            if (!_handoffManager.TryConsume(handoffRequest.Handoff, out Guid userId))
+            {
+                _logger.LogDetails(LogType.WARNING, "Invalid or expired handoff!");
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "Incorrect or expired handoff."
+                };
+            }
+            var user = await _userDetailService.GetUser(userId.ToString());
+            string userToken = _jwtManager.GenerateToken(user);
+            if (string.IsNullOrWhiteSpace(userToken))
+            {
+                _logger.LogDetails(LogType.WARNING, "Failed to generate token!");
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "Failed to generate token!"
+                };
+            }
+            return new ResponseDataDetail<string>
+            {
+                Status = true,
+                Message = "Authentication successful.",
+                Data = userToken
             };
         }
 
