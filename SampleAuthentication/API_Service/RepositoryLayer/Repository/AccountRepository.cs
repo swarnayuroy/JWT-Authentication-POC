@@ -14,6 +14,7 @@ namespace API_Service.RepositoryLayer.Repository
         private readonly IService<Account> _accountService;
         private readonly IUserDetailService _userDetailService;
         private readonly IAccountService _accountDataService;
+        private readonly HandoffManager _handoffManager;
         private readonly IJwtManager _jwtManager;
 
         public AccountRepository(
@@ -22,6 +23,7 @@ namespace API_Service.RepositoryLayer.Repository
             IService<Account> accountService,
             IUserDetailService userDetailService,
             IAccountService accountDataService,
+            HandoffManager handoffManager,
             IJwtManager jwtManager
         )
         {
@@ -30,6 +32,7 @@ namespace API_Service.RepositoryLayer.Repository
             this._accountService = accountService;
             this._userDetailService = userDetailService;
             this._accountDataService = accountDataService;
+            this._handoffManager = handoffManager;
             this._jwtManager = jwtManager;
         }
         
@@ -65,15 +68,36 @@ namespace API_Service.RepositoryLayer.Repository
                 return new ResponseDetail { Status = false, Message = "Some error ocurred!" };
             }
 
+            if (userCredential.Client.Equals("mvc", StringComparison.OrdinalIgnoreCase) &&
+                user.Role.Equals("user", StringComparison.OrdinalIgnoreCase))
+            {
+                var handoff = _handoffManager.Create(Guid.Parse(user.Id.ToString()));
+                _logger.LogDetails(LogType.INFO, "Hand-off process initiated.");
+                return new ResponseDataDetail<LoginResult>
+                {
+                    Status = true,
+                    Message = "hand-off to angular client",
+                    Data = new LoginResult
+                    {
+                        Type = "handoff",
+                        Handoff = handoff
+                    }
+                };
+            }
+            
             string userToken = _jwtManager.GenerateToken(user);
             if (!String.IsNullOrEmpty(userToken))
             {
                 _logger.LogDetails(LogType.INFO, "Generated token successfully");
-                return new ResponseDataDetail<string>
+                return new ResponseDataDetail<LoginResult>
                 {
                     Status = true,
                     Message = "Account validation successful",
-                    Data = userToken
+                    Data = new LoginResult
+                    {
+                        Type = "token",
+                        Token = userToken
+                    }
                 };
             }
             _logger.LogDetails(LogType.WARNING, "Failed to generate token!");

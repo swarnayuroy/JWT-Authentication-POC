@@ -8,6 +8,7 @@ using System.Web.Helpers;
 using System.Web.Mvc;
 using web.Models;
 using web.Models.ResponseModel;
+using web.Models.SessionModel;
 using web.Repository;
 
 namespace web.Controllers
@@ -61,18 +62,33 @@ namespace web.Controllers
             response = await _repository.CheckCredential(formModel.SignIn);
             if (response.Status)
             {
-                if (response is ResponseDataDetail<string> responseWithToken && !string.IsNullOrEmpty(responseWithToken.Data))
+                if (response is ResponseDataDetail<LoginResult> loginResult && loginResult.Data != null)
                 {
-                    var cookie = new HttpCookie("sessionToken", responseWithToken.Data)
+                    // MVC → Angular hand-off
+                    if (loginResult.Data.Type.Equals("handoff", StringComparison.OrdinalIgnoreCase) &&
+                    !string.IsNullOrEmpty(loginResult.Data.Handoff))
                     {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.Lax,
-                        Path = "/"
-                    };
-                    Response.Cookies.Add(cookie);
-                    return RedirectToAction("Dashboard", "Home");
+                        var angularUrl = "https://localhost:4200/login";
+
+                        return Redirect($"{angularUrl}?handOff={HttpUtility.UrlEncode(loginResult.Data.Handoff)}");
+                    }
+
+                    // uasual MVC authentication flow
+                    if (loginResult.Data.Type.Equals("token", StringComparison.OrdinalIgnoreCase) &&
+                    !string.IsNullOrEmpty(loginResult.Data.Token))
+                    {
+                        var cookie = new HttpCookie("sessionToken", loginResult.Data.Token)
+                        {
+                            HttpOnly = true,
+                            Secure = true,
+                            SameSite = SameSiteMode.Lax,
+                            Path = "/"
+                        };
+                        Response.Cookies.Add(cookie);
+                        return RedirectToAction("Dashboard", "Home");
+                    }                    
                 }
+
                 return View("Login", new Form
                 {
                     showSignInForm = true,

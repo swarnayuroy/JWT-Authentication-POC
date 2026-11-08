@@ -23,6 +23,7 @@ namespace TestProject.api_service_test
         private Mock<IService<Account>> _accountServiceMock;
         private Mock<IUserDetailService> _userDetailServiceMock;
         private Mock<IAccountService> _accountDataServiceMock;
+        private Mock<HandoffManager> _handoffManagerMock;
         private Mock<IJwtManager> _jwtManagerMock = new Mock<IJwtManager>();
 
         private AccountRepository _repository;
@@ -34,6 +35,7 @@ namespace TestProject.api_service_test
             _userDetailServiceMock = new Mock<IUserDetailService>();
             _accountDataServiceMock = new Mock<IAccountService>();
             _loggerMock = new Mock<ILogger<AccountRepository>>();
+            _handoffManagerMock = new Mock<HandoffManager>();
             _repository = new AccountRepository
             (
                 _loggerMock.Object, 
@@ -41,6 +43,7 @@ namespace TestProject.api_service_test
                 _accountServiceMock.Object,
                 _userDetailServiceMock.Object,
                 _accountDataServiceMock.Object,
+                _handoffManagerMock.Object,
                 _jwtManagerMock.Object
             );
         }
@@ -127,7 +130,7 @@ namespace TestProject.api_service_test
         [Test]
         public async Task Check_ReturnsTrue_WhenSuccessful()
         {
-            //Arrange
+            // Arrange
             var userId = Guid.NewGuid();
             var credential = new UserCredential
             {
@@ -135,34 +138,55 @@ namespace TestProject.api_service_test
                 Password = "TestJohn@1994"
             };
 
-            _userDetailServiceMock.Setup(x => x.GetUserByEmail(credential.Email)).ReturnsAsync(new UserDetail
+            var expectedToken = "xxxxx.yyyyy.zzzzz";
+
+            var user = new UserDetail
             {
                 Id = userId.ToString(),
                 Name = "John Doe",
-                Email = credential.Email
-            });
+                Email = credential.Email,
+                Role = "Superadmin"
+            };
 
-            _accountDataServiceMock.Setup(x => x.CheckAndGetAccount(userId.ToString(), credential.Password)).ReturnsAsync(new Account
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                Password = credential.Password
-            });
+            _userDetailServiceMock
+                .Setup(x => x.GetUserByEmail(credential.Email))
+                .ReturnsAsync(user);
 
-            _accountServiceMock.Setup(x => x.Update(It.IsAny<Account>())).ReturnsAsync(true);
+            _accountDataServiceMock
+                .Setup(x => x.CheckAndGetAccount(userId.ToString(), credential.Password))
+                .ReturnsAsync(new Account
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    Password = credential.Password
+                });
 
-            _jwtManagerMock.Setup(x => x.GenerateToken(It.IsAny<UserDetail>())).Returns("xxxxx.yyyyy.zzzzz");
-            
+            _accountServiceMock
+                .Setup(x => x.Update(It.IsAny<Account>()))
+                .ReturnsAsync(true);
 
-            //Act
+            _jwtManagerMock
+                .Setup(x => x.GenerateToken(user))
+                .Returns(expectedToken);
+
+            // Act
             var result = await _repository.CheckCredential(credential);
-            var dataResult = result as ResponseDataDetail<string>;
 
-            //Assert
+            // Assert
             Assert.That(result.Status, Is.True);
-            Assert.That(result, Is.TypeOf<ResponseDataDetail<string>>());
+            Assert.That(result, Is.TypeOf<ResponseDataDetail<LoginResult>>());
 
-            Assert.That(dataResult?.Data, Is.EqualTo("xxxxx.yyyyy.zzzzz"));
+            var dataResult = (ResponseDataDetail<LoginResult>)result;
+
+            Assert.That(dataResult.Data.Type, Is.EqualTo("token"));
+            Assert.That(dataResult.Data.Token, Is.EqualTo(expectedToken));
+            Assert.That(dataResult.Data.Handoff, Is.Empty);
+
+            _jwtManagerMock.Verify(x => x.GenerateToken(user), Times.Once);
+            _accountServiceMock.Verify(x => x.Update(It.Is<Account>(
+                account => account.UserId == userId &&
+                           account.Id != Guid.Empty &&
+                           account.LoggedInAt != null)), Times.Once);
         }
         #endregion
 

@@ -35,7 +35,7 @@ namespace API_Service.Controllers
         {
             var response = await _accountService.CheckCredential(userCredential);
 
-            return response.Status ? Ok(response as ResponseDataDetail<string>) : Unauthorized(response.Message);
+            return response.Status ? Ok(response as ResponseDataDetail<LoginResult>) : Unauthorized(response.Message);
         }
 
         [AllowAnonymous]

@@ -38,7 +38,7 @@ namespace web.Repository
             {
                 var response = await _httpService.CheckCredential(userCredential);
 
-                return await _filterResponse.ProcessData<string>(response);
+                return await _filterResponse.ProcessData<LoginResult>(response);
             }
             catch (Exception ex)
             {

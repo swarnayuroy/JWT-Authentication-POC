@@ -90,6 +90,7 @@ builder.Services.AddScoped<IUserDetailService, UserDataService>();
 builder.Services.AddScoped<IAccountService, AccountDataService>();
 
 builder.Services.AddScoped<IJwtManager, JwtManager>();
+builder.Services.AddSingleton<HandoffManager>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 

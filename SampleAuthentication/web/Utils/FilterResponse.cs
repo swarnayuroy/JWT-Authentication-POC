@@ -117,11 +117,11 @@ namespace web.Utils
                             // This can be extended for other types if needed
                             try
                             {
-                                if (typeof(TData).Equals(typeof(string)))
+                                if (typeof(TData).Equals(typeof(LoginResult)))
                                 {
-                                    string responseData = data.ToObject<string>();
+                                    LoginResult responseData = data.ToObject<LoginResult>();
 
-                                    return new ResponseDataDetail<string>
+                                    return new ResponseDataDetail<LoginResult>
                                     {
                                         Status = status,
                                         StatusCode = response.StatusCode,
