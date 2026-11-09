@@ -93,7 +93,8 @@ namespace API_Service.RepositoryLayer.Repository
                     Data = new LoginResult
                     {
                         Type = "handoff",
-                        Handoff = handoff
+                        Handoff = handoff,
+                        UserId = user.Id.ToString()
                     }
                 };
             }
@@ -109,7 +110,8 @@ namespace API_Service.RepositoryLayer.Repository
                     Data = new LoginResult
                     {
                         Type = "token",
-                        Token = userToken
+                        Token = userToken,
+                        UserId = user.Id.ToString()
                     }
                 };
             }
@@ -152,11 +154,15 @@ namespace API_Service.RepositoryLayer.Repository
                     Message = "Failed to generate token!"
                 };
             }
-            return new ResponseDataDetail<string>
+            return new ResponseDataDetail<LoginResult>
             {
                 Status = true,
                 Message = "Authentication successful.",
-                Data = userToken
+                Data = new LoginResult
+                {
+                    Token = userToken,
+                    UserId = user.Id.ToString()
+                }
             };
         }
 

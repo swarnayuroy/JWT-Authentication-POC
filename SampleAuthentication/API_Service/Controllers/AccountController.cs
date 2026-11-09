@@ -79,11 +79,11 @@ namespace API_Service.Controllers
             
             if (response.Status)
             {
-                if (response is ResponseDataDetail<string> responseToken && !string.IsNullOrWhiteSpace(responseToken.Data))
+                if (response is ResponseDataDetail<LoginResult> responseToken && !string.IsNullOrWhiteSpace(responseToken.Data.Token))
                 {
                     Response.Cookies.Append (
                         "auth_token", 
-                        responseToken.Data, 
+                        responseToken.Data.Token, 
                         new CookieOptions {
                             HttpOnly = true,
                             Secure = true,
@@ -91,10 +91,11 @@ namespace API_Service.Controllers
                             Expires = DateTimeOffset.UtcNow.AddMinutes(15)
                         }
                     );
-                    return Ok(new ResponseDetail
+                    return Ok(new ResponseDataDetail<string>
                     {
                         Status = true,
-                        Message = "Authentication successful."
+                        Message = "Authentication successful.",
+                        Data = responseToken.Data.UserId
                     });
                 }
             }
