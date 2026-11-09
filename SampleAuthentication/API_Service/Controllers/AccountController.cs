@@ -52,10 +52,11 @@ namespace API_Service.Controllers
                                 Expires = DateTimeOffset.UtcNow.AddMinutes(15)
                             }
                         );
-                        return Ok(new ResponseDetail
+                        return Ok(new ResponseDataDetail<string>
                         {
                             Status = true,
-                            Message = "Authentication successful."
+                            Message = "Authentication successful.",
+                            Data = responseToken.Data.UserId
                         });
                     }
                 }

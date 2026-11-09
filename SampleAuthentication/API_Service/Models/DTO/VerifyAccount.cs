@@ -2,6 +2,7 @@
 {
     public class LoginResult
     {
+        public string UserId { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
         public string Handoff { get; set; } = string.Empty;
