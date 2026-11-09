@@ -8,10 +8,26 @@ import { SystemMessage } from 'src/app/utils/system-message';
 })
 export class AuthStateService {
   private readonly authenticatedState = signal(false);
+  private readonly userIdState = signal<string | null>(null);
 
   authenticated = this.authenticatedState.asReadonly();
+  userId = this.userIdState.asReadonly();
 
   constructor(private logger: LoggerService) {}
+
+  setUserId(userId: string): void {
+    this.userIdState.set(userId);
+    sessionStorage.setItem('userId', userId);
+  }
+
+  restoreUserId(): void {
+    const userId = sessionStorage.getItem('userId');
+
+    if (userId) {
+      this.userIdState.set(userId);
+      this.authenticatedState.set(true);
+    }
+  }
 
   setAuthenticated(message?: string): void {
     this.logger.logDetails(
@@ -27,5 +43,7 @@ export class AuthStateService {
       message || SystemMessage.LOGOUT_SUCCESS,
     );
     this.authenticatedState.set(false);
+    this.userIdState.set(null);
+    sessionStorage.removeItem('userId');
   }
 }

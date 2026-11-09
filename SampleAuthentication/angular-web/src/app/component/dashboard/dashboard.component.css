@@ -1,4 +1,6 @@
 .board-content {
-  width: 600px;
-  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

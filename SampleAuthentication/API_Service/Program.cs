@@ -104,6 +104,18 @@ builder.Services.AddAuthentication(options =>
 {
     options.RequireHttpsMetadata = true;
     options.SaveToken = true;
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.TryGetValue("auth_token", out var token) && !string.IsNullOrWhiteSpace(token))
+            {
+                context.Token = token;
+            }
+
+            return Task.CompletedTask;
+        }
+    };
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidIssuer = builder.Configuration["JwtConfig:Issuer"],
