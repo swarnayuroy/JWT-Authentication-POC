@@ -55,7 +55,10 @@ export class LoginComponent {
       .pipe(finalize(() => this.loaderService.hide()))
       .subscribe({
         next: (response) => {
-          if (response.body?.status) {
+          if (response.body?.status && response.body?.data) {
+            const userId = response.body.data;
+
+            this.authState.setUserId(userId);
             this.authState.setAuthenticated(response.body.message);
 
             // dashboard navigation
@@ -108,7 +111,6 @@ export class LoginComponent {
             const userId = response.body.data;
 
             this.authState.setUserId(userId);
-
             this.authState.setAuthenticated(response.body.message);
 
             // dashboard navigation
