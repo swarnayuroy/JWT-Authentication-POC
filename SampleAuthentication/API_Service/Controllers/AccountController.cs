@@ -37,6 +37,7 @@ namespace API_Service.Controllers
             
             if (response.Status)
             {
+                #region case for angular authentication
                 if (userCredential.Client.Equals("angular", StringComparison.OrdinalIgnoreCase))
                 {
                     if (response is ResponseDataDetail<LoginResult> responseToken && !string.IsNullOrWhiteSpace(responseToken.Data.Token))
@@ -58,10 +59,13 @@ namespace API_Service.Controllers
                         });
                     }
                 }
+                #endregion
                 return Ok(response as ResponseDataDetail<LoginResult>);
             }
             return Unauthorized(response.Message);
         }
+
+        #region Handling angular client
 
         [AllowAnonymous]
         [HttpPost]
@@ -95,6 +99,28 @@ namespace API_Service.Controllers
             }
             return Unauthorized(response.Message);
         }
+
+        [HttpPost]
+        [Route("ng-logout")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult NgLogout()
+        {
+            Response.Cookies.Delete("auth_token", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = "/"
+            });
+
+            return Ok(new ResponseDetail
+            {
+                Status = true,
+                Message = "Logout successful."
+            });
+        }
+
+        #endregion
 
         [AllowAnonymous]
         [HttpPost]

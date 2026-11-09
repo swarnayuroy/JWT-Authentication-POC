@@ -4,6 +4,7 @@ import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 
 import { AuthStateService } from './service/auth-state.service';
+import { AuthService } from './service/auth.service';
 import { LoaderComponent } from './component/shared/loader/loader.component';
 import { ToastNotificationComponent } from './component/shared/toast-notification/toast-notification.component';
 import { LoaderService } from './service/shared/loader.service';
@@ -28,6 +29,7 @@ export class AppComponent {
   constructor(
     private router: Router,
     private authState: AuthStateService,
+    private authService: AuthService,
     private loaderService: LoaderService,
   ) {
     this.router.events
@@ -44,12 +46,21 @@ export class AppComponent {
 
     this.isLoggingOut.set(true);
     this.loaderService.show();
-    this.authState.clearAuthentication();
 
     setTimeout(() => {
-      this.router.navigate(['/login']).then(() => {
-        this.loaderService.hide();
-        this.isLoggingOut.set(false);
+      this.authService.logout().subscribe({
+        next: () => {
+          this.authState.clearAuthentication();
+
+          this.router.navigate(['/login']).then(() => {
+            this.loaderService.hide();
+            this.isLoggingOut.set(false);
+          });
+        },
+        error: () => {
+          this.loaderService.hide();
+          this.isLoggingOut.set(false);
+        },
       });
     }, 400);
   }

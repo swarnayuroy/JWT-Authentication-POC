@@ -53,4 +53,17 @@ export class AuthService {
       { observe: 'response', withCredentials: true },
     );
   }
+
+  logout(): Observable<HttpResponse<ApiResponse>> {
+    this.logger.logDetails(LogLevel.INFO, 'Logging out...');
+
+    return this.http.post<ApiResponse>(
+      `${this.apiUrl}/ng-logout`,
+      {},
+      {
+        observe: 'response',
+        withCredentials: true,
+      },
+    );
+  }
 }
