@@ -49,8 +49,8 @@ export class AppComponent {
 
     setTimeout(() => {
       this.authService.logout().subscribe({
-        next: () => {
-          this.authState.clearAuthentication();
+        next: (response) => {
+          this.authState.clearAuthentication(response.body?.message);
 
           this.router.navigate(['/login']).then(() => {
             this.loaderService.hide();

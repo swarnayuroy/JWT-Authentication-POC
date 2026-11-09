@@ -56,7 +56,7 @@ export class LoginComponent {
       .subscribe({
         next: (response) => {
           if (response.body?.status) {
-            this.authState.setAuthenticated();
+            this.authState.setAuthenticated(response.body.message);
 
             // dashboard navigation
             this.router.navigate(['/dashboard']);
@@ -105,7 +105,7 @@ export class LoginComponent {
       .subscribe({
         next: (response) => {
           if (response.body?.status) {
-            this.authState.setAuthenticated();
+            this.authState.setAuthenticated(response.body.message);
 
             // dashboard navigation
             this.router.navigate(['/dashboard']);
