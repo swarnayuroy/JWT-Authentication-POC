@@ -6,8 +6,8 @@
     </div>
 
     <div class="board-header-right-content" *ngIf="isDashboard">
-      <button type="button" (click)="onLogout()">
-        <i class="fa-solid fa-power-off"></i> Logout
+      <button type="button" (click)="onLogout()" [disabled]="isLoggingOut()">
+        <i class="fa-solid fa-power-off"></i>
       </button>
     </div>
   </div>

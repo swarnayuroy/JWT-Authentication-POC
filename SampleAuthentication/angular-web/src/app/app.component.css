@@ -38,3 +38,8 @@
   background-color: lightgrey;
   cursor: pointer;
 }
+
+.board-header-right-content button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

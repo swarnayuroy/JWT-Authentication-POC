@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
@@ -6,6 +6,7 @@ import { filter } from 'rxjs';
 import { AuthStateService } from './service/auth-state.service';
 import { LoaderComponent } from './component/shared/loader/loader.component';
 import { ToastNotificationComponent } from './component/shared/toast-notification/toast-notification.component';
+import { LoaderService } from './service/shared/loader.service';
 
 @Component({
   selector: 'app-root',
@@ -22,10 +23,12 @@ import { ToastNotificationComponent } from './component/shared/toast-notificatio
 export class AppComponent {
   headerTitle: string = 'Angular';
   isDashboard: boolean = false;
+  isLoggingOut = signal(false);
 
   constructor(
     private router: Router,
     private authState: AuthStateService,
+    private loaderService: LoaderService,
   ) {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
@@ -35,7 +38,19 @@ export class AppComponent {
   }
 
   onLogout(): void {
+    if (this.isLoggingOut()) {
+      return;
+    }
+
+    this.isLoggingOut.set(true);
+    this.loaderService.show();
     this.authState.clearAuthentication();
-    this.router.navigate(['/login']);
+
+    setTimeout(() => {
+      this.router.navigate(['/login']).then(() => {
+        this.loaderService.hide();
+        this.isLoggingOut.set(false);
+      });
+    }, 400);
   }
 }

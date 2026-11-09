@@ -73,7 +73,8 @@ builder.Services.AddCors(options =>
             "http://localhost:4200"    // angular-web client
             )
             .WithMethods("GET", "POST", "PUT", "DELETE")
-            .WithHeaders("Content-Type", "Authorization");
+            .WithHeaders("Content-Type", "Authorization")
+            .AllowCredentials();
     });
 });
 

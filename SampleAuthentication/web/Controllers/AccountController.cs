@@ -68,7 +68,7 @@ namespace web.Controllers
                     if (loginResult.Data.Type.Equals("handoff", StringComparison.OrdinalIgnoreCase) &&
                     !string.IsNullOrEmpty(loginResult.Data.Handoff))
                     {
-                        var angularUrl = "https://localhost:4200/login";
+                        var angularUrl = "http://localhost:4200/login";
 
                         return Redirect($"{angularUrl}?handOff={HttpUtility.UrlEncode(loginResult.Data.Handoff)}");
                     }

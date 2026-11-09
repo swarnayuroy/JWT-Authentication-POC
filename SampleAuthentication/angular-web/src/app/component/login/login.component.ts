@@ -57,6 +57,8 @@ export class LoginComponent {
         next: (response) => {
           if (response.body?.status) {
             this.authState.setAuthenticated();
+
+            // dashboard navigation
             this.router.navigate(['/dashboard']);
           } else {
             const errorDetail = new ErrorDetailResponse();
@@ -104,13 +106,6 @@ export class LoginComponent {
         next: (response) => {
           if (response.body?.status) {
             this.authState.setAuthenticated();
-
-            const successDetail = new SuccessDetailResponse();
-            successDetail.statusCode = response.status;
-            successDetail.message =
-              response.body?.message || SystemMessage.LOGIN_SUCCESS;
-
-            this.toastService.showSuccess(successDetail);
 
             // dashboard navigation
             this.router.navigate(['/dashboard']);
