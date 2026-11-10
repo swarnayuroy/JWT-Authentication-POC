@@ -128,6 +128,33 @@ namespace TestProject.api_service_test
         }
 
         [Test]
+        public async Task Check_ReturnsFalse_IfAdminFromAngularClient()
+        {
+            //Arrange
+            var userId = Guid.NewGuid();
+            var credential = new UserCredential
+            {
+                Email = "doe.john@gmail.com",
+                Password = "TestJohn@1994",
+                Client = "angular"
+            };
+            _userDetailServiceMock.Setup(x => x.GetUserByEmail(credential.Email)).ReturnsAsync(new UserDetail
+            {
+                Id = userId.ToString(),
+                Name = "John Doe",
+                Email = credential.Email,
+                Role = "Admin"
+            });
+
+            //Act
+            var result = await _repository.CheckCredential(credential);
+
+            //Assert
+            Assert.That(result.Status, Is.False);
+            Assert.That(result.Message, Is.EqualTo("Process revoked."));
+        }
+
+        [Test]
         public async Task Check_ReturnsTrue_WhenSuccessful()
         {
             // Arrange
@@ -135,7 +162,8 @@ namespace TestProject.api_service_test
             var credential = new UserCredential
             {
                 Email = "doe.john@gmail.com",
-                Password = "TestJohn@1994"
+                Password = "TestJohn@1994",
+                Client = "mvc"
             };
 
             var expectedToken = "xxxxx.yyyyy.zzzzz";
@@ -183,6 +211,64 @@ namespace TestProject.api_service_test
             Assert.That(dataResult.Data.Handoff, Is.Empty);
 
             _jwtManagerMock.Verify(x => x.GenerateToken(user), Times.Once);
+            _accountServiceMock.Verify(x => x.Update(It.Is<Account>(
+                account => account.UserId == userId &&
+                           account.Id != Guid.Empty &&
+                           account.LoggedInAt != null)), Times.Once);
+        }
+
+        [Test]
+        public async Task Check_ReturnsTrue_WhenSuccessfulWithHandoff()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var credential = new UserCredential
+            {
+                Email = "doe.john@gmail.com",
+                Password = "TestJohn@1994",
+                Client = "mvc"
+            };
+
+            _userDetailServiceMock.Setup(x => x.GetUserByEmail(credential.Email)).ReturnsAsync(new UserDetail
+            {
+                Id = userId.ToString(),
+                Name = "John Doe",
+                Email = credential.Email,
+                Role = "User"
+            });
+
+            _accountDataServiceMock.Setup(x => x.CheckAndGetAccount(userId.ToString(), credential.Password))
+                .ReturnsAsync(new Account
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    Password = credential.Password
+                });
+
+            string expectedHandOff = Guid.NewGuid().ToString("N");
+            _accountServiceMock
+                .Setup(x => x.Update(It.IsAny<Account>()))
+                .ReturnsAsync(true);
+
+            // Act
+            var result = await _repository.CheckCredential(credential);
+
+            // Assert
+            Assert.That(result.Status, Is.True);
+            Assert.That(result, Is.TypeOf<ResponseDataDetail<LoginResult>>());
+
+            var dataResult = (ResponseDataDetail<LoginResult>)result;
+            Assert.That(dataResult.Message, Is.EqualTo("hand-off to angular client"));
+            Assert.That(dataResult.Data.Type, Is.EqualTo("handoff"));
+            Assert.That(dataResult.Data.Token, Is.Empty);
+            Assert.That(dataResult.Data.Handoff, Is.Not.Empty);
+            Assert.That(dataResult.Data.UserId, Is.EqualTo(userId.ToString()));
+
+            Assert.That(
+                _handoffManagerMock.Object.TryConsume(dataResult.Data.Handoff, out var handoffUserId),
+                Is.True);
+            Assert.That(handoffUserId, Is.EqualTo(userId));
+
             _accountServiceMock.Verify(x => x.Update(It.Is<Account>(
                 account => account.UserId == userId &&
                            account.Id != Guid.Empty &&

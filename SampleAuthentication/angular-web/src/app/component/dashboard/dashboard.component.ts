@@ -21,20 +21,18 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     const userId = this.authState.userId();
 
-    if (!userId) {
-      return;
+    if (userId) {
+      this.userService.getById(userId).subscribe({
+        next: (response) => {
+          if (response.body?.status && response.body.data) {
+            this.user = response.body.data;
+          }
+        },
+        error: (error) => {
+          console.error('Failed to load user details.', error);
+        },
+      });
     }
-
-    this.userService.getById(userId).subscribe({
-      next: (response) => {
-        if (response.body?.status && response.body.data) {
-          this.user = response.body.data;
-        }
-      },
-      error: (error) => {
-        console.error('Failed to load user details.', error);
-      },
-    });
   }
 
   get firstName(): string {
