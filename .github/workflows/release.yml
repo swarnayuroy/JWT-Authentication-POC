@@ -107,7 +107,7 @@ jobs:
       shell: pwsh
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
         name: Release ${{ steps.get_version.outputs.version }}
         body: ${{ steps.release_notes.outputs.notes }}
