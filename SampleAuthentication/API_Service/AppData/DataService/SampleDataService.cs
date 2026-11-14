@@ -614,5 +614,31 @@ namespace API_Service.AppData.DataService
             _logger.LogDetails(LogType.WARNING, $"Couldn't find any account");
             return new Models.Entities.Account();
         }
+
+        public async Task<Models.Entities.Account> GetAccountByUserId(Guid userId)
+        {
+            if (userId != Guid.Empty)
+            {
+                var dataContext = new Data();
+                var accountDetail = await (from account in _dataContextProvider.Account.AsNoTracking()
+                                           where account.UserId == userId
+                                           select new Models.Entities.Account
+                                           {
+                                               Id = account.Id,
+                                               UserId = account.UserId,
+                                               CreatedAt = account.CreatedAt,
+                                               Password = account.Password,
+                                           }).FirstOrDefaultAsync();
+
+                if (accountDetail != null)
+                {
+                    _logger.LogDetails(LogType.INFO, $"Account found");
+                    dataContext.AccountDetail = accountDetail;
+                    return dataContext.AccountDetail;
+                }
+            }
+            _logger.LogDetails(LogType.WARNING, $"Couldn't find any account");
+            return new Models.Entities.Account();
+        }
     }
 }

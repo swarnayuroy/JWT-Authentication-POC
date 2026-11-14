@@ -67,20 +67,14 @@ namespace API_Service.RepositoryLayer.Repository
             // Find account by verifying the user id and password
             _logger.LogDetails(LogType.INFO, $"Validating password for the user...");
             var account = await _accountDataService.CheckAndGetAccount(user.Id.ToString(), userCredential.Password);
-            
+
             if (account == null || account.Id == Guid.Empty)
-            {                
-                _logger.LogDetails(LogType.WARNING, "incorrect password");
-                return new ResponseDetail { Status = false, Message = "Incorrect password" };             
-            }
-
-            account.LoggedInAt = DateTime.Now;
-            if (!await _accountService.Update(account))
             {
-                _logger.LogDetails(LogType.ERROR, $"Failed to save login time for user {user.Id}");
-                return new ResponseDetail { Status = false, Message = "Some error ocurred!" };
+                _logger.LogDetails(LogType.WARNING, "incorrect password");
+                return new ResponseDetail { Status = false, Message = "Incorrect password" };
             }
 
+            // proceed with handoff when client is 'mvc' and role is 'user'
             if (userCredential.Client.Equals("mvc", StringComparison.OrdinalIgnoreCase) &&
                 user.Role.Equals("user", StringComparison.OrdinalIgnoreCase))
             {
@@ -97,8 +91,16 @@ namespace API_Service.RepositoryLayer.Repository
                         UserId = user.Id.ToString()
                     }
                 };
+            }            
+
+            account.LoggedInAt = DateTime.Now;
+            if (!await _accountService.Update(account))
+            {
+                _logger.LogDetails(LogType.ERROR, $"Failed to save login time for user {user.Id}");
+                return new ResponseDetail { Status = false, Message = "Some error ocurred!" };
             }
-            
+
+            _logger.LogDetails(LogType.INFO, $"Generating token for user, {user.Id.ToString()}...");
             string userToken = _jwtManager.GenerateToken(user);
             if (!String.IsNullOrEmpty(userToken))
             {
@@ -134,6 +136,7 @@ namespace API_Service.RepositoryLayer.Repository
                     Message = "Invalid handoff."
                 };
             }
+            _logger.LogDetails(LogType.INFO, $"Completing handoff for {handoffRequest.Handoff}...");
             if (!_handoffManager.TryConsume(handoffRequest.Handoff, out Guid userId))
             {
                 _logger.LogDetails(LogType.WARNING, "Invalid or expired handoff!");
@@ -143,7 +146,37 @@ namespace API_Service.RepositoryLayer.Repository
                     Message = "Incorrect or expired handoff."
                 };
             }
+
+            _logger.LogDetails(LogType.INFO, $"getting user by {userId.ToString()}, after handoff...");
             var user = await _userDetailService.GetUser(userId.ToString());
+            
+            if (user == null || string.IsNullOrEmpty(user.Id))
+            {
+                _logger.LogDetails(LogType.WARNING, "Failed to retrieve user information during handoff completion.");
+                return new ResponseDetail
+                {
+                    Status = false,
+                    Message = "Failed to retrieve user information."
+                };
+            }
+
+            _logger.LogDetails(LogType.INFO, $"Fetching account for the user...");
+            var account = await _accountDataService.GetAccountByUserId(userId);
+
+            if (account == null || account.Id == Guid.Empty)
+            {
+                _logger.LogDetails(LogType.WARNING, "Failed to retrieve account information");
+                return new ResponseDetail { Status = false, Message = "Failed to retrieve account information" };
+            }
+
+            account.LoggedInAt = DateTime.Now;
+            if (!await _accountService.Update(account))
+            {
+                _logger.LogDetails(LogType.ERROR, $"Failed to save login time for user, {userId.ToString()}");
+                return new ResponseDetail { Status = false, Message = "Some error ocurred!" };
+            }
+
+            _logger.LogDetails(LogType.INFO, $"Generating token for user, {userId.ToString()}...");
             string userToken = _jwtManager.GenerateToken(user);
             if (string.IsNullOrWhiteSpace(userToken))
             {
@@ -154,6 +187,8 @@ namespace API_Service.RepositoryLayer.Repository
                     Message = "Failed to generate token!"
                 };
             }
+            _logger.LogDetails(LogType.INFO, $"Generated token successfully for user, {userId.ToString()}");
+
             return new ResponseDataDetail<LoginResult>
             {
                 Status = true,

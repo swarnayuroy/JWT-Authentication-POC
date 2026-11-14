@@ -246,9 +246,6 @@ namespace TestProject.api_service_test
                 });
 
             string expectedHandOff = Guid.NewGuid().ToString("N");
-            _accountServiceMock
-                .Setup(x => x.Update(It.IsAny<Account>()))
-                .ReturnsAsync(true);
 
             // Act
             var result = await _repository.CheckCredential(credential);
@@ -268,11 +265,6 @@ namespace TestProject.api_service_test
                 _handoffManagerMock.Object.TryConsume(dataResult.Data.Handoff, out var handoffUserId),
                 Is.True);
             Assert.That(handoffUserId, Is.EqualTo(userId));
-
-            _accountServiceMock.Verify(x => x.Update(It.Is<Account>(
-                account => account.UserId == userId &&
-                           account.Id != Guid.Empty &&
-                           account.LoggedInAt != null)), Times.Once);
         }
         #endregion
 

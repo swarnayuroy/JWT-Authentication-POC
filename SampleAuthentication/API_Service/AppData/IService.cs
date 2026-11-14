@@ -21,6 +21,7 @@ namespace API_Service.AppData
     public interface IAccountService
     {
         Task<Account> GetAccountById(string id);
+        Task<Account> GetAccountByUserId(Guid userId);
         Task<Account> CheckAndGetAccount(string userEmail, string password);
     }
 }
