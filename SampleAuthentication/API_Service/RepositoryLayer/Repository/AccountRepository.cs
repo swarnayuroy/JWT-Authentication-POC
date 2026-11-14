@@ -14,7 +14,7 @@ namespace API_Service.RepositoryLayer.Repository
         private readonly IService<Account> _accountService;
         private readonly IUserDetailService _userDetailService;
         private readonly IAccountService _accountDataService;
-        private readonly HandoffManager _handoffManager;
+        private readonly IHandoffManager _handoffManager;
         private readonly IJwtManager _jwtManager;
 
         public AccountRepository(
@@ -23,7 +23,7 @@ namespace API_Service.RepositoryLayer.Repository
             IService<Account> accountService,
             IUserDetailService userDetailService,
             IAccountService accountDataService,
-            HandoffManager handoffManager,
+            IHandoffManager handoffManager,
             IJwtManager jwtManager
         )
         {
@@ -78,7 +78,7 @@ namespace API_Service.RepositoryLayer.Repository
             if (userCredential.Client.Equals("mvc", StringComparison.OrdinalIgnoreCase) &&
                 user.Role.Equals("user", StringComparison.OrdinalIgnoreCase))
             {
-                var handoff = _handoffManager.Create(Guid.Parse(user.Id.ToString()));
+                var handoff = await _handoffManager.Create(Guid.Parse(user.Id.ToString()));
                 _logger.LogDetails(LogType.INFO, "Hand-off process initiated.");
                 return new ResponseDataDetail<LoginResult>
                 {
@@ -137,7 +137,8 @@ namespace API_Service.RepositoryLayer.Repository
                 };
             }
             _logger.LogDetails(LogType.INFO, $"Completing handoff for {handoffRequest.Handoff}...");
-            if (!_handoffManager.TryConsume(handoffRequest.Handoff, out Guid userId))
+            var userId = await _handoffManager.TryConsume(handoffRequest.Handoff);
+            if (!userId.HasValue)
             {
                 _logger.LogDetails(LogType.WARNING, "Invalid or expired handoff!");
                 return new ResponseDetail
@@ -148,7 +149,7 @@ namespace API_Service.RepositoryLayer.Repository
             }
 
             _logger.LogDetails(LogType.INFO, $"getting user by {userId.ToString()}, after handoff...");
-            var user = await _userDetailService.GetUser(userId.ToString());
+            var user = await _userDetailService.GetUser(userId.Value.ToString());
             
             if (user == null || string.IsNullOrEmpty(user.Id))
             {
@@ -161,7 +162,7 @@ namespace API_Service.RepositoryLayer.Repository
             }
 
             _logger.LogDetails(LogType.INFO, $"Fetching account for the user...");
-            var account = await _accountDataService.GetAccountByUserId(userId);
+            var account = await _accountDataService.GetAccountByUserId(userId.Value);
 
             if (account == null || account.Id == Guid.Empty)
             {

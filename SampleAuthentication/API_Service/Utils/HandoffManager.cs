@@ -1,45 +1,50 @@
-﻿using System.Collections.Concurrent;
+﻿using StackExchange.Redis;
+using System.Collections.Concurrent;
 
 namespace API_Service.Utils
 {
-    public class HandoffData
+    public interface IHandoffManager
     {
-        public Guid UserId { get; set; }
-        public DateTime ExpiresAt { get; set; }
+        Task<string> Create(Guid userId);
+        Task<Guid?> TryConsume(string handoff);
     }
 
-    public class HandoffManager
+    public class HandoffManager : IHandoffManager
     {
-        private static readonly ConcurrentDictionary<string, HandoffData> _handoffs = new();
+        private readonly IDatabase _database;
+        public HandoffManager(RedisConnectionTest redisConnection)
+        {
+            _database = redisConnection.GetDatabase();
+        }        
 
-        public string Create(Guid userId)
+        public async Task<string> Create(Guid userId)
         {
             var handoff = Guid.NewGuid().ToString("N");
 
-            _handoffs[handoff] = new HandoffData
-            {
-                UserId = userId,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(2)
-            };
+            await _database.StringSetAsync(
+                handoff,
+                userId.ToString(),
+                TimeSpan.FromMinutes(2));
 
             return handoff;
         }
-        public bool TryConsume(string handoff, out Guid userId)
+        public async Task<Guid?> TryConsume(string handoff)
         {
-            userId = Guid.Empty;
-
-            if (!_handoffs.TryRemove(handoff, out var data))
+            if (string.IsNullOrWhiteSpace(handoff))
             {
-                return false;
+                return null;
             }
 
-            if (data.ExpiresAt < DateTime.UtcNow)
+            var value = await _database.StringGetDeleteAsync(handoff);
+
+            if (value.IsNullOrEmpty)
             {
-                return false;
+                return null;
             }
 
-            userId = data.UserId;
-            return true;
+            return Guid.TryParse(value.ToString(), out var userId)
+                ? userId
+                : null;
         }
     }
 }

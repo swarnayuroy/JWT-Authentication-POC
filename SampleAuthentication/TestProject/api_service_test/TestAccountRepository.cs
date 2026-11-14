@@ -23,7 +23,7 @@ namespace TestProject.api_service_test
         private Mock<IService<Account>> _accountServiceMock;
         private Mock<IUserDetailService> _userDetailServiceMock;
         private Mock<IAccountService> _accountDataServiceMock;
-        private Mock<HandoffManager> _handoffManagerMock;
+        private Mock<IHandoffManager> _handoffManagerMock;
         private Mock<IJwtManager> _jwtManagerMock = new Mock<IJwtManager>();
 
         private AccountRepository _repository;
@@ -35,7 +35,7 @@ namespace TestProject.api_service_test
             _userDetailServiceMock = new Mock<IUserDetailService>();
             _accountDataServiceMock = new Mock<IAccountService>();
             _loggerMock = new Mock<ILogger<AccountRepository>>();
-            _handoffManagerMock = new Mock<HandoffManager>();
+            _handoffManagerMock = new Mock<IHandoffManager>();
             _repository = new AccountRepository
             (
                 _loggerMock.Object, 
@@ -247,6 +247,10 @@ namespace TestProject.api_service_test
 
             string expectedHandOff = Guid.NewGuid().ToString("N");
 
+            _handoffManagerMock
+                .Setup(x => x.Create(userId))
+                .ReturnsAsync(expectedHandOff);
+
             // Act
             var result = await _repository.CheckCredential(credential);
 
@@ -261,10 +265,8 @@ namespace TestProject.api_service_test
             Assert.That(dataResult.Data.Handoff, Is.Not.Empty);
             Assert.That(dataResult.Data.UserId, Is.EqualTo(userId.ToString()));
 
-            Assert.That(
-                _handoffManagerMock.Object.TryConsume(dataResult.Data.Handoff, out var handoffUserId),
-                Is.True);
-            Assert.That(handoffUserId, Is.EqualTo(userId));
+            Assert.That(dataResult.Data.Handoff, Is.EqualTo(expectedHandOff));
+            _handoffManagerMock.Verify(x => x.Create(userId), Times.Once);
         }
         #endregion
 
