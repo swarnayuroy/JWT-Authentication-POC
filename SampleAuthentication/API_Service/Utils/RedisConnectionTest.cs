@@ -3,7 +3,7 @@ using StackExchange.Redis;
 
 namespace API_Service.Utils
 {
-    public class RedisConnectionTest
+    public class RedisConnectionTest: IAsyncDisposable
     {
         private readonly ConnectionMultiplexer _connection;
 
@@ -18,6 +18,7 @@ namespace API_Service.Utils
 
         public static async Task<RedisConnectionTest> CreateAsync(IConfiguration configuration)
         {
+            ConnectionMultiplexer? azureConnection = null;
             try
             {
                 var endpoint = configuration["Redis:Endpoint"];
@@ -32,19 +33,22 @@ namespace API_Service.Utils
                 options.Protocol = RedisProtocol.Resp3;
                 options.AbortOnConnectFail = false;
 
-                await options.ConfigureForAzureWithTokenCredentialAsync(
-                    new DefaultAzureCredential());
+                await options.ConfigureForAzureWithTokenCredentialAsync(new DefaultAzureCredential());
 
-                var connection = await ConnectionMultiplexer.ConnectAsync(options);
+                azureConnection = await ConnectionMultiplexer.ConnectAsync(options);
 
-                await connection.GetDatabase().PingAsync();
+                await azureConnection.GetDatabase().PingAsync();
 
                 Console.WriteLine("Connected to Azure Redis successfully.");
 
-                return new RedisConnectionTest(connection);
+                return new RedisConnectionTest(azureConnection);
             }
             catch (Exception)
             {
+                if (azureConnection != null)
+                {
+                    await azureConnection.DisposeAsync();
+                }
                 Console.WriteLine("Falling back to local redis...");
                 var endpoint = configuration["Redis:LocalEndpoint"];
                 if (string.IsNullOrWhiteSpace(endpoint))
@@ -82,33 +86,9 @@ namespace API_Service.Utils
             }            
         }
 
-        public async Task<bool> PingAsync()
+        public ValueTask DisposeAsync()
         {
-            var result = await GetDatabase().PingAsync();
-
-            return result >= TimeSpan.Zero;
-        }
-
-        public async Task<bool> SetGetDeleteAsync()
-        {
-            var database = GetDatabase();
-
-            var key = $"test:{Guid.NewGuid():N}";
-            var value = Guid.NewGuid().ToString();
-
-            // SET
-            await database.StringSetAsync(
-                key,
-                value,
-                TimeSpan.FromMinutes(2));
-
-            // GET
-            var retrievedValue = await database.StringGetAsync(key);
-
-            // DELETE
-            await database.KeyDeleteAsync(key);
-
-            return retrievedValue == value;
+            return _connection.DisposeAsync();
         }
     }
 }

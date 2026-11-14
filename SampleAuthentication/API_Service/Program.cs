@@ -26,8 +26,7 @@ log4net.Config.XmlConfigurator.Configure(logRepository, log4netConfigFile);
 log4net.GlobalContext.Properties["ProjectDirectory"] = projectDirectory;
 
 var builder = WebApplication.CreateBuilder(args);
-var redisConnectionTest =
-    await RedisConnectionTest.CreateAsync(builder.Configuration);
+var redisConnectionTest = await RedisConnectionTest.CreateAsync(builder.Configuration);
 
 // Add services to the container.
 builder.Logging.ClearProviders();
@@ -92,8 +91,8 @@ builder.Services.AddScoped<IUserDetailService, UserDataService>();
 builder.Services.AddScoped<IAccountService, AccountDataService>();
 
 builder.Services.AddScoped<IJwtManager, JwtManager>();
-    builder.Services.AddSingleton<IHandoffManager, HandoffManager>();
-builder.Services.AddSingleton(redisConnectionTest);
+builder.Services.AddSingleton<IHandoffManager, HandoffManager>();
+builder.Services.AddSingleton<RedisConnectionTest>(redisConnectionTest);
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
@@ -134,25 +133,6 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var redisTest = scope.ServiceProvider.GetRequiredService<RedisConnectionTest>();
-
-    var redisAvailable = await redisTest.PingAsync();
-    //var redisAvailable = await redisTest.SetGetDeleteAsync();
-
-    Console.WriteLine(
-        redisAvailable
-            ? "Redis connection successful."
-            : "Redis connection failed.");    
-    /*
-    Console.WriteLine(
-        redisAvailable
-            ? "Redis SET/GET/DELETE successful."
-            : "Redis SET/GET/DELETE failed.");
-    */
-}
-
 // Configure the HTTP request pipeline.
 app.UseApiMiddleware();
 
@@ -171,4 +151,11 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+try
+{
+    await app.RunAsync();
+}
+finally
+{
+    await redisConnectionTest.DisposeAsync();
+}
